@@ -7,3 +7,4 @@ Worked on design brief and debrief for Gabriele. Met with Vasilis to discuss the
 - Offline functionality with PWA techniques
 
 # Wednesday 30-5
+
