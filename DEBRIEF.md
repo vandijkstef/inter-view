@@ -2,11 +2,10 @@
 This document outlines the project "Inter-view", an interview tool designed for HvA researchers to conduct semi-structured interviews, and audio record the outcomes. The responses will be seperated and easily sortable/filterable afterwards to process the results.
 
 ## A note about deployment
-Since the application can process personal data and/or confidential information, measures of security are required. I have a fair understanding of security, but I'm not an expert. I will provide HTTPS/SSL connections to the (testing)server, and audio files should only be visible/downloadable on logged in users. A real long-term deployment would probably require ICT people from HvA or a company providing hosting services. All data should be processed and stored on private servers, authored by HvA. Specifically excluding cloud services like Dropbox and Google Drive. During development I will use a private server, and notify the user to use dummy data only.
+Since the application can process personal data and/or confidential information, measures of security are required. I have a fair understanding of security, but I'm not an expert. I will provide HTTPS/SSL connections to the (testing)server, and audio files should only be visible/downloadable on logged in users. A real long-term deployment would probably require ICT people from HvA or a company providing hosting services. All data should be processed and stored on private servers, authored by HvA. Specifically excluding cloud services like Dropbox and Google Drive. During development I will use a private server, and notify the user to enter dummy data only.
 
 ## A note about mobile / cross-platform
 The interface can be created responsive to screen sizes and device. Note that tapping a device can disturb the audio recording. It will likely be much harder to let the app function stable in bad network conditions. The size of the audio files will most likely be hard to handle on mobile platforms without creating a platform-specific native app. In perfect conditions, mobile platforms should function just as desktop platforms using any major browser. Based on the timeframe, mobile optimisation is definitely 'nice to have'. The focus will be on the laptop with external mic setting. 
-
 
 ## Stages
 Each interview will have 3 stages; preparation, interviewing and processing. Each of these stages are set in a different context.
@@ -53,7 +52,6 @@ After taking the interviews, the application should provide a proper way to extr
 - Provide an area to add the transcription, so all data will stay together
 
 ## Planning
-Please provide me with a time and location.
 ### 7th of June
 Interaction design on the application, basics of the 'back-end' to enter scripts and find the conducted interviews in a basic layout
 ### 12th of June
