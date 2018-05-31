@@ -1,0 +1,11 @@
+{
+	"name": "Inter-view",
+	"short_name": "Inter-view",
+	"description": "Conduct semi structured interviews",
+	"dir": "auto",
+	"lang": "en-US",
+	"display": "standalone",
+	"start_url": "/",
+	"background_color": "#FFFFFF",
+	"theme_color": "#cddc39"
+  }

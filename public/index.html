@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>TITLE</title>
+		<link rel='stylesheet' href='/css/style.css' />
+
+		<link href="/manifest.json" rel="manifest">
+	</head>
+	<body>
+		<h1>TITLE</h1>
+		<p>Welcome to TITLE</p>
+	</body>
+	<script>
+		if ('serviceWorker' in navigator) {
+			navigator.serviceWorker.register('/sw.js');
+		}
+	</script>
+</html>

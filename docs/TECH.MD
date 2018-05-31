@@ -13,3 +13,16 @@ Within this section the scripts can be created and/or changed, and responses can
 
 ## Back-end
 The actual back-end is merely a REST API to handle data storage which will be used by the front-end and administration section. It will statically serve the front-end.
+
+
+---
+
+# Notes
+Add to manifest.json]
+"icons": [
+	  {
+		"src": "/icons/github-icon.png",
+		"sizes": "512x512",
+		"type": "image/png"
+	  }
+	]
