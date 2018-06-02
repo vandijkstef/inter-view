@@ -7,7 +7,8 @@ router.get('/', function(req, res) {
 	res.sendFile(path.join(__dirname + '/public/index.html'));
 });
 
-router.get('/api', function(req, res) {
+router.post('/api', function(req, res) {
+	console.log()
 	res.json({hello: 'world'});
 });
 
