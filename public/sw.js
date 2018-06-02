@@ -1,8 +1,8 @@
 self.addEventListener('install', event => event.waitUntil(
-	caches.open('inter-view')
+	caches.open('iview')
 		.then(cache => cache.addAll([
-			// '/offline.html',
-			'/css/style.min.css',
+			'/index.html',
+			'/css/style.css',
 			// '/js/client.js'
 		]))
 		.then(self.skipWaiting())
@@ -11,7 +11,6 @@ self.addEventListener('install', event => event.waitUntil(
 
 self.addEventListener('fetch', (event) => {
 	const req = event.request;
-	console.log(req);
 	event.respondWith(
 		fetch(req)
 			.catch((err) => {
@@ -22,8 +21,8 @@ self.addEventListener('fetch', (event) => {
 });
 
 function fetchOfflinePage() {
-	return caches.open('inter-view')
-		.then(cache => cache.match('/offline.html'));
+	return caches.open('iview')
+		.then(cache => cache.match('/index.html'));
 }
 
 // function fetchCoreFile(url) {

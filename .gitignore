@@ -33,3 +33,4 @@ sessions/*.json
 *.css.map
 
 public/js/script.js
+sessions/
