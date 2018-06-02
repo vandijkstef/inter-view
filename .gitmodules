@@ -1,0 +1,3 @@
+[submodule "public/js/source/UItools"]
+	path = public/js/source/UItools
+	url = https://github.com/vandijkstef/UItools.git
