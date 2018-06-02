@@ -31,3 +31,5 @@ docs/*.pdf
 sessions/*.json
 *.css
 *.css.map
+
+public/js/script.js
