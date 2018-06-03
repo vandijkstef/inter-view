@@ -4,9 +4,12 @@
 	"private": true,
 	"scripts": {
 		"start": "npm run build && node ./bin/www",
-		"watch": "nodemon ./bin/www -i sessions/*",
+		"watch": "nodemon ./bin/www",
 		"build": "babel public/js/source/script.js --out-file public/js/script.js",
-		"dev": "npm run build && npm run watch"
+		"dev": "npm run build && npm run watch",
+		"cert": "openssl req -new -newkey rsa:2048 -nodes -out localhost.csr -keyout private.key",
+		"sign": "openssl x509 -req -in localhost.csr -signkey private.key -out server.crt",
+		"docert": "npm run cert && npm run sign"
 	},
 	"dependencies": {
 		"cookie-parser": "~1.4.3",
@@ -17,11 +20,12 @@
 		"http-errors": "~1.6.2",
 		"morgan": "~1.9.0",
 		"node-sass-middleware": "0.11.0",
-		"session-file-store": "^1.2.0"
+		"session-file-store": "^1.2.0",
+		"uniqid": "^5.0.0"
 	},
 	"nodemonConfig": {
 		"ignore": [
-			"sessions/*.json",
+			"sessions/*",
 			"public/*"
 		]
 	},
