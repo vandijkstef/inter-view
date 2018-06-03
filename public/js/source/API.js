@@ -10,10 +10,8 @@ export default class {
 		API.onload = function() {
 			console.log(API);
 			if (API.status === 200) {
-				// TODO: Test JSON parse before callback
-				let json;
 				try {
-					json = JSON.parse(API.responseText)
+					const json = JSON.parse(API.responseText)
 					return callback(json);
 				} catch (err) {
 					return callback({err: 'No JSON', data: API.responseText});

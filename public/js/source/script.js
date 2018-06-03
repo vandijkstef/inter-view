@@ -22,10 +22,27 @@ import API from './API.js';
 	// Handle login
 	function LoginHandler(e) {
 		e.preventDefault();
-		api.call({hello: 'world'}, (data) => {
+		api.call({
+			action: 'auth',
+			username: document.querySelector('input[name=username]').value,
+			password: document.querySelector('input[name=password]').value
+		}, (data) => {
+			if (data.authcode) {
+				localStorage.setItem('authcode', data.authcode);
+				console.log('Auth code received');
+			} else {
+				console.warn(data.err);
+			}
+		});
+	}
+
+	function TestAuthCode() {
+		api.call({
+			action: 'testauth',
+			authcode: localStorage.getItem('authcode')
+		}, (data) => {
 			console.log(data);
 		});
-		console.log('login');
 	}
-	
+	document.addEventListener('click', TestAuthCode);
 }
