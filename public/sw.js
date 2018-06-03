@@ -16,7 +16,7 @@ self.addEventListener('fetch', (event) => {
 			.catch((err) => {
 				console.log(err);
 				fetchOfflinePage()
-			})
+			});
 	);
 });
 
