@@ -1,48 +1,63 @@
-import UI from './UItools/UItools.js';
+// import UItools from './UItools/UItools.js'; // TODO: Rework UItools with a manager, setting up based on document
+import UIm from './UI.js';
 import API from './API.js';
 
 {
 	// App variables
 	const api = new API('api');
+	const UI = new UIm();
+	// UItools.renderText('Inter-view', document.body, '', '', 'h1');
 
-	// TODO: Decide on URL, Decide on online status, Decide on login status
-	
-	// TODO: Rework UItools with a manager, setting up based on document
+	// TODO: Create router
 
-	UI.renderText('Inter-view', document.body, '', '', 'h1');
-
-	// Login form
-	UI.render(UI.addHandler(UI.getForm('login', [
-		UI.getInput('Username', 'text', 'username'),
-		UI.getInput('Password', 'password', 'password')
-	], '/', 'Login'), LoginHandler), document.body);
-
+	// Decide on online status, Decide on login status
+	if (navigator.onLine) {
+		// TODO: Offline functionality
+		// This can only be reached if the page is loaded. It won't reach here if we disconnect after loading, we can be pretty sure the page got served by a serviceworker
+		// TODO: Can we 'assume' login?
+		// TODO: Do we have cached scripts?
+		// Note to self: Online mode can only be enabled by reloading the page
+	} else {
+		// Decide on login status
+		console.log('here');
+		if (!localStorage.getItem('authcode')) {
+			console.log('No Auth code, lets login');
+			UI.RenderLogin();
+		} else {
+			TestAuthCode((status) => {
+				if (!status) {
+					console.log('Auth code invalid, lets login again');
+					localStorage.removeItem('authcode');
+					UI.RenderLogin();
+				} else {
+					console.log('Seems like we are safely logged in');
+				}
+			});
+		}
+	}
 
 	// Functions (TODO: maybe set them external?)
 	// Handle login
-	function LoginHandler(e) {
-		e.preventDefault();
-		api.call({
-			action: 'auth',
-			username: document.querySelector('input[name=username]').value,
-			password: document.querySelector('input[name=password]').value
-		}, (data) => {
-			if (data.authcode) {
-				localStorage.setItem('authcode', data.authcode);
-				console.log('Auth code received');
-			} else {
-				console.warn(data.err);
-			}
-		});
-	}
+	
 
-	function TestAuthCode() {
+	function TestAuthCode(callback) {
 		api.call({
 			action: 'testauth',
 			authcode: localStorage.getItem('authcode')
 		}, (data) => {
-			console.log(data);
+			return callback(data.status);
 		});
 	}
-	document.addEventListener('click', TestAuthCode);
+
 }
+
+// TODO: Notification thingy
+// Create div in a corner to place other divs in
+// Connect to UI?!
+
+// TODO: PE Form building -> Input type file + record attrib
+// Dus.. Alles onder elkaar zetten als 1 form
+
+// TODO: Server-side/client-side template literal thingies
+
+// TODO: Create loading spinner/icon/smthing

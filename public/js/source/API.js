@@ -1,5 +1,5 @@
 export default class {
-	constructor(API) {
+	constructor(API = 'api') {
 		this.server = 'http://localhost:3000/' + API; // TODO: Fix url
 	}
 
@@ -11,7 +11,7 @@ export default class {
 			console.log(API);
 			if (API.status === 200) {
 				try {
-					const json = JSON.parse(API.responseText)
+					const json = JSON.parse(API.responseText);
 					return callback(json);
 				} catch (err) {
 					return callback({err: 'No JSON', data: API.responseText});
