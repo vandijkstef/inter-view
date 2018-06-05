@@ -15,8 +15,8 @@ self.addEventListener('fetch', (event) => {
 		fetch(req)
 			.catch((err) => {
 				console.log(err);
-				fetchOfflinePage()
-			});
+				fetchOfflinePage();
+			})
 	);
 });
 
