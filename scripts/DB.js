@@ -16,14 +16,16 @@ class DB {
 			callback = columns;
 			columns = '*';
 		}
-		let query = `SELECT ${columns} FROM ${table}`;
+		let query = `SELECT ? FROM ??`;
 		if (where) {
 			if (typeof where === 'function') {
 				callback = where;
 			} else {
-				query += ` WHERE ${where}`;
+				query += ` WHERE ??`;
+				// TODO: Expand where object into a safe queryString
 			}
 		}
+		query = mysql.format(query, [columns, table, where]);
 		console.log(query);
 		this.connection.query(query, (error, results) => { // TODO: Formatting of SQL string
 			if (error) throw error;
