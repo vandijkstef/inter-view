@@ -1,11 +1,11 @@
 export default class {
 	constructor(API = 'api') {
-		this.server = 'http://localhost:3000/' + API; // TODO: Fix url
+		this.server = window.location.href + API;
 	}
 
 	call(data, callback) {
 		const API = new XMLHttpRequest();
-		API.open('POST', this.server); // TODO: Access token
+		API.open('POST', this.server); 
 		API.setRequestHeader('Content-Type', 'application/json');
 		API.onload = function() {
 			console.log(API);
