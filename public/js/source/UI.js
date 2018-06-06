@@ -9,20 +9,21 @@ export default class {
 
 		// Build the base page (hello function?)
 		this.body = document.body;
-		this.header = UItools.render(UItools.createElement('', '', 'header'), document.body, true);
+		// this.header = UItools.render(UItools.createElement('', '', 'header'), document.body, true);
 		this.docTitle = document.querySelector('title');
-		this.pageTitle = UItools.render(			UItools.getText('', '', '', 'h1'),			this.header, true);
+		// this.pageTitle = UItools.render(UItools.getText('', '', '', 'h1'), this.header, true);
 		this.main = UItools.render(UItools.createElement('content', '', 'main'), document.body, true);
 		this.SetTitle('test a title');
 	}
 
 	Clear(target) {
 		target.innerHTML = '';
+		this.main.classList.remove('login');
 	}
 
 	SetTitle(string) {
 		this.docTitle.innerText = `${string} | Inter-view`;
-		this.pageTitle.innerText = string;
+		// this.pageTitle.innerText = string;
 	}
 	
 	Notify(message, type) {
@@ -46,15 +47,17 @@ export default class {
 
 	RenderLogin() {
 		this.Clear(this.main);
+		this.main.classList.add('login');
 		UItools.render(
 			UItools.addHandler(
 				UItools.getForm(
 					'login', [
-						UItools.getInput('Username', 'text', 'username'),
-						UItools.getInput('Password', 'password', 'password')
+						UItools.getImage('/img/logo.svg', 'Inter-view Logo'),
+						UItools.getInput(UItools.getLabel('Username'), 'text', 'username'),
+						UItools.getInput(UItools.getLabel('Password'), 'password', 'password')
 					],
 					'/',
-					'Login'
+					UItools.getInput('', 'submit', '', 'Login', '', 'shadowed')
 				),
 				this.handlers.LoginHandler
 			),
