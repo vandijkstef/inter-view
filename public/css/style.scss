@@ -7,10 +7,23 @@ $bred: rgb(137, 6, 86);
 $orange: rgb(239, 166, 29);
 $yellow: rgb(255, 210, 0);
 
+$black: rgb(0, 0, 0);
+$white: rgb(255, 255, 255);
+$grey: rgb(112, 112, 112);
+
+$trans: .25s;
+
+// TODO: Critical CSS Rendering
+
+* {
+	box-sizing: border-box;
+	font-family: Open Sans, Helvetica, Arial, sans-serif;
+}
+
 body {
-	background-color: rgba($main, 0.1);
+	background-color: rgba($main, 0.2);
 	padding: 50px;
-	font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
+	font-size: 1.1em;
 }
 
 #notify {
@@ -23,11 +36,54 @@ body {
 }
 
 .content {
-	background-color: white;
+	background-color: $white;
 	display: block;
 	width: auto;
-	padding: 2rem;
+	padding: 2rem 3rem;
 	border-radius: .3rem;
 	margin: 2em auto;
-	text-align: center;
+	box-shadow: 0 3px 6px rgba($main, .2);
+	&.login {
+		max-width: 24em;
+		img {
+			max-width: 18em;
+			display: block;
+			margin: 0 auto 2em;
+		}
+	}
+}
+
+input {
+	width: 100%;
+	font-size: 1.2em;
+	padding: .5em;
+	margin-bottom: 1em;
+	margin-top: .5em;
+}
+
+label {
+	color: $grey;
+	font-size: .95em;
+	margin-bottom: .5em;
+}
+
+.button, input[type=submit], button {
+	background-color: $green;
+	color: $white;
+	font-size: .9em;
+	transition: background-color $trans;
+	border: none;
+	&:hover, &:focus {
+		background-color: lighten($green, 4);
+	}
+	&:focus {
+		outline: none;
+		text-decoration: underline;
+	}
+	&.shadowed {
+		box-shadow: 0 0.1em .4em darken($grey, 10);
+		&:active {
+			box-shadow: 0 0 .1em darken($grey, 10);
+		}
+	}
 }
