@@ -3,6 +3,7 @@ This document comtains notes regarding the design.
 
 ## General notes
 Please note that the complete design is a 'guide' for the contents per page and flow of the application. Exact measurements will differ based on window/screen size and device. Form fields will be created in the correct datatype and validation will be demoed in the browser (probably next meeting Tuesday).
+Lightblue areas should be seen as scrollable areas.
 
 ## Login screen
 Will be 'skipped' when the app is functioning offline. The app will assume your identity based on the last visit.
