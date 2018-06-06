@@ -36,3 +36,4 @@ public/js/script.js
 sessions/
 
 .env
+*.bak
