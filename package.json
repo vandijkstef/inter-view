@@ -11,17 +11,21 @@
 		"sign": "openssl x509 -req -in localhost.csr -signkey private.key -out server.crt",
 		"docert": "npm run cert && npm run sign"
 	},
+	"engines" : { 
+		"node" : ">=10" 
+	}, 
 	"dependencies": {
 		"cookie-parser": "~1.4.3",
 		"debug": "~2.6.9",
+		"dotenv": "^6.0.0",
 		"ejs": "~2.5.7",
 		"express": "~4.16.0",
 		"express-session": "^1.15.6",
 		"http-errors": "~1.6.2",
 		"morgan": "~1.9.0",
+		"mysql": "^2.15.0",
 		"node-sass-middleware": "0.11.0",
-		"session-file-store": "^1.2.0",
-		"uniqid": "^5.0.0"
+		"session-file-store": "^1.2.0"
 	},
 	"nodemonConfig": {
 		"ignore": [
