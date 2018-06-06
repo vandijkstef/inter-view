@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const path = require('path');
-const uniqid = require('uniqid');
+const DB = require('../scripts/DB.js');
+const crypto = require('crypto');
 
 /* GET home page. */
 router.get('/', function(req, res) {
@@ -14,27 +15,40 @@ router.post('/api', function(req, res) {
 	};
 	switch (req.body.action) {
 	case 'auth':
-		if (req.session.authcode) {
-			data.err = 'Authcode already set in session';
-			data.authcode = req.session.authcode;
+		if (req.session.user) {
+			data.err = 'User already logged in';
+			data.status = true;
 			res.json(data);
-		} else if (req.body.username) {
-			req.session.authcode = uniqid();
-			req.session.save((err) => {
-				if (err) {
-					console.log(err);
+		} else if (req.body.username && req.body.password) {
+			const db = new DB();
+			const hash = crypto.createHmac('sha256', process.env.SECRET).update(req.body.password).digest('hex');
+			db.Select('users', `username='${req.body.username}' AND password='${hash}'`, (userData) => {
+				if (userData.length === 1) {
+					req.session.user = {
+						name: userData[0].displayname
+					};
+					data.status = true;
+					data.user = req.session.user;
+					req.session.save((err) => {
+						if (err) {
+							console.log(err);
+							res.json(data);
+						} else {
+							res.json(data);
+						}
+					});
 				} else {
-					data.authcode = req.session.authcode;
+					data.err = 'Invalid login';
 					res.json(data);
 				}
 			});
 		} else {
-			data.err = 'Invalid login';
+			data.err = 'Invalid login data';
 			res.json(data);
 		}
 		break;
 	case 'testauth':
-		if (req.session.authcode === req.body.authcode) {
+		if (req.session.user) {
 			data.status = true;
 		}
 		res.json(data);

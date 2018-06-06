@@ -11,39 +11,35 @@ import API from './API.js';
 	// TODO: Create router
 
 	// Decide on online status, Decide on login status
-	if (navigator.onLine) {
+	if (!navigator.onLine) {
 		// TODO: Offline functionality
 		// This can only be reached if the page is loaded. It won't reach here if we disconnect after loading, we can be pretty sure the page got served by a serviceworker
 		// TODO: Can we 'assume' login?
 		// TODO: Do we have cached scripts?
 		// Note to self: Online mode can only be enabled by reloading the page
+		UI.RenderHome();
 	} else {
 		// Decide on login status
-		console.log('here');
-		if (!localStorage.getItem('authcode')) {
-			console.log('No Auth code, lets login');
-			UI.RenderLogin();
-		} else {
-			TestAuthCode((status) => {
-				if (!status) {
-					console.log('Auth code invalid, lets login again');
-					localStorage.removeItem('authcode');
-					UI.RenderLogin();
-				} else {
-					console.log('Seems like we are safely logged in');
-				}
-			});
-		}
+		TestAuth((status) => {
+			console.log(status);
+			if (!status) {
+				UI.RenderLogin();
+			} else {
+				console.log('Seems like we are safely logged in');
+				UI.Notify('Seems like we are logged in?');
+				UI.Notify('Seems like we are logged in??');
+				UI.RenderHome();
+			}
+		});
 	}
 
 	// Functions (TODO: maybe set them external?)
 	// Handle login
 	
 
-	function TestAuthCode(callback) {
+	function TestAuth(callback) {
 		api.call({
-			action: 'testauth',
-			authcode: localStorage.getItem('authcode')
+			action: 'testauth'
 		}, (data) => {
 			return callback(data.status);
 		});
