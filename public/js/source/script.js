@@ -1,4 +1,3 @@
-// import UItools from './UItools/UItools.js'; // TODO: Rework UItools with a manager, setting up based on document
 import UIm from './UI.js';
 import API from './API.js';
 
@@ -8,7 +7,7 @@ import API from './API.js';
 	const UI = new UIm();
 	// UItools.renderText('Inter-view', document.body, '', '', 'h1');
 
-	// TODO: Create router
+	// TODO: Create router, or.. do I need that?
 
 	// Decide on online status, Decide on login status
 	if (!navigator.onLine) {
