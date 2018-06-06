@@ -1,13 +1,14 @@
-$main: rgba(37, 22, 122, 1);
-$lblue: rgba(0, 167, 211, 1);
-$dblue: rgba(45, 108, 192, 1);
-$green: rgba(122, 161, 0, 1);
-$red: rgba(211, 17, 69, 1);
-$bred: rgba(137, 6, 86, 1);
-$orange: rgba(239, 166, 29, 1);
-$yellow: rgba(255, 210, 0, 1);
+$main: rgb(37, 22, 122);
+$lblue: rgb(0, 167, 211);
+$dblue: rgb(45, 108, 192);
+$green: rgb(122, 161, 0);
+$red: rgb(211, 17, 69);
+$bred: rgb(137, 6, 86);
+$orange: rgb(239, 166, 29);
+$yellow: rgb(255, 210, 0);
 
 body {
+	background-color: rgba($main, 0.1);
 	padding: 50px;
 	font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
 }
@@ -19,4 +20,14 @@ body {
     position: absolute;
     right: 0;
     bottom: 0;
+}
+
+.content {
+	background-color: white;
+	display: block;
+	width: auto;
+	padding: 2rem;
+	border-radius: .3rem;
+	margin: 2em auto;
+	text-align: center;
 }

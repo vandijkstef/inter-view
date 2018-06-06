@@ -12,7 +12,7 @@ export default class {
 		this.header = UItools.render(UItools.createElement('', '', 'header'), document.body, true);
 		this.docTitle = document.querySelector('title');
 		this.pageTitle = UItools.render(			UItools.getText('', '', '', 'h1'),			this.header, true);
-		this.main = UItools.render(UItools.createElement('', '', 'main'), document.body, true);
+		this.main = UItools.render(UItools.createElement('content', '', 'main'), document.body, true);
 		this.SetTitle('test a title');
 	}
 
