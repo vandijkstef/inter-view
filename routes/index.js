@@ -22,7 +22,7 @@ router.post('/api', function(req, res) {
 		} else if (req.body.username && req.body.password) {
 			const db = new DB();
 			const hash = crypto.createHmac('sha256', process.env.SECRET).update(req.body.password).digest('hex');
-			db.Select('users', `username='${req.body.username}' AND password='${hash}'`, (userData) => {
+			db.Select('users', {username: req.body.username, password: hash}, (userData) => {
 				if (userData.length === 1) {
 					req.session.user = {
 						name: userData[0].displayname
