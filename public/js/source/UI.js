@@ -21,19 +21,50 @@ export default class {
 	}
 
 	SetTitle(string) {
-		this.docTitle.innerText = string;
+		this.docTitle.innerText = `${string} | Inter-view`;
 		this.pageTitle.innerText = string;
+	}
+	
+	Notify(message, type) {
+		if (!this.notify) {
+			this.notify = UItools.render(UItools.createElement('container', 'notify'), document.body, true);
+		}
+		UItools.render(
+			UItools.addHandler(
+				UItools.getText(message),
+				this.NotifyDestroy
+			),
+			this.notify,
+			type,
+			true
+		);
+	}
+
+	NotifyDestroy(e) {
+		e.target.remove();
 	}
 
 	RenderLogin() {
 		this.Clear(this.main);
-		UItools.render(UItools.addHandler(UItools.getForm('login', [
-			UItools.getInput('Username', 'text', 'username'),
-			UItools.getInput('Password', 'password', 'password')
-		], '/', 'Login'), this.handlers.LoginHandler), this.main);
+		UItools.render(
+			UItools.addHandler(
+				UItools.getForm(
+					'login', [
+						UItools.getInput('Username', 'text', 'username'),
+						UItools.getInput('Password', 'password', 'password')
+					],
+					'/',
+					'Login'
+				),
+				this.handlers.LoginHandler
+			),
+			this.main
+		);
 	}
 
-
-	
+	RenderHome() {
+		this.Clear(this.main);
+		UItools.renderText('Home', this.main);
+	}
 
 }

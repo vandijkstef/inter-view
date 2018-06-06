@@ -11,3 +11,12 @@ body {
 	padding: 50px;
 	font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
 }
+
+#notify {
+	display: flex;
+	flex-direction: column-reverse;
+    background-color: red;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
