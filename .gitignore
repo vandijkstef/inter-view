@@ -34,3 +34,5 @@ sessions/*.json
 
 public/js/script.js
 sessions/
+
+.env
