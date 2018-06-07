@@ -25,9 +25,9 @@ import API from './API.js';
 				UI.RenderLogin();
 			} else {
 				console.log('Seems like we are safely logged in');
+				UI.RenderHome();
 				UI.Notify('Seems like we are logged in?');
 				UI.Notify('Seems like we are logged in??');
-				UI.RenderHome();
 			}
 		});
 	}
