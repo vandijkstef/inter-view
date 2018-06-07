@@ -12,6 +12,7 @@ $white: rgb(255, 255, 255);
 $grey: rgb(112, 112, 112);
 
 $trans: .25s;
+$radius: .3rem;
 
 // TODO: Critical CSS Rendering
 
@@ -22,7 +23,7 @@ $trans: .25s;
 
 body {
 	background-color: rgba($main, 0.2);
-	padding: 50px;
+	margin: 1rem;
 	font-size: 1.1em;
 }
 
@@ -32,23 +33,48 @@ body {
     background-color: red;
     position: absolute;
     right: 0;
-    bottom: 0;
+	bottom: 0;
+	border-radius: 0 0 $radius 0;
 }
 
 .content {
+	position: relative;
 	background-color: $white;
-	display: block;
+	display: grid;
+    grid-template-rows: 4em;
 	width: auto;
-	padding: 2rem 3rem;
-	border-radius: .3rem;
-	margin: 2em auto;
+	height: 96.5vh;
+	padding: 1rem;
+	border-radius: $radius;
+	margin: 0 auto;
 	box-shadow: 0 3px 6px rgba($main, .2);
 	&.login {
+		display: block;
+		height: auto;
 		max-width: 24em;
+		padding: 2rem 3rem;
 		img {
 			max-width: 18em;
 			display: block;
 			margin: 0 auto 2em;
+		}
+	}
+}
+
+header {
+	display: flex;
+	align-items: center;
+	img {
+		max-width: 12em;
+	}
+	h1 {
+		font-size: 1.2em;
+		flex-grow: 2;
+		&::before {
+			content: "|";
+			color: $grey;
+			opacity: .5;
+			margin-right: .8rem;
 		}
 	}
 }
@@ -67,12 +93,32 @@ label {
 	margin-bottom: .5em;
 }
 
+.grid {
+	display: grid;
+	max-height: 85vh; // This would be content area - header
+	&.col-50 {
+		grid-template-columns: 50% 1fr;
+		&.split {
+			grid-template-columns: 47.5% 5% 47.5%;
+		}
+	}
+}
+
+.scrollwindow {
+	background-color: rgba($main, .05);
+	overflow-y: scroll;
+	max-height: inherit;
+	padding: .6rem;
+}
+
 .button, input[type=submit], button {
 	background-color: $green;
 	color: $white;
-	font-size: .9em;
+	font-size: 1.2em;
+	padding: .8rem;
 	transition: background-color $trans;
 	border: none;
+	width: 100%;
 	&:hover, &:focus {
 		background-color: lighten($green, 4);
 	}
@@ -84,6 +130,12 @@ label {
 		box-shadow: 0 0.1em .4em darken($grey, 10);
 		&:active {
 			box-shadow: 0 0 .1em darken($grey, 10);
+		}
+	}
+	&.secondary {
+		background-color: $main;
+		&:hover, &:focus {
+			background-color: lighten($main, 8);
 		}
 	}
 }
