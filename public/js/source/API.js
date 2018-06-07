@@ -10,12 +10,13 @@ export default class {
 		API.onload = function() {
 			console.log(API);
 			if (API.status === 200) {
+				let json;
 				try {
-					const json = JSON.parse(API.responseText);
-					return callback(json);
+					json = JSON.parse(API.responseText);
 				} catch (err) {
 					return callback({err: 'No JSON', data: API.responseText});
 				}
+				return callback(json);
 			} else {
 				console.warn('API error: ' + API.status);
 			}

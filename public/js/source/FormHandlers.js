@@ -19,9 +19,15 @@ export default class {
 			} else if (data.user) {
 				localStorage.setItem('user', JSON.stringify(data.user));
 				console.log('User data received');
+				window.UI.RenderHome(); // This works, but can be a potential security risk? Well, a little, since it will only render base layout and serve cached data (which is served anyway in offline mode) and result pages won't be cached anyway.
 			} else {
 				console.warn('Undefined error');
 			}
 		});
+	}
+
+	EditScript(e) {
+		e.preventDefault();
+		window.UI.RenderScriptEdit();
 	}
 }
