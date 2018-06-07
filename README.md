@@ -2,7 +2,7 @@
 ![Logo of the project](./doc/github-icon.png)
 # Inter-view
 > Documentation is found in the `/docs` folder
-
+Inter-view is a browser tool that enables you to audio record (semi-)structured interviews in intervals. It requires a Node.JS back-end to set up, but is able to function offline afterwards using a serviceworker.
 <!-- Add a nice image here at the end of the week, showing off your shiny frontend 📸 -->
 
 <!-- Maybe a table of contents here? 📚 -->

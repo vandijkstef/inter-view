@@ -26,3 +26,8 @@ Add to manifest.json]
 		"type": "image/png"
 	  }
 	]
+
+Apparently theres something called OPUS audio codec, which is used by software like discord. It can provide better audio quality on lower bitrates, especially compared to WAV, but browser support is limited; It doesn't work in Safari on either desktop and mobile platform (thus also Chrome on iOS). Strangely enough, it is supported by Edge. Obivously, IE is not supported.
+
+
+TODO: IndexDB/PouchDB
