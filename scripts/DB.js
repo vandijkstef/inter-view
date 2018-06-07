@@ -10,23 +10,38 @@ class DB {
 		});
 	}
 
-	Select(table, where, columns = '*', callback) {
+	Select(table, where, callback) {
 		this.connection.connect();
-		if (typeof columns === 'function') {
-			callback = columns;
-			columns = '*';
-		}
-		let query = `SELECT ? FROM ??`;
+		// if (typeof columns === 'function') {
+		// 	callback = columns;
+		// 	columns = '*';
+		// }
+		let query = `SELECT * FROM ??`;
 		if (where) {
 			if (typeof where === 'function') {
 				callback = where;
 			} else {
-				query += ` WHERE ??`;
-				// TODO: Expand where object into a safe queryString
+				query += ` WHERE `;
+				if (typeof where === 'object') {
+					let string = '';
+					let first = true;
+					for (const col in where) {
+						if (first) {
+							first = false;
+						} else {
+							string += 'AND ';
+						}
+						const key = mysql.escapeId(col);
+						const value = mysql.escape(where[col]);
+						string += `${key}=${value}`;
+						string += ' ';
+					}
+					where = string;
+					query += string;
+				}
 			}
 		}
-		query = mysql.format(query, [columns, table, where]);
-		console.log(query);
+		query = mysql.format(query, [table, where]);
 		this.connection.query(query, (error, results) => { // TODO: Formatting of SQL string
 			if (error) throw error;
 			callback(results);
