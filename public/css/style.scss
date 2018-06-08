@@ -73,6 +73,7 @@ img {
 	margin: 0 auto;
 	box-shadow: 0 3px 6px rgba($main, .2);
 	&.login {
+		position: unset;
 		display: block;
 		height: auto;
 		max-width: 24em;
@@ -143,6 +144,13 @@ label {
 	}
 }
 
+.flex {
+	display: flex;
+	.center {
+		align-items: center;
+	}
+}
+
 .scrollwindow {
 	background-color: rgba($main, .05);
 	overflow-y: scroll;
@@ -178,5 +186,16 @@ label {
 		&:hover, &:focus {
 			background-color: lighten($main, 8);
 		}
+	}
+}
+
+.icon {
+	&.point {
+		fill: $grey;
+		max-width: 70%;
+		margin: 0 auto;
+	}
+	&.mic {
+		width: 2.6em;
 	}
 }

@@ -60,8 +60,16 @@ export default class {
 		return UItools.getImage('/img/logo.svg', 'Inter-view Logo');
 	}
 	
-	GetIcon(icon) {
-		return UItools.getImage(`/img/icons/svg${icon}.svg`); // TODO: Make nicename from icon filename for title attribute
+	GetIcon(icon, classes, id) {
+		classes = UItools.forceArray(classes);
+		classes.push('icon');
+		return UItools.getImage(`/img/icons/svg/${icon}.svg`, 'TODO: Title from filename', classes, id);
+	}
+
+	GetIconSVG(icon, classes, id) { // TODO: GetIconSVG -> Get actual SVG data, don't wrap in image
+		classes = UItools.forceArray(classes);
+		classes.push('icon');
+		return UItools.getImage(`/img/icons/svg/${icon}.svg`, 'TODO: Title from filename', classes, id);
 	}
 
 	GetHeader(title, nav, micEnabled, micConfigurable) {
@@ -82,7 +90,7 @@ export default class {
 
 	GetMic(enabled, configurable) {
 		console.log(enabled, configurable);
-		return UItools.wrap(UItools.getText('mic'));
+		return UItools.wrap(this.GetIcon('021-microphone', 'mic'));
 	}
 	
 	GetScrollWindow(content, id) {
@@ -139,7 +147,11 @@ export default class {
 						this.GetScrollWindow(
 							UItools.getButton('New Script', ['secondary', 'shadowed'], '', this.handlers.EditScript)
 						),
-						UItools.getText('=>'),
+						// UItools.getText('=>'),
+						UItools.wrap(
+							this.GetIcon('014-next', 'point'),
+							['flex', 'center']
+						),
 						this.GetScrollWindow(
 							UItools.getText('Script preview')
 						)
@@ -152,8 +164,8 @@ export default class {
 	}
 
 	RenderScriptEdit(id) {
+		// Let's always re-fetch the data. I don't want this to work offline, and this way I'm revalidating cached data (should you pop online after having the home window opened in offline mode, though I'll probably ask you to reload anyway)
 		this.Clear(this.main);
-		console.log(id); // TODO: Fetch ID
 		UItools.render(
 			[
 				this.GetHeader('New Script'),
@@ -168,10 +180,14 @@ export default class {
 										UItools.getInput(UItools.getLabel('Description'), 'textarea', 'description'),								
 									]
 								),
-								this.GetScrollWindow(
+								UItools.wrap(
 									[
-										UItools.getText('meta'),
-										UItools.getButton('Add Meta', ['secondary', 'shadowed'], '', this.handlers.AddMeta)
+										UItools.getText('Metadata', '', '', 'h2'),
+										this.GetScrollWindow(
+											[
+												UItools.getButton('Add Meta', ['secondary', 'shadowed'], '', this.handlers.AddMeta)
+											]
+										)
 									]
 								)
 							],
