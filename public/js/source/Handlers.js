@@ -30,4 +30,12 @@ export default class {
 		e.preventDefault();
 		window.UI.RenderScriptEdit();
 	}
+
+	AddMeta(e) {
+		console.log('Adding meta', e.target.parentElement);
+	}
+
+	AddQuestion(e) {
+		console.log('Adding question', e.target.parentElement);
+	}
 }
