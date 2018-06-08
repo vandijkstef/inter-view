@@ -1,5 +1,5 @@
 import UItools from './UItools/UItools.js';
-import FormHandlers from './FormHandlers.js';
+import FormHandlers from './Handlers.js';
 
 export default class {
 
