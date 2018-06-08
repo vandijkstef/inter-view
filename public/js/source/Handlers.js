@@ -1,4 +1,5 @@
 import API from './API.js';
+import UItools from './UItools/UItools.js';
 
 export default class {
 	constructor() {
@@ -28,14 +29,30 @@ export default class {
 
 	EditScript(e) {
 		e.preventDefault();
+		// TODO: Fetch ID (just pass false/undefined for new script)
 		window.UI.RenderScriptEdit();
 	}
 
 	AddMeta(e) {
+		e.preventDefault();
 		console.log('Adding meta', e.target.parentElement);
+		// TODO: Fix something with naming/ID
+		UItools.render(
+			[
+				UItools.getInput(false, 'text', 'metaID', '', 'Meta Key'),
+				UItools.getInput(false, 'select', 'metaType', [{value: 'text'}, {value:'email'}], 'Meta Key')
+			],
+			e.target.parentElement
+		);
 	}
 
 	AddQuestion(e) {
+		e.preventDefault();
 		console.log('Adding question', e.target.parentElement);
+		// TODO: Fix something with name/questionID
+		UItools.render(
+			UItools.getInput(false, 'text', 'questionID', '', 'Enter question'),
+			e.target.parentElement
+		);
 	}
 }
