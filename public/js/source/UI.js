@@ -48,8 +48,14 @@ export default class {
 	}
 
 	GetHeader(title, nav, micEnabled, micConfigurable) {
-		return UItools.wrap([this.GetLogo(), UItools.getText(title, '', '', 'h1'), this.GetNav(nav), this.GetMic(micEnabled, micConfigurable)], '', '', 'header');
-		
+		return UItools.wrap(
+			[
+				this.GetLogo(),
+				UItools.getText(title, '', '', 'h1'),
+				this.GetNav(nav),
+				this.GetMic(micEnabled, micConfigurable)
+			],
+			'', '', 'header');
 	}
 
 	GetNav(nav) {
@@ -133,7 +139,36 @@ export default class {
 		console.log(id); // TODO: Fetch ID
 		UItools.render(
 			[
-				this.GetHeader('New Script')
+				this.GetHeader('New Script'),
+				UItools.getForm('name',
+					[
+						UItools.wrap(
+							[
+								UItools.wrap(
+									[
+										UItools.getInput(false, 'hidden', 'scriptID', id),
+										UItools.getInput(UItools.getLabel('Title'), 'text', 'title'),
+										UItools.getInput(UItools.getLabel('Description'), 'textarea', 'description'),								
+									]
+								),
+								this.GetScrollWindow(
+									[
+										UItools.getText('meta'),
+										UItools.getButton('Add Meta', ['secondary', 'shadowed'], '', this.handlers.AddMeta)
+									]
+								)
+							],
+							['grid', 'row-50']
+						),
+						this.GetScrollWindow(
+							[
+								UItools.getText('questions'),
+								UItools.getButton('Add Question', ['secondary', 'shadowed'], '', this.handlers.AddQuestion)
+							]
+						)
+					], '/', false,
+					['grid', 'col-50']
+				)
 			],
 			this.main
 		);
