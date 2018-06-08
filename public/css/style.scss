@@ -27,6 +27,30 @@ body {
 	font-size: 1.1em;
 }
 
+img {
+	max-width: 100%;
+}
+
+*:focus {
+	outline-color: $lblue;
+}
+
+.dev {
+	position: fixed;
+    bottom: 0;
+	width: 100%;
+	color: red;
+	font-style: italic;
+	font-size: 1.2em;
+	text-transform: uppercase;
+	text-align: center;
+	text-shadow: 0px 0px 2px black;
+	& + .dev {
+		top: 0;
+		bottom: none;
+	}
+}
+
 #notify {
 	display: flex;
 	flex-direction: column-reverse;

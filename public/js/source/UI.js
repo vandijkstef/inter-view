@@ -20,6 +20,23 @@ export default class {
 		this.docTitle = document.querySelector('title');
 		this.SetTitle('test a title');
 
+		// TODO: Remove post-dev, maybe hookup to smth server-ish? Or add actual live host to this? (Warning, subdomain hosting!)
+		if (window.location.hostname !== 'localhost') {
+			UItools.render(
+				[
+					UItools.wrap(
+						UItools.getText('This is a development version: Please use dummy data only!'),
+						'dev'
+					),
+					UItools.wrap(
+						UItools.getText('This is a development version: Please use dummy data only!'),
+						'dev'
+					)
+				],
+				document.body
+			);
+		}
+
 	}
 
 	Clear(target) {
