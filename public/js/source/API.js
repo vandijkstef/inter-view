@@ -8,7 +8,6 @@ export default class {
 		API.open('POST', this.server); 
 		API.setRequestHeader('Content-Type', 'application/json');
 		API.onload = function() {
-			console.log(API);
 			if (API.status === 200) {
 				let json;
 				try {
