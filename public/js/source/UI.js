@@ -84,12 +84,12 @@ export default class {
 	}
 
 	GetNav(nav) {
-		console.log(nav);
+		console.log('GetNav', nav);
 		return UItools.wrap(UItools.getText('nav'));
 	}
 
 	GetMic(enabled, configurable) {
-		console.log(enabled, configurable);
+		console.log('GetMic', enabled, configurable);
 		return UItools.wrap(this.GetIcon('021-microphone', 'mic'));
 	}
 	
@@ -107,9 +107,7 @@ export default class {
 				UItools.getText(message),
 				this.NotifyDestroy
 			),
-			this.notify,
-			type,
-			true
+			this.notify
 		);
 	}
 
@@ -188,16 +186,29 @@ export default class {
 												UItools.getButton('Add Meta', ['secondary', 'shadowed'], '', this.handlers.AddMeta)
 											]
 										)
-									]
+									],
+									['grid', 'row-TWB']
 								)
 							],
 							['grid', 'row-50']
 						),
-						this.GetScrollWindow(
+						UItools.wrap(
 							[
-								UItools.getText('questions'),
-								UItools.getButton('Add Question', ['secondary', 'shadowed'], '', this.handlers.AddQuestion)
-							]
+								UItools.getText('Questions', '', '', 'h2'),
+								this.GetScrollWindow(
+									[
+										UItools.getButton('Add Question', ['secondary', 'shadowed'], '', this.handlers.AddQuestion)
+									]
+								),
+								UItools.wrap(
+									[
+										UItools.getButton('Cancel', ['secondary', 'shadowed'], '', this.handlers.CancelEdit),
+										UItools.getButton('Store Script', 'shadowed', '', this.handlers.StoreScript)
+									],
+									['buttonRow']
+								)
+							],
+							['grid', 'row-TWB']
 						)
 					], '/', false,
 					['grid', 'col-50']

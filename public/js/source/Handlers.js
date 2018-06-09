@@ -52,7 +52,36 @@ export default class {
 		// TODO: Fix something with name/questionID
 		UItools.render(
 			UItools.getInput(false, 'text', 'questionID', '', 'Enter question'),
-			e.target.parentElement
+			e.target.parentElement, false, e.target
 		);
+	}
+
+	CancelEdit(e) {
+		e.preventDefault();
+		console.log('Cancel Script');
+		window.UI.RenderHome();
+	}
+
+	StoreScript(e) {
+		e.preventDefault();
+		console.log('Storing Script');
+		const data = {
+			
+		}
+		// formData.append('test', 'smth');
+		this.api = new API();
+		this.api.call(data, (data) => {
+			console.log(data);
+			if (data.err) {
+				console.warn(data.err);
+			} else if (data.user) {
+				// localStorage.setItem('user', JSON.stringify(data.user));
+				console.log('User data received');
+				window.UI.RenderHome(); // This works, but can be a potential security risk? Well, a little, since it will only render base layout and serve cached data (which is served anyway in offline mode) and result pages won't be cached anyway.
+			} else {
+				console.warn('Undefined error');
+			}
+		});
+		
 	}
 }
