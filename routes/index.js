@@ -55,6 +55,7 @@ router.post('/api', function(req, res) {
 		break;
 	default:
 		data.err = 'Not implemented: ' + req.body.action;
+		data.req = req.body;
 		res.json(data);
 		break;
 	}
