@@ -142,6 +142,9 @@ label {
 	&.row-50 {
 		grid-template-rows: 50% 50%;
 	}
+	&.row-TWB {
+		grid-template-rows: 4em 1fr;
+	}
 }
 
 .flex {
@@ -152,7 +155,7 @@ label {
 }
 
 .scrollwindow {
-	background-color: rgba($main, .05);
+	background-color: rgba($main, .10);
 	overflow-y: scroll;
 	max-height: inherit;
 	padding: .6rem;
@@ -185,6 +188,16 @@ label {
 		background-color: $main;
 		&:hover, &:focus {
 			background-color: lighten($main, 8);
+		}
+	}
+}
+
+.buttonRow {
+	display: flex;
+	button {
+		margin-top: 1em;
+		&:not(:first-of-type) {
+			margin-left: 1em;
 		}
 	}
 }
