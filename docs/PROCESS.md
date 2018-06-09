@@ -24,6 +24,8 @@ Worked on creating the design in Adobe XD.
 # Tuesday 5-6
 Finished the 'front-side' of the design in XD. Finalised auth, based on the SQL database.
 
-# Wednesday
-- Finish design for presentation
-- CSS basics, maybe the 'home screen'
+# Wednesday 6-6
+Finished the interview tool design for the application in XD. Did CSS basics and the login screen.
+
+# Thursday 7-6
+Met with Titus for a code review. Discussed concerns about wav audio format
