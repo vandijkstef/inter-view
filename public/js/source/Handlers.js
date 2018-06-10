@@ -69,7 +69,9 @@ export default class {
 							],
 							'controls'
 						)
-					]
+					],
+					[script.cached ? 'cached' : null],
+					`script_${script.id}`
 				)
 			],
 			targetBefore.parentElement,
