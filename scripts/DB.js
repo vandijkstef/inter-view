@@ -90,23 +90,13 @@ class DB {
 
 		let query = `UPDATE ?? SET `;
 		
-		// let cols = '(';
-		// let values = '(';
 		for (const col in data) {
 			if (col != 'id') {
 				query += mysql.escapeId(col) + ' = ' + mysql.escape(data[col]) + ', ';
 			}
-			// cols += mysql.escapeId(col) + ',';
-			// values += mysql.escape(data[col]) + ',';
 		}
 		query += mysql.escapeId('lastSaved') + ' = ' + 'NOW() ';
-		// cols += mysql.escapeId('lastSaved');
-		// values += 'NOW()';
-		// cols += ')';
-		// values += ')';
-		
 		query += 'WHERE id = ' + mysql.escape(data.id);
-		// query += `${cols} VALUES ${values}`;
 
 		query = mysql.format(query, [table]);
 		console.log(query);
