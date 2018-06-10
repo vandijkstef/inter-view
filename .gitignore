@@ -37,3 +37,5 @@ sessions/
 
 .env
 *.bak
+bundle.js
+bundle.min.js
