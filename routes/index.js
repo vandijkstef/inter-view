@@ -53,6 +53,28 @@ router.post('/api', function(req, res) {
 		}
 		res.json(data);
 		break;
+	case 'scripts_fetch':
+		if (req.session.user) {
+			const db = new DB();
+			db.Select('scripts', (scripts) => {
+				if (!scripts) {
+					data.err = 'No scripts';
+					res.json(data);
+				} else {
+					data.status = true;
+					data.scripts = scripts;
+					res.json(data);
+				}
+			});
+		} else {
+			data.err = 'Cannot fetch script: Not authenticated';
+			res.json(data);
+		}
+		break;
+	case 'script_fetch':
+		data.err('not implemented: Fetch single');
+		res.json(data);
+		break;
 	case 'script_store':
 		if (req.session.user) {
 			console.log(req.body);
