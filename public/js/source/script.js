@@ -24,8 +24,8 @@ import API from './API.js';
 			} else {
 				UI.RenderHome();
 			}
-			// UI.Notify('I\'m a notification. Please give some nice CSS');
-			// UI.Notify('Oh, don\'t you dare clicking me!');
+			UI.Notify('I\'m a notification. Please give some nice CSS');
+			UI.Notify('Oh, don\'t you dare clicking me!');
 		});
 	}
 
