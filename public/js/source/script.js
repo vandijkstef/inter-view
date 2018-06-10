@@ -8,6 +8,12 @@ import API from './API.js';
 
 	// TODO: Create router, or.. do I need that?
 
+	// Prevent navigation
+	// Apparently, client needs to have seen at least one form/input for this to get enabled
+	window.addEventListener('beforeunload', function (e) {
+		e.returnValue = 'false';
+	});
+
 	// Decide on online status, Decide on login status
 	if (!navigator.onLine) {
 		// TODO: Offline functionality
