@@ -29,8 +29,9 @@ export default class {
 
 	EditScript(e) {
 		e.preventDefault();
-		// TODO: Fetch ID (just pass false/undefined for new script)
-		window.UI.RenderScriptEdit();
+		console.log(this);
+		// console.log(e.target.parentElement);
+		window.UI.RenderScriptEdit(this.dataset.scriptID);
 	}
 
 	// TODO: Move as much as possible from these Add* methods to UI.js
@@ -39,10 +40,17 @@ export default class {
 		console.log('Adding meta', e.target.parentElement);
 		// TODO: Fix something with naming/ID
 		UItools.render(
-			[
-				UItools.getInput(false, 'text', 'metaID', '', 'Meta Key', '', true),
-				UItools.getInput(false, 'select', 'metaType', [{value: 'text'}, {value:'email'}], 'Meta Key', '', true)
-			],
+			UItools.wrap(
+				[
+					UItools.getInput(false, 'hidden', 'metaID', 'new'),
+					UItools.getInput(false, 'hidden', 'metaOrder', document.querySelectorAll('.scrollwindow fieldset').length),
+					UItools.getInput(false, 'text', 'metaKey', '', 'Meta Key', '', true),
+					UItools.getInput(false, 'select', 'metaType', [{value: 'text'}, {value:'email'}], 'Meta Key', '', true)
+				],
+				'',
+				'',
+				'fieldset'
+			),
 			e.target.parentElement,
 			false,
 			e.target
@@ -55,7 +63,13 @@ export default class {
 		// TODO: Fix something with name/questionID
 		UItools.render(
 			[
-				UItools.getInput(false, 'text', 'questionID', '', 'Enter question', '', true)
+				UItools.wrap(
+					[
+						UItools.getInput(false, 'hidden', 'questionID', 'TODO:questionID'),
+						UItools.getInput(false, 'hidden', 'questionOrder', document.querySelectorAll('.scrollwindow fieldset').length),
+						UItools.getInput(false, 'text', 'questionText', '', 'Enter question', '', true)
+					], '', '', 'fieldset'
+				)
 			],
 			e.target.parentElement,
 			false,
@@ -65,17 +79,26 @@ export default class {
 
 	AddScript(script, targetBefore) {
 		// TODO: Improve
+		const settingsIcon = window.UI.GetIconSVG('040-settings-1');
+		console.log(settingsIcon);
+		UItools.addHandler(settingsIcon, this.EditScript);
+		settingsIcon.dataset.scriptID = script.id;
 		UItools.render(
 			[
 				UItools.wrap(
 					[
-						UItools.getText(script.title),
-						UItools.getText(script.description),
+						UItools.wrap(
+							[
+								UItools.getText(script.title),
+								UItools.getText(script.description),
+							]
+						),
 						UItools.wrap(
 							[
 								window.UI.GetIconSVG('035-checked'),
-								window.UI.GetIconSVG('040-settings-1')
-							]
+								settingsIcon
+							],
+							'controls'
 						)
 					]
 				)
@@ -96,14 +119,37 @@ export default class {
 			e.preventDefault();
 			console.log('Storing Scripts');
 			const FD = new FormData(e.target.form);
+			const metaData = [];
+			const metaIDs = FD.getAll('metaID');
+			const metaOrders = FD.getAll('moteOrder');
+			const metaKeys = FD.getAll('metaKey');
+			const metaTypes = FD.getAll('metaType');
+			for(let i = 0; i < metaIDs.length; i++) {
+				metaData.push({
+					id: metaIDs[i],
+					order: metaOrders[i],
+					key: metaKeys[i],
+					type: metaTypes[i]
+				});
+			}
+			const questionData = [];
+			const questionIDs = FD.getAll('questionID');
+			const questionOrders = FD.getAll('questionOrder');
+			const questionTexts = FD.getAll('questionText');
+			for(let i = 0; i < questionIDs.length; i++) {
+				questionData.push({
+					id: questionIDs[i],
+					order: questionOrders[i],
+					text: questionTexts[i]
+				});
+			}
 			const data = {
 				action: 'script_store',
 				id: FD.get('scriptID') || 'new',
 				title: FD.get('title'),
 				description: FD.get('description'),
-				metaKeys: FD.getAll('metaID'), // This is unsafe
-				metaTypes: FD.getAll('metaType'), // This is unsafe
-				questions: FD.getAll('questionID')
+				metas: metaData,
+				questions: questionData
 			};
 			// formData.append('test', 'smth');
 			this.api = new API();

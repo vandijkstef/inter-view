@@ -218,3 +218,15 @@ label {
 		width: 2.6em;
 	}
 }
+
+#scripts > div {
+	display: flex;
+	justify-content: space-between;
+}
+
+.controls {
+	width: 2em;
+	svg {
+		fill: $grey;
+	}
+}

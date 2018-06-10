@@ -72,7 +72,7 @@ router.post('/api', function(req, res) {
 		}
 		break;
 	case 'script_fetch':
-		data.err('not implemented: Fetch single');
+		data.err ='not implemented: Fetch single';
 		res.json(data);
 		break;
 	case 'script_store':

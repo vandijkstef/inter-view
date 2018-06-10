@@ -68,10 +68,12 @@ export default class {
 		return UItools.getImage(`/img/icons/svg/${icon}.svg`, 'TODO: Title from filename', classes, id);
 	}
 
-	GetIconSVG(icon, classes, id) { // TODO: GetIconSVG -> Get actual SVG data, don't wrap in image
+	GetIconSVG(icon, classes = [], id) { // TODO: GetIconSVG -> Get actual SVG data, don't wrap in image
 		classes = UItools.forceArray(classes);
 		classes.push('icon');
-		return UItools.getSVG(`/img/icons/svg/${icon}.svg`, 'TODO: Title from filename', classes, id);
+		const title = icon.split('-')[1];
+		classes.push(title);
+		return UItools.getSVG(`/img/icons/svg/${icon}.svg`, title, classes, id);
 	}
 
 	GetHeader(title, nav, micEnabled, micConfigurable) {
@@ -178,6 +180,20 @@ export default class {
 
 	RenderScriptEdit(id) {
 		// Let's always re-fetch the data. I don't want this to work offline, and this way I'm revalidating cached data (should you pop online after having the home window opened in offline mode, though I'll probably ask you to reload anyway)
+		console.log(id);
+		if (id) {
+			const api = new API();
+			api.call({
+				action: 'script_fetch',
+				scriptID: id
+			}, (data) => {
+				console.log(data.script);
+				// data.scripts.forEach((script) => {
+				// this.handlers.AddScript(script, newScriptButton);
+				// localStorage.setItem(`script_${script.id}`, JSON.stringify(script)); // TODO: No, later
+				// });
+			});
+		}
 		this.Clear(this.main);
 		UItools.render(
 			[
