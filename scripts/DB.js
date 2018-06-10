@@ -48,6 +48,33 @@ class DB {
 			this.connection.end();
 		});  
 	}
+
+	Insert(table, data, callback) {
+		this.connection.connect();
+
+		let query = `INSERT INTO ?? `;
+		let cols = '(';
+		let values = '(';
+
+		for (const col in data) {
+			cols += mysql.escapeId(col) + ',';
+			values += mysql.escape(data[col]) + ',';
+		}
+
+		cols += ')';
+		cols = cols.replace(',)', ')');
+		values += ')';
+		values = values.replace(',)', ')');
+	
+		query += `${cols} VALUES ${values}`;
+
+		query = mysql.format(query, [table]);
+		this.connection.query(query, (error, results) => { // TODO: Formatting of SQL string
+			if (error) throw error;
+			callback(results.insertID);
+			this.connection.end();
+		});  
+	}
 }
 
 module.exports = DB;
