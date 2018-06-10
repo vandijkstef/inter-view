@@ -32,10 +32,10 @@ sessions/*.json
 *.css
 *.css.map
 
-public/js/script.js
-sessions/
-
 .env
 *.bak
 bundle.js
 bundle.min.js
+
+public/js/script.js
+sessions/
