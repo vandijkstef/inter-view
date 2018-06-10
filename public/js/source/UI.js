@@ -167,13 +167,28 @@ export default class {
 			],
 			this.main
 		);
+		const cachedScripts = [];
+		for (let i = 0;  i < localStorage.length; i++) {
+			const keySplit = localStorage.key(i).split('_');
+			const keyType = keySplit[0];
+			console.log(keyType);
+			if (keyType === 'script') {
+				const keyValue = keySplit[1];
+				console.log(keyValue);
+				const script = JSON.parse(localStorage.getItem(localStorage.key(i)));
+				script.cached = true;
+				cachedScripts.push(parseInt(keyValue));
+				this.handlers.AddScript(script, newScriptButton);
+			}
+		}
 		const api = new API();
 		api.call({
 			action: 'scripts_fetch'
 		}, (data) => {
 			data.scripts.forEach((script) => {
-				this.handlers.AddScript(script, newScriptButton);
-				// localStorage.setItem(`script_${script.id}`, JSON.stringify(script)); // TODO: No, later
+				if (!cachedScripts.includes(script.id)) { // TODO: Improve, test lastSaved value
+					this.handlers.AddScript(script, newScriptButton);
+				}
 			});
 		});
 	}
@@ -182,22 +197,25 @@ export default class {
 		// Let's always re-fetch the data. I don't want this to work offline, and this way I'm revalidating cached data (should you pop online after having the home window opened in offline mode, though I'll probably ask you to reload anyway)
 		console.log(id);
 		if (id) {
-			const api = new API();
-			api.call({
-				action: 'script_fetch',
-				scriptID: id
-			}, (data) => {
-				// console.log(inputTitle.input);
-				// data.scripts.forEach((script) => {
-				// localStorage.setItem(`script_${script.id}`, JSON.stringify(script)); // TODO: No, later
-				// });
-				this.PostRenderScriptEdit(data.script);
+			this.FetchScript(id, (script) => {
+				this.PostRenderScriptEdit(script);
 			});
 		} else {
 			console.log('no ID');
 			this.PostRenderScriptEdit();
 		}
 		
+	}
+
+	FetchScript(id, callback) { // TODO: Move this method out of UI
+		const api = new API();
+		api.call({
+			action: 'script_fetch',
+			scriptID: id
+		}, (data) => {
+			localStorage.setItem(`script_${data.script.id}`, JSON.stringify(data.script));
+			return callback(data.script);
+		});
 	}
 
 	PostRenderScriptEdit(script) {
