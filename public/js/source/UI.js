@@ -187,26 +187,47 @@ export default class {
 				action: 'script_fetch',
 				scriptID: id
 			}, (data) => {
-				console.log(data.script);
+				// console.log(inputTitle.input);
 				// data.scripts.forEach((script) => {
-				// this.handlers.AddScript(script, newScriptButton);
 				// localStorage.setItem(`script_${script.id}`, JSON.stringify(script)); // TODO: No, later
 				// });
+				this.PostRenderScriptEdit(data.script);
 			});
+		} else {
+			console.log('no ID');
+			this.PostRenderScriptEdit();
 		}
+		
+	}
+
+	PostRenderScriptEdit(script) {
 		this.Clear(this.main);
+
+		let title;
+		if (!script) {
+			script = {
+				id: 'new'
+			};
+			title = 'New Script';
+		} else {
+			title = `Edit script: ${script.title}`;
+		}
+
+		const addMetaButton = UItools.getButton('Add Meta', ['secondary', 'shadowed'], '', this.handlers.AddMeta);
+		const addQuestionButton = UItools.getButton('Add Question', ['secondary', 'shadowed'], '', this.handlers.AddQuestion);
+
 		UItools.render(
 			[
-				this.GetHeader('New Script'),
+				this.GetHeader(title),
 				UItools.getForm('name',
 					[
 						UItools.wrap(
 							[
 								UItools.wrap(
 									[
-										UItools.getInput(false, 'hidden', 'scriptID', id),
-										UItools.getInput(UItools.getLabel('Title'), 'text', 'title', '', '', '', true),
-										UItools.getInput(UItools.getLabel('Description'), 'textarea', 'description'),								
+										UItools.getInput(false, 'hidden', 'scriptID', script.id),
+										UItools.getInput(UItools.getLabel('Title'), 'text', 'title', script.title, '', '', true),
+										UItools.getInput(UItools.getLabel('Description'), 'textarea', 'description', script.description)		
 									]
 								),
 								UItools.wrap(
@@ -214,7 +235,7 @@ export default class {
 										UItools.getText('Metadata', '', '', 'h2'),
 										this.GetScrollWindow(
 											[
-												UItools.getButton('Add Meta', ['secondary', 'shadowed'], '', this.handlers.AddMeta)
+												addMetaButton
 											]
 										)
 									],
@@ -228,7 +249,7 @@ export default class {
 								UItools.getText('Questions', '', '', 'h2'),
 								this.GetScrollWindow(
 									[
-										UItools.getButton('Add Question', ['secondary', 'shadowed'], '', this.handlers.AddQuestion)
+										addQuestionButton
 									]
 								),
 								UItools.wrap(
@@ -246,6 +267,67 @@ export default class {
 				)
 			],
 			this.main
+		);
+
+		script.metas.forEach((meta) => {
+			this.AddMeta(addMetaButton, meta);
+		});
+		script.questions.forEach((question) => {
+			this.AddQuestion(addQuestionButton, question);
+		});
+	}
+
+	AddMeta(metaButton, metaData) {
+		if (!metaData) {
+			metaData = {
+				id: 'new',
+				order: document.querySelectorAll('.scrollwindow fieldset').length,
+				key: '',
+				type: 'text'
+			};
+		}
+		const metaTypeSelect = UItools.getInput(false, 'select', 'metaType', [{value: 'text', label: 'Text'}, {value:'email', label: 'E-mail'}], 'Meta Key', '', true);
+		metaTypeSelect.value = metaData.type;
+		UItools.render(
+			UItools.wrap(
+				[
+					UItools.getInput(false, 'hidden', 'metaID', metaData.id),
+					UItools.getInput(false, 'hidden', 'metaOrder', metaData.order),
+					UItools.getInput(false, 'text', 'metaKey', metaData.key, 'Meta Key', '', true),
+					metaTypeSelect
+				],
+				'',
+				'',
+				'fieldset'
+			),
+			metaButton.parentElement,
+			false,
+			metaButton
+		);
+	}
+
+	AddQuestion(questionButton, questionData) {
+		if (!questionData) {
+			questionData = {
+				id: 'new',
+				order: document.querySelectorAll('.scrollwindow fieldset').length,
+				question: ''
+			};
+		}
+		console.log(questionData);
+		UItools.render(
+			[
+				UItools.wrap(
+					[
+						UItools.getInput(false, 'hidden', 'questionID', questionData.id),
+						UItools.getInput(false, 'hidden', 'questionOrder', questionData.order),
+						UItools.getInput(false, 'text', 'questionText', questionData.question, 'Enter question', '', true)
+					], '', '', 'fieldset'
+				)
+			],
+			questionButton.parentElement,
+			false,
+			questionButton
 		);
 	}
 

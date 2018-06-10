@@ -42,6 +42,7 @@ class DB {
 			}
 		}
 		query = mysql.format(query, [table, where]);
+		console.log(query);
 		this.connection.query(query, (error, results) => { // TODO: Formatting of SQL string
 			// if (error) throw error;
 			callback(results);
@@ -50,28 +51,68 @@ class DB {
 	}
 
 	Insert(table, data, callback) {
-		this.connection.connect();
+		if (this.connection.state === 'disconnected') {
+			this.connection.connect();
+		}
 
 		let query = `INSERT INTO ?? `;
+		
 		let cols = '(';
 		let values = '(';
-
 		for (const col in data) {
 			cols += mysql.escapeId(col) + ',';
 			values += mysql.escape(data[col]) + ',';
 		}
-
+		cols += mysql.escapeId('lastSaved');
+		values += 'NOW()';
 		cols += ')';
-		cols = cols.replace(',)', ')');
 		values += ')';
-		values = values.replace(',)', ')');
 	
 		query += `${cols} VALUES ${values}`;
 
 		query = mysql.format(query, [table]);
+		console.log(query);
 		this.connection.query(query, (error, results) => { // TODO: Formatting of SQL string
 			if (error) throw error;
-			callback(results.insertID);
+			callback(results.insertId);
+			this.connection.end();
+		});  
+	}
+
+	Update(table, data, callback) {
+		if (!data.id) {
+			return callback(false);
+		}
+
+		if (this.connection.state === 'disconnected') {
+			this.connection.connect();
+		}
+
+		let query = `UPDATE ?? SET `;
+		
+		// let cols = '(';
+		// let values = '(';
+		for (const col in data) {
+			if (col != 'id') {
+				query += mysql.escapeId(col) + ' = ' + mysql.escape(data[col]) + ', ';
+			}
+			// cols += mysql.escapeId(col) + ',';
+			// values += mysql.escape(data[col]) + ',';
+		}
+		query += mysql.escapeId('lastSaved') + ' = ' + 'NOW() ';
+		// cols += mysql.escapeId('lastSaved');
+		// values += 'NOW()';
+		// cols += ')';
+		// values += ')';
+		
+		query += 'WHERE id = ' + mysql.escape(data.id);
+		// query += `${cols} VALUES ${values}`;
+
+		query = mysql.format(query, [table]);
+		console.log(query);
+		this.connection.query(query, (error, results) => { // TODO: Formatting of SQL string
+			if (error) throw error;
+			callback(results);
 			this.connection.end();
 		});  
 	}

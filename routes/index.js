@@ -72,8 +72,30 @@ router.post('/api', function(req, res) {
 		}
 		break;
 	case 'script_fetch':
-		data.err ='not implemented: Fetch single';
-		res.json(data);
+		if (req.session.user) {
+			const db = new DB();
+			db.Select('scripts', {id: req.body.scriptID}, (script) => {
+				if (!script[0]) {
+					data.err = `No script for ${req.body.scriptID}`;
+					res.json(data);
+				} else {
+					data.status = true;
+					data.script = script[0];
+					const db = new DB();
+					db.Select('scripts_meta', {script_id: data.script.id}, (metas) => {
+						data.script.metas = metas;
+						const db = new DB();
+						db.Select('questions', {script_id: data.script.id}, (questions) => {
+							data.script.questions = questions;
+							res.json(data);
+						});
+					});
+				}
+			});
+		} else {
+			data.err = 'Cannot fetch script: Not authenticated';
+			res.json(data);
+		}
 		break;
 	case 'script_store':
 		if (req.session.user) {
@@ -85,13 +107,28 @@ router.post('/api', function(req, res) {
 					console.log(insertID);
 					data.status = true;
 					data.scriptID = insertID;
-					// TODO: Meta values
-					// TODO: Questions
+					req.body.metas.forEach((meta) => {
+						const db = new DB(); // Recreate DB so we have a seperate connection, which we can neatly close
+						db.Insert('scripts_meta', {script_id: insertID, key: meta.key, type: meta.type, order: meta.order}, (metaInsertID) => {
+							console.log(`Inserted Meta ${metaInsertID}`);
+						});
+					});
+					req.body.questions.forEach((question) => {
+						const db = new DB();
+						db.Insert('questions', {script_id: insertID, question: question.text, order: question.order}, (questionInsertID) => {
+							console.log(`Inserted Question ${questionInsertID}`);
+						});
+					});
 					res.json(data);
 				});
 			} else {
 				// UPDATE
-				res.json(data);
+				const db = new DB();
+				console.log('updating');
+				db.Update('scripts', {id: req.body.id, title: req.body.title, description: req.body.description}, (status) => {
+					data.status = status;
+					res.json(data);
+				});
 			}
 		} else {
 			data.err = 'Cannot store script: Not authenticated';

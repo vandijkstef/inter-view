@@ -29,7 +29,6 @@ export default class {
 
 	EditScript(e) {
 		e.preventDefault();
-		console.log(this);
 		// console.log(e.target.parentElement);
 		window.UI.RenderScriptEdit(this.dataset.scriptID);
 	}
@@ -38,43 +37,13 @@ export default class {
 	AddMeta(e) {
 		e.preventDefault();
 		console.log('Adding meta', e.target.parentElement);
-		// TODO: Fix something with naming/ID
-		UItools.render(
-			UItools.wrap(
-				[
-					UItools.getInput(false, 'hidden', 'metaID', 'new'),
-					UItools.getInput(false, 'hidden', 'metaOrder', document.querySelectorAll('.scrollwindow fieldset').length),
-					UItools.getInput(false, 'text', 'metaKey', '', 'Meta Key', '', true),
-					UItools.getInput(false, 'select', 'metaType', [{value: 'text'}, {value:'email'}], 'Meta Key', '', true)
-				],
-				'',
-				'',
-				'fieldset'
-			),
-			e.target.parentElement,
-			false,
-			e.target
-		);
+		window.UI.AddMeta(e.target);
 	}
 
 	AddQuestion(e) {
 		e.preventDefault();
 		console.log('Adding question', e.target.parentElement);
-		// TODO: Fix something with name/questionID
-		UItools.render(
-			[
-				UItools.wrap(
-					[
-						UItools.getInput(false, 'hidden', 'questionID', 'TODO:questionID'),
-						UItools.getInput(false, 'hidden', 'questionOrder', document.querySelectorAll('.scrollwindow fieldset').length),
-						UItools.getInput(false, 'text', 'questionText', '', 'Enter question', '', true)
-					], '', '', 'fieldset'
-				)
-			],
-			e.target.parentElement,
-			false,
-			e.target
-		);
+		window.UI.AddQuestion(e.target);
 	}
 
 	AddScript(script, targetBefore) {
@@ -121,7 +90,7 @@ export default class {
 			const FD = new FormData(e.target.form);
 			const metaData = [];
 			const metaIDs = FD.getAll('metaID');
-			const metaOrders = FD.getAll('moteOrder');
+			const metaOrders = FD.getAll('metaOrder');
 			const metaKeys = FD.getAll('metaKey');
 			const metaTypes = FD.getAll('metaType');
 			for(let i = 0; i < metaIDs.length; i++) {
@@ -151,16 +120,14 @@ export default class {
 				metas: metaData,
 				questions: questionData
 			};
-			// formData.append('test', 'smth');
+
 			this.api = new API();
 			this.api.call(data, (data) => {
 				console.log(data);
 				if (data.err) {
 					console.warn(data.err);
-				} else if (data.user) {
-					// localStorage.setItem('user', JSON.stringify(data.user));
-					console.log('User data received');
-					window.UI.RenderHome(); // This works, but can be a potential security risk? Well, a little, since it will only render base layout and serve cached data (which is served anyway in offline mode) and result pages won't be cached anyway.
+				} else if (data.status) {
+					window.UI.RenderHome(data.scriptID);
 				} else {
 					console.warn('Undefined error');
 				}
