@@ -141,10 +141,16 @@ label {
 	}
 	&.row-50 {
 		grid-template-rows: 50% 50%;
+		.grid {
+			&.row-TWB {
+				max-height: 42.5vh;
+			}
+		}
 	}
 	&.row-TWB {
 		grid-template-rows: 4em 1fr;
 	}
+	
 }
 
 .flex {
