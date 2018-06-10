@@ -39,10 +39,12 @@ export default class {
 		// TODO: Fix something with naming/ID
 		UItools.render(
 			[
-				UItools.getInput(false, 'text', 'metaID', '', 'Meta Key'),
-				UItools.getInput(false, 'select', 'metaType', [{value: 'text'}, {value:'email'}], 'Meta Key')
+				UItools.getInput(false, 'text', 'metaID', '', 'Meta Key', '', true),
+				UItools.getInput(false, 'select', 'metaType', [{value: 'text'}, {value:'email'}], 'Meta Key', '', true)
 			],
-			e.target.parentElement
+			e.target.parentElement,
+			false,
+			e.target
 		);
 	}
 
@@ -51,8 +53,12 @@ export default class {
 		console.log('Adding question', e.target.parentElement);
 		// TODO: Fix something with name/questionID
 		UItools.render(
-			UItools.getInput(false, 'text', 'questionID', '', 'Enter question'),
-			e.target.parentElement, false, e.target
+			[
+				UItools.getInput(false, 'text', 'questionID', '', 'Enter question', '', true)
+			],
+			e.target.parentElement,
+			false,
+			e.target
 		);
 	}
 
@@ -63,25 +69,33 @@ export default class {
 	}
 
 	StoreScript(e) {
-		e.preventDefault();
-		console.log('Storing Script');
-		const data = {
-			
+		if (e.target.form.checkValidity()) {
+			e.preventDefault();
+			console.log('Storing Scripts');
+			const FD = new FormData(e.target.form);
+			const data = {
+				action: 'script_store',
+				id: FD.get('scriptID') || 'new',
+				title: FD.get('title'),
+				description: FD.get('description'),
+				metaKeys: FD.getAll('metaID'), // This is unsafe
+				metaTypes: FD.getAll('metaType'), // This is unsafe
+				questions: FD.getAll('questionID')
+			};
+			// formData.append('test', 'smth');
+			this.api = new API();
+			this.api.call(data, (data) => {
+				console.log(data);
+				if (data.err) {
+					console.warn(data.err);
+				} else if (data.user) {
+					// localStorage.setItem('user', JSON.stringify(data.user));
+					console.log('User data received');
+					window.UI.RenderHome(); // This works, but can be a potential security risk? Well, a little, since it will only render base layout and serve cached data (which is served anyway in offline mode) and result pages won't be cached anyway.
+				} else {
+					console.warn('Undefined error');
+				}
+			});
 		}
-		// formData.append('test', 'smth');
-		this.api = new API();
-		this.api.call(data, (data) => {
-			console.log(data);
-			if (data.err) {
-				console.warn(data.err);
-			} else if (data.user) {
-				// localStorage.setItem('user', JSON.stringify(data.user));
-				console.log('User data received');
-				window.UI.RenderHome(); // This works, but can be a potential security risk? Well, a little, since it will only render base layout and serve cached data (which is served anyway in offline mode) and result pages won't be cached anyway.
-			} else {
-				console.warn('Undefined error');
-			}
-		});
-		
 	}
 }
