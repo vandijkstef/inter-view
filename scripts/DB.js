@@ -43,7 +43,7 @@ class DB {
 		}
 		query = mysql.format(query, [table, where]);
 		this.connection.query(query, (error, results) => { // TODO: Formatting of SQL string
-			if (error) throw error;
+			// if (error) throw error;
 			callback(results);
 			this.connection.end();
 		});  
