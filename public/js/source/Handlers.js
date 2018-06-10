@@ -33,6 +33,7 @@ export default class {
 		window.UI.RenderScriptEdit();
 	}
 
+	// TODO: Move as much as possible from these Add* methods to UI.js
 	AddMeta(e) {
 		e.preventDefault();
 		console.log('Adding meta', e.target.parentElement);
@@ -62,9 +63,31 @@ export default class {
 		);
 	}
 
+	AddScript(script, targetBefore) {
+		// TODO: Improve
+		UItools.render(
+			[
+				UItools.wrap(
+					[
+						UItools.getText(script.title),
+						UItools.getText(script.description),
+						UItools.wrap(
+							[
+								window.UI.GetIconSVG('035-checked'),
+								window.UI.GetIconSVG('040-settings-1')
+							]
+						)
+					]
+				)
+			],
+			targetBefore.parentElement,
+			false,
+			targetBefore
+		);
+	}
+
 	CancelEdit(e) {
 		e.preventDefault();
-		console.log('Cancel Script');
 		window.UI.RenderHome();
 	}
 

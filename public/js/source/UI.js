@@ -1,5 +1,6 @@
 import UItools from './UItools/UItools.js';
 import FormHandlers from './Handlers.js';
+import API from './API.js';
 
 export default class {
 
@@ -70,7 +71,7 @@ export default class {
 	GetIconSVG(icon, classes, id) { // TODO: GetIconSVG -> Get actual SVG data, don't wrap in image
 		classes = UItools.forceArray(classes);
 		classes.push('icon');
-		return UItools.getImage(`/img/icons/svg/${icon}.svg`, 'TODO: Title from filename', classes, id);
+		return UItools.getSVG(`/img/icons/svg/${icon}.svg`, 'TODO: Title from filename', classes, id);
 	}
 
 	GetHeader(title, nav, micEnabled, micConfigurable) {
@@ -102,7 +103,7 @@ export default class {
 	// TODO: I might wanna rework Notify into a seperate class
 	Notify(message, type) {
 		if (!this.notify) {
-			this.notify = UItools.render(UItools.createElement('container', 'notify'), this.main, true);
+			this.notify = UItools.render(UItools.createElement(['container', type], 'notify'), this.main, true);
 		}
 		UItools.render(
 			UItools.addHandler(
@@ -140,13 +141,15 @@ export default class {
 
 	RenderHome() {
 		this.Clear(this.main);
+		const newScriptButton = UItools.getButton('New Script', ['secondary', 'shadowed'], '', this.handlers.EditScript);
 		UItools.render(
 			[
 				this.GetHeader('Script Selection'),
 				UItools.wrap(
 					[
 						this.GetScrollWindow(
-							UItools.getButton('New Script', ['secondary', 'shadowed'], '', this.handlers.EditScript)
+							newScriptButton,
+							'scripts'
 						),
 						// UItools.getText('=>'),
 						UItools.wrap(
@@ -162,6 +165,15 @@ export default class {
 			],
 			this.main
 		);
+		const api = new API();
+		api.call({
+			action: 'scripts_fetch'
+		}, (data) => {
+			data.scripts.forEach((script) => {
+				this.handlers.AddScript(script, newScriptButton);
+				// localStorage.setItem(`script_${script.id}`, JSON.stringify(script)); // TODO: No, later
+			});
+		});
 	}
 
 	RenderScriptEdit(id) {
