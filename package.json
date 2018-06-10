@@ -5,16 +5,18 @@
 	"scripts": {
 		"start": "npm run build && node ./bin/www",
 		"watch": "nodemon ./bin/www",
-		"build": "babel public/js/source/script.js --out-file public/js/script.js",
-		"dev": "npm run build && npm run watch",
+		"babel": "babel public/js/source/script.js --out-file public/js/script.js",
+		"rollup": "rollup public/js/source/script.js --format iife --name 'bundle' --file public/js/bundle.js && minify public/js/bundle.js --out-file public/js/bundle.min.js",
+		"dev": "npm run rollup && npm run watch",
 		"cert": "openssl req -new -newkey rsa:2048 -nodes -out localhost.csr -keyout private.key",
 		"sign": "openssl x509 -req -in localhost.csr -signkey private.key -out server.crt",
 		"docert": "npm run cert && npm run sign"
 	},
-	"engines" : { 
-		"node" : ">=10" 
-	}, 
+	"engines": {
+		"node": ">=10"
+	},
 	"dependencies": {
+		"compression": "^1.7.2",
 		"cookie-parser": "~1.4.3",
 		"debug": "~2.6.9",
 		"dotenv": "^6.0.0",
@@ -35,7 +37,9 @@
 	},
 	"devDependencies": {
 		"babel-cli": "^6.26.0",
-		"babel-preset-env": "^1.7.0"
+		"babel-minify": "^0.4.3",
+		"babel-preset-env": "^1.7.0",
+		"rollup": "^0.60.1"
 	},
 	"babel": {
 		"presets": [
