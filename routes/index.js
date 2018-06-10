@@ -53,6 +53,29 @@ router.post('/api', function(req, res) {
 		}
 		res.json(data);
 		break;
+	case 'script_store':
+		if (req.session.user) {
+			console.log(req.body);
+			const db = new DB();
+			if (req.body.id === 'new') {
+				// INSERT
+				db.Insert('scripts', {title: req.body.title, description: req.body.description}, (insertID) => {
+					console.log(insertID);
+					data.status = true;
+					data.scriptID = insertID;
+					// TODO: Meta values
+					// TODO: Questions
+					res.json(data);
+				});
+			} else {
+				// UPDATE
+				res.json(data);
+			}
+		} else {
+			data.err = 'Cannot store script: Not authenticated';
+			res.json(data);
+		}
+		break;
 	default:
 		data.err = 'Not implemented: ' + req.body.action;
 		data.req = req.body;
