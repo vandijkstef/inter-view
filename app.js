@@ -7,8 +7,11 @@ const filestore = require('session-file-store')(session);
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const sassMiddleware = require('node-sass-middleware');
+const compression = require('compression');
 
 const app = express();
+
+app.use(compression());
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -21,14 +24,14 @@ app.use(session({
 	saveUninitialized: true,
 	cookie: { secure: false } // TODO: Set true on HTTPS env
 }));
-app.use(express.json());
+app.use(express.json()); // TODO: What does this do?
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(sassMiddleware({
 	src: path.join(__dirname, 'public'),
 	dest: path.join(__dirname, 'public'),
-	indentedSyntax: false, // true = .sass and false = .scss
-	sourceMap: true
+	outputStyle: 'compressed', // 'expanded'
+	sourceMap: true // Not required in production
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 
