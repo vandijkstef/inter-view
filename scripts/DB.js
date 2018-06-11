@@ -42,7 +42,6 @@ class DB {
 			}
 		}
 		query = mysql.format(query, [table, where]);
-		console.log(query);
 		this.connection.query(query, (error, results) => { // TODO: Formatting of SQL string
 			if (error) throw error;
 			callback(results);
@@ -71,7 +70,6 @@ class DB {
 		query += `${cols} VALUES ${values}`;
 
 		query = mysql.format(query, [table]);
-		console.log(query);
 		this.connection.query(query, (error, results) => { // TODO: Formatting of SQL string
 			if (error) throw error;
 			callback(results.insertId);
@@ -99,7 +97,6 @@ class DB {
 		query += 'WHERE id = ' + mysql.escape(data.id);
 
 		query = mysql.format(query, [table]);
-		console.log(query);
 		this.connection.query(query, (error, results) => { // TODO: Formatting of SQL string
 			if (error) throw error;
 			callback(results);

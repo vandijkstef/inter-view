@@ -99,32 +99,27 @@ router.post('/api', function(req, res) {
 		break;
 	case 'script_store':
 		if (req.session.user) {
-			console.log(req.body);
 			const db = new DB();
 			if (req.body.id === 'new') {
-				// INSERT
 				db.Insert('scripts', {title: req.body.title, description: req.body.description}, (insertID) => {
-					console.log(insertID);
 					data.status = true;
 					data.scriptID = insertID;
 					req.body.metas.forEach((meta) => {
 						const db = new DB(); // Recreate DB so we have a seperate connection, which we can neatly close
-						db.Insert('scripts_meta', {script_id: insertID, key: meta.key, type: meta.type, order: meta.order}, (metaInsertID) => {
-							console.log(`Inserted Meta ${metaInsertID}`);
+						db.Insert('scripts_meta', {script_id: insertID, key: meta.key, type: meta.type, order: meta.order}, () => {
+							// Silence is golden..
 						});
 					});
 					req.body.questions.forEach((question) => {
 						const db = new DB();
-						db.Insert('questions', {script_id: insertID, question: question.text, order: question.order}, (questionInsertID) => {
-							console.log(`Inserted Question ${questionInsertID}`);
+						db.Insert('questions', {script_id: insertID, question: question.text, order: question.order}, () => {
+							// Silence is golden..
 						});
 					});
 					res.json(data);
 				});
 			} else {
-				// UPDATE
 				const db = new DB();
-				console.log('updating');
 				db.Update('scripts', {id: req.body.id, title: req.body.title, description: req.body.description}, (status) => {
 					// TODO: Update Meta
 					// TODO: Update questions

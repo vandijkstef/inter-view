@@ -191,10 +191,8 @@ export default class {
 		for (let i = 0;  i < localStorage.length; i++) {
 			const keySplit = localStorage.key(i).split('_');
 			const keyType = keySplit[0];
-			console.log(keyType);
 			if (keyType === 'script') {
 				const keyValue = keySplit[1];
-				console.log(keyValue);
 				const script = JSON.parse(localStorage.getItem(localStorage.key(i)));
 				script.cached = true;
 				cachedScripts.push(parseInt(keyValue));
@@ -215,6 +213,7 @@ export default class {
 
 	SetScript(script) {
 		this.script = script;
+		this.script.currentQuestion = 0;
 	}
 
 	RenderPreMeta() {
@@ -223,7 +222,10 @@ export default class {
 			return;
 		}
 		this.scriptStarted = true;
-		console.log(this.script);
+		const preMetas = [];
+		this.script.metas.forEach((meta) => {
+			preMetas.push(UItools.getInput(meta.key, meta.type, `meta_${meta.id}`));
+		});
 		this.Clear(this.main);
 		UItools.render(
 			[
@@ -232,9 +234,25 @@ export default class {
 					[
 						UItools.wrap(
 							[
-								UItools.getText('one')
+								UItools.createElement(),
+								UItools.wrap(
+									preMetas,
+									'metabox'
+								),
+								UItools.wrap(
+									[
+										UItools.wrap(
+											[
+												UItools.getText(this.script.title, '', '', 'h2'),
+												UItools.getText(this.script.description) // TODO: Extra description
+											]
+										),
+										UItools.getButton('Start Interview', '', '', this.handlers.GoQuestions)
+									],
+									['grid', 'row-BB']
+								)
 							],
-							['grid', 'row-50']
+							['grid', 'col-131']
 						)
 					], '/', false,
 					// ['grid', 'col-50']
@@ -253,6 +271,23 @@ export default class {
 			console.warn('Questions shall not be taken');
 			return;
 		}
+		this.Clear(this.main);
+		UItools.render(
+			[
+				UItools.getForm('preMeta',
+					[
+						UItools.wrap(
+							[
+								UItools.getText(this.script.questions[this.script.currentQuestion].question),
+								UItools.getButton('=>', '', '', this.handlers.GoNextQuestion)
+							]
+						)
+					], '/', false,
+					// ['grid', 'col-50']
+				)
+			],
+			this.main
+		);
 	}
 
 	RenderPostMeta() {
@@ -260,6 +295,37 @@ export default class {
 			console.warn('The Meta will not post');
 			return;
 		}
+		this.Clear(this.main);
+		UItools.render(
+			[
+				this.GetHeader('Interviewee Post Meta'),
+				UItools.getForm('postMeta',
+					[
+						UItools.wrap(
+							[
+								UItools.createElement(),
+								UItools.getText('METAS HERE PLOX'),
+								UItools.wrap(
+									[
+										UItools.wrap(
+											[
+												UItools.getText(this.script.title, '', '', 'h2'),
+												UItools.getText(this.script.description) // TODO: Extra description
+											]
+										),
+										UItools.getButton('End Interview', '', '', this.handlers.GoPostInterview)
+									],
+									['grid', 'row-BB']
+								)
+							],
+							['grid', 'col-131']
+						)
+					], '/', false,
+					// ['grid', 'col-50']
+				)
+			],
+			this.main
+		);
 	}
 
 	RenderPostInterview() {
@@ -267,17 +333,48 @@ export default class {
 			console.warn('U want to Post interview without interviewing?');
 			return;
 		}
+		this.Clear(this.main);
+		UItools.render(
+			[
+				this.GetHeader('Interview Review'),
+				UItools.getForm('review',
+					[
+						UItools.wrap(
+							[
+								UItools.createElement(),
+								UItools.wrap(
+									UItools.getText('PostMetas')
+								),
+								UItools.wrap(
+									[
+										UItools.wrap(
+											[
+												UItools.getText(this.script.title, '', '', 'h2'),
+												UItools.getText(this.script.description) // TODO: Extra description
+											]
+										),
+										UItools.getButton('Save Interview', '', '', this.handlers.StoreInterview)
+									],
+									['grid', 'row-BB']
+								)
+							],
+							['grid', 'col-131']
+						)
+					], '/', false,
+					// ['grid', 'col-50']
+				)
+			],
+			this.main
+		);
 	}
 
 	RenderScriptEdit(id) {
 		// Let's always re-fetch the data. I don't want this to work offline, and this way I'm revalidating cached data (should you pop online after having the home window opened in offline mode, though I'll probably ask you to reload anyway)
-		console.log(id);
 		if (id) {
 			this.FetchScript(id, (script) => {
 				this.PostRenderScriptEdit(script);
 			});
 		} else {
-			console.log('no ID');
 			this.PostRenderScriptEdit();
 		}
 		
@@ -349,7 +446,7 @@ export default class {
 								UItools.wrap(
 									[
 										UItools.getButton('Cancel', ['secondary', 'shadowed'], '', this.handlers.CancelEdit),
-										UItools.getButton('Store Script', 'shadowed', '', this.handlers.StoreScript)
+										UItools.getButton('Save Script', 'shadowed', '', this.handlers.StoreScript)
 									],
 									['buttonRow']
 								)
@@ -412,7 +509,6 @@ export default class {
 				question: ''
 			};
 		}
-		console.log(questionData);
 		UItools.render(
 			[
 				UItools.wrap(

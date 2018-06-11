@@ -145,6 +145,9 @@ label {
 			}
 		}
 	}
+	&.col-131 {
+		grid-template-columns: 1fr 50% 1fr;
+	}
 	&.row-50 {
 		grid-template-rows: 50% 50%;
 		.grid {
@@ -155,6 +158,9 @@ label {
 	}
 	&.row-TWB {
 		grid-template-rows: 4em 1fr;
+	}
+	&.row-BB {
+		grid-template-rows: 1fr;
 	}
 	
 }
@@ -261,4 +267,10 @@ label {
 			fill: $green;
 		}
 	}
+}
+
+.metabox {
+	margin: 0 auto;
+    background-color: rgba($main, .1);
+    padding: 1em 2em;
 }
