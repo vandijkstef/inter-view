@@ -147,22 +147,42 @@ export default class {
 		UItools.render(
 			[
 				this.GetHeader('Script Selection'),
-				UItools.wrap(
-					[
-						this.GetScrollWindow(
-							newScriptButton,
-							'scripts'
-						),
-						// UItools.getText('=>'),
-						UItools.wrap(
-							this.GetIcon('014-next', 'point'),
-							['flex', 'center']
-						),
-						this.GetScrollWindow(
-							UItools.getText('Script preview')
-						)
-					],
-					['grid', 'col-50', 'split']
+				UItools.addHandler(
+					UItools.getForm('scriptSelect',
+						[
+							UItools.wrap(
+								[
+									this.GetScrollWindow(
+										newScriptButton,
+										'scripts'
+									),
+									UItools.wrap(
+										this.GetIcon('014-next', 'point'),
+										['flex', 'center']
+									),
+									UItools.wrap(
+										[
+											UItools.getText('Select script', '', '', 'h2'),
+											this.GetScrollWindow(
+												UItools.getText('Script preview')
+											),
+											UItools.wrap(
+												[
+													UItools.getButton('Start Script', '', '', this.handlers.StartScript)
+												],
+												['buttonRow']
+											)
+										],
+										['grid', 'row-TWB']
+									),
+								],
+								['grid', 'col-50', 'split']
+							)
+						], 
+						'/',
+						false
+					),
+					this.handlers.startScript
 				)
 			],
 			this.main
@@ -178,7 +198,7 @@ export default class {
 				const script = JSON.parse(localStorage.getItem(localStorage.key(i)));
 				script.cached = true;
 				cachedScripts.push(parseInt(keyValue));
-				this.handlers.AddScript(script, newScriptButton);
+				this.AddScript(script, newScriptButton);
 			}
 		}
 		const api = new API();
@@ -187,10 +207,66 @@ export default class {
 		}, (data) => {
 			data.scripts.forEach((script) => {
 				if (!cachedScripts.includes(script.id)) { // TODO: Improve, test lastSaved value
-					this.handlers.AddScript(script, newScriptButton);
+					this.AddScript(script, newScriptButton);
 				}
 			});
 		});
+	}
+
+	SetScript(script) {
+		this.script = script;
+	}
+
+	RenderPreMeta() {
+		if (!this.script || this.scriptStarted) {
+			console.warn('Flow isn\'t accepting your jokes bruh');
+			return;
+		}
+		this.scriptStarted = true;
+		console.log(this.script);
+		this.Clear(this.main);
+		UItools.render(
+			[
+				this.GetHeader('Interviewee Pre Meta'),
+				UItools.getForm('preMeta',
+					[
+						UItools.wrap(
+							[
+								UItools.getText('one')
+							],
+							['grid', 'row-50']
+						)
+					], '/', false,
+					// ['grid', 'col-50']
+				)
+			],
+			this.main
+		);
+		// PreMeta
+		// Questions
+		// PostMeta
+		// PostInterview
+	}
+
+	RenderQuestions() {
+		if (!this.script && !this.scriptStarted) {
+			console.warn('Questions shall not be taken');
+			return;
+		}
+	}
+
+	RenderPostMeta() {
+		if (!this.script && !this.scriptStarted) {
+			console.warn('The Meta will not post');
+			return;
+		}
+	}
+
+	RenderPostInterview() {
+		if (!this.script && !this.scriptStarted) {
+			console.warn('U want to Post interview without interviewing?');
+			return;
+		}
 	}
 
 	RenderScriptEdit(id) {
@@ -350,6 +426,44 @@ export default class {
 			questionButton.parentElement,
 			false,
 			questionButton
+		);
+	}
+
+	AddScript(script, targetBefore) {
+		// TODO: Improve
+		const settingsIcon = this.GetIconSVG('040-settings-1');
+		UItools.addHandler(settingsIcon, this.handlers.EditScript);
+		settingsIcon.dataset.scriptID = script.id;
+		UItools.render(
+			[
+				UItools.addHandler(UItools.getInput(false, 'radio', 'script', `script_${script.id}`), this.handlers.RadioDiv, 'change'),
+				UItools.addHandler(
+					UItools.wrap(
+						[
+							
+							UItools.wrap(
+								[
+									UItools.getText(script.title),
+									UItools.getText(script.description),
+								]
+							),
+							UItools.wrap(
+								[
+									this.GetIconSVG('035-checked'),
+									settingsIcon
+								],
+								'controls'
+							)
+						],
+						[script.cached ? 'cached' : null],
+						`script_${script.id}`
+					), 
+					this.handlers.DivRadio
+				)
+			],
+			targetBefore.parentElement,
+			false,
+			targetBefore
 		);
 	}
 

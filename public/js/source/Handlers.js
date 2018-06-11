@@ -1,5 +1,5 @@
 import API from './API.js';
-import UItools from './UItools/UItools.js';
+// import UItools from './UItools/UItools.js'; // KREYGASM, if we can omit from using this here, I'm happy
 
 export default class {
 	constructor() {
@@ -29,11 +29,9 @@ export default class {
 
 	EditScript(e) {
 		e.preventDefault();
-		// console.log(e.target.parentElement);
 		window.UI.RenderScriptEdit(this.dataset.scriptID);
 	}
 
-	// TODO: Move as much as possible from these Add* methods to UI.js
 	AddMeta(e) {
 		e.preventDefault();
 		console.log('Adding meta', e.target.parentElement);
@@ -44,40 +42,6 @@ export default class {
 		e.preventDefault();
 		console.log('Adding question', e.target.parentElement);
 		window.UI.AddQuestion(e.target);
-	}
-
-	AddScript(script, targetBefore) {
-		// TODO: Improve
-		const settingsIcon = window.UI.GetIconSVG('040-settings-1');
-		console.log(settingsIcon);
-		UItools.addHandler(settingsIcon, this.EditScript);
-		settingsIcon.dataset.scriptID = script.id;
-		UItools.render(
-			[
-				UItools.wrap(
-					[
-						UItools.wrap(
-							[
-								UItools.getText(script.title),
-								UItools.getText(script.description),
-							]
-						),
-						UItools.wrap(
-							[
-								window.UI.GetIconSVG('035-checked'),
-								settingsIcon
-							],
-							'controls'
-						)
-					],
-					[script.cached ? 'cached' : null],
-					`script_${script.id}`
-				)
-			],
-			targetBefore.parentElement,
-			false,
-			targetBefore
-		);
 	}
 
 	CancelEdit(e) {
@@ -136,4 +100,43 @@ export default class {
 			});
 		}
 	}
+
+	StartScript(e) {
+		e.preventDefault();
+		let selection = document.querySelectorAll('input[name=script]');
+		selection.forEach((input) => {
+			if (input.checked) {
+				selection = input.value;
+			}
+		});
+
+		if (typeof selection === 'object') {
+			console.warn('No selection made');
+			return;
+		}
+
+		let script = JSON.parse(localStorage.getItem(selection));
+		if (!script) {
+			window.UI.FetchScript(selection.split('_')[1], (scriptData) => {
+				script = scriptData;
+				console.log('Starting', e.target, selection, script);
+				window.UI.SetScript(script);
+				window.UI.RenderPreMeta();
+			});
+		} else {
+			console.log('Starting', e.target, selection, script);
+			window.UI.SetScript(script);
+			window.UI.RenderPreMeta();
+		}
+	}
+
+	RadioDiv(e) {
+		console.log(e.target, e.target.parentElement);
+	}
+
+	DivRadio(e) {
+		console.log(e.target);
+		document.querySelector(`input[value=${e.target.id}]`).checked = true;
+	}
+
 }
