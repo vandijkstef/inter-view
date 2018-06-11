@@ -230,3 +230,11 @@ label {
 		fill: $grey;
 	}
 }
+
+.cached {
+	.controls {
+		.checked svg {
+			fill: $green;
+		}
+	}
+}

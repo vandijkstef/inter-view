@@ -126,6 +126,8 @@ router.post('/api', function(req, res) {
 				const db = new DB();
 				console.log('updating');
 				db.Update('scripts', {id: req.body.id, title: req.body.title, description: req.body.description}, (status) => {
+					// TODO: Update Meta
+					// TODO: Update questions
 					data.status = status;
 					res.json(data);
 				});

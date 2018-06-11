@@ -287,12 +287,16 @@ export default class {
 			this.main
 		);
 
-		script.metas.forEach((meta) => {
-			this.AddMeta(addMetaButton, meta);
-		});
-		script.questions.forEach((question) => {
-			this.AddQuestion(addQuestionButton, question);
-		});
+		if (script.metas) {
+			script.metas.forEach((meta) => {
+				this.AddMeta(addMetaButton, meta);
+			});
+		}
+		if (script.questions) {
+			script.questions.forEach((question) => {
+				this.AddQuestion(addQuestionButton, question);
+			});
+		}
 	}
 
 	AddMeta(metaButton, metaData) {
