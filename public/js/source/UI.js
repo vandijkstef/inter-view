@@ -255,15 +255,10 @@ export default class {
 							['grid', 'col-131']
 						)
 					], '/', false,
-					// ['grid', 'col-50']
 				)
 			],
 			this.main
 		);
-		// PreMeta
-		// Questions
-		// PostMeta
-		// PostInterview
 	}
 
 	RenderQuestions() {
