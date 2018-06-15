@@ -39,3 +39,6 @@ bundle.min.js
 
 public/js/script.js
 sessions/
+
+*.key
+*.crt

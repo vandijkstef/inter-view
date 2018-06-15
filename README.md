@@ -10,6 +10,11 @@ Inter-view is a browser tool that enables you to audio record (semi-)structured 
 ## Getting started
 These instructions will tell you how to get going with this project.
 
+### Setup local SSL
+```
+openssl req -x509 -out localhost.crt -keyout localhost.key \ -newkey rsa:2048 -nodes -sha256 \ -subj '/CN=localhost' -extensions EXT -config <( \ printf "[dn]\nCN=localhost\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:localhost\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth")
+```
+
 ### Prerequisites
 Let's write something about server and/or client prerequites.
 
