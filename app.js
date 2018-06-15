@@ -18,13 +18,13 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 console.log(process.env.NODE_ENV ? true : false);
 app.use(session({
-	secret: process.env.SECRET,
+	secret: process.env.SECRET_SESS,
 	store: new filestore(),
 	resave: false,
 	saveUninitialized: true,
 	cookie: { secure: false } // TODO: Set true on HTTPS env
 }));
-app.use(express.json()); // TODO: What does this do?
+app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(sassMiddleware({
