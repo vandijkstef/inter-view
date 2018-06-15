@@ -1,6 +1,7 @@
 import UItools from './UItools/UItools.js';
 import FormHandlers from './Handlers.js';
 import API from './API.js';
+import AudioManager from './AudioManager.js';
 
 export default class {
 
@@ -22,22 +23,21 @@ export default class {
 		this.SetTitle('test a title');
 
 		// TODO: Remove post-dev, maybe hookup to smth server-ish? Or add actual live host to this? (Warning, subdomain hosting!)
-		// TODO: Apparently, this notice breaks interaction on iOS Chrome
-		// if (window.location.hostname !== 'localhost') {
-		// 	UItools.render(
-		// 		[
-		// 			UItools.wrap(
-		// 				UItools.getText('This is a development version: Please use dummy data only!'),
-		// 				'dev'
-		// 			),
-		// 			UItools.wrap(
-		// 				UItools.getText('This is a development version: Please use dummy data only!'),
-		// 				'dev'
-		// 			)
-		// 		],
-		// 		document.body
-		// 	);
-		// }
+		if (window.location.hostname !== 'localhost') {
+			UItools.render(
+				[
+					UItools.wrap(
+						UItools.getText('This is a development version: Please use dummy data only!'),
+						'dev'
+					),
+					UItools.wrap(
+						UItools.getText('This is a development version: Please use dummy data only!'),
+						'dev'
+					)
+				],
+				document.body
+			);
+		}
 
 	}
 
@@ -54,7 +54,7 @@ export default class {
 	SetTitle(string) {
 		this.docTitle.innerText = `${string} | Inter-view`;
 		if (this.pageTitle) {
-			this.pageTitle.innerText = string; // TODO: Re-enable title on main content pages
+			this.pageTitle.innerText = string; // TODO: Re-enable title on main content pages. pageTitle isn't currently hooked up, also, the header isn't reused at all
 		}
 	}
 
@@ -85,7 +85,8 @@ export default class {
 				this.GetNav(nav),
 				this.GetMic(micEnabled, micConfigurable)
 			],
-			'', '', 'header');
+			'', '', 'header'
+		);
 	}
 
 	GetNav(nav) {
@@ -95,11 +96,24 @@ export default class {
 
 	GetMic(enabled, configurable) {
 		console.log('GetMic', enabled, configurable);
-		return UItools.wrap(this.GetIcon('021-microphone', 'mic'));
+		const mic = this.GetIconSVG('021-microphone', 'mic');
+		const micWrap = UItools.addHandler(UItools.wrap(mic), this.AddAudioModal);
+		micWrap.mic = mic;
+		micWrap.AudioManager = new AudioManager();
+		micWrap.AudioManager.HasPermission((permission) => {
+			if (!permission) {
+				mic.classList.add('error');
+			}
+		});
+		return micWrap;
 	}
 	
 	GetScrollWindow(content, id) {
 		return UItools.wrap(content, 'scrollwindow', id);
+	}
+
+	GetLoader() {
+		return UItools.createElement('loading');
 	}
 	
 	// TODO: I might wanna rework Notify into a seperate class
@@ -143,7 +157,12 @@ export default class {
 
 	RenderHome() {
 		this.Clear(this.main);
+		this.StartScriptButton = UItools.getButton('Start Script', '', '', this.handlers.StartScript);
+		this.StartScriptButton.disabled = true;
+		this.ScriptPreview = this.GetScrollWindow(UItools.getText('Select a script on the left side'));
+
 		const newScriptButton = UItools.getButton('New Script', ['secondary', 'shadowed'], '', this.handlers.EditScript);
+
 		UItools.render(
 			[
 				this.GetHeader('Script Selection'),
@@ -153,7 +172,9 @@ export default class {
 							UItools.wrap(
 								[
 									this.GetScrollWindow(
-										newScriptButton,
+										[
+											newScriptButton
+										],
 										'scripts'
 									),
 									UItools.wrap(
@@ -163,12 +184,10 @@ export default class {
 									UItools.wrap(
 										[
 											UItools.getText('Select script', '', '', 'h2'),
-											this.GetScrollWindow(
-												UItools.getText('Script preview')
-											),
+											this.ScriptPreview,
 											UItools.wrap(
 												[
-													UItools.getButton('Start Script', '', '', this.handlers.StartScript)
+													this.StartScriptButton
 												],
 												['buttonRow']
 											)
@@ -199,15 +218,57 @@ export default class {
 				this.AddScript(script, newScriptButton);
 			}
 		}
-		const api = new API();
-		api.call({
-			action: 'scripts_fetch'
-		}, (data) => {
-			data.scripts.forEach((script) => {
-				if (!cachedScripts.includes(script.id)) { // TODO: Improve, test lastSaved value
-					this.AddScript(script, newScriptButton);
-				}
+		if (navigator.onLine) {
+			console.log('loader');
+			const loader = this.AddLoader(newScriptButton);
+			const api = new API();
+			api.call({
+				action: 'scripts_fetch'
+			}, (data) => {
+				data.scripts.forEach((script) => {
+					if (!cachedScripts.includes(script.id)) { // TODO: Improve, test lastSaved value
+						this.AddScript(script, newScriptButton);
+					}
+				});
+				console.log('removing loader');
+				loader.parentElement.removeChild(loader);
 			});
+		}
+	}
+
+	ScriptSelection() {
+		// TODO: Add loading spinner
+		this.StartScriptButton.disabled = true;
+		const selection = document.querySelectorAll('input[name=script]');
+		let selected;
+		selection.forEach((option) => {
+			if (option.checked) {
+				selected = option.value.split('_')[1];
+			}
+		});
+		if (!selected) {
+			this.Notify('Oops, something went wrong. Please refresh the page', 'warning');
+			return;
+		}
+		this.FetchScript(selected, (script) => {
+			this.Clear(this.ScriptPreview);
+			const entries = [];
+			script.metas.forEach((meta) => {
+				entries.push(UItools.getText(meta.key));
+			});
+			script.questions.sort((a, b) => {
+				return a.order - b.order;
+			});
+			script.questions.forEach((question) => {
+				entries.push(UItools.getText(question.question));
+			});
+			UItools.render(
+				entries,
+				this.ScriptPreview
+			);
+			if (script.questions.length > 0) {
+				this.StartScriptButton.disabled = false;
+			}
 		});
 	}
 
@@ -230,7 +291,8 @@ export default class {
 		UItools.render(
 			[
 				this.GetHeader('Interviewee Pre Meta'),
-				UItools.getForm('preMeta',
+				UItools.getForm(
+					'preMeta',
 					[
 						UItools.wrap(
 							[
@@ -254,7 +316,9 @@ export default class {
 							],
 							['grid', 'col-131']
 						)
-					], '/', false,
+					],
+					'/',
+					false
 				)
 			],
 			this.main
@@ -277,7 +341,9 @@ export default class {
 								UItools.getButton('=>', '', '', this.handlers.GoNextQuestion)
 							]
 						)
-					], '/', false,
+					],
+					'/',
+					false
 					// ['grid', 'col-50']
 				)
 			],
@@ -315,7 +381,9 @@ export default class {
 							],
 							['grid', 'col-131']
 						)
-					], '/', false,
+					],
+					'/',
+					false
 					// ['grid', 'col-50']
 				)
 			],
@@ -355,7 +423,9 @@ export default class {
 							],
 							['grid', 'col-131']
 						)
-					], '/', false,
+					],
+					'/',
+					false
 					// ['grid', 'col-50']
 				)
 			],
@@ -375,14 +445,24 @@ export default class {
 		
 	}
 
-	FetchScript(id, callback) { // TODO: Move this method out of UI
+	FetchScript(id, callback) {
+		// TODO: Move this method out of UI
+		// TODO: Test if online, if not, try to retrieve from cache
 		const api = new API();
 		api.call({
 			action: 'script_fetch',
 			scriptID: id
 		}, (data) => {
-			localStorage.setItem(`script_${data.script.id}`, JSON.stringify(data.script));
-			return callback(data.script);
+			if (data.status === true) {
+				localStorage.setItem(`script_${data.script.id}`, JSON.stringify(data.script));
+				const script = document.querySelector(`div#script_${data.script.id}`);
+				if (script) {
+					script.classList.add('cached');
+				}
+				return callback(data.script);
+			} else {
+				this.Notify(data.err);
+			}
 		});
 	}
 
@@ -522,6 +602,10 @@ export default class {
 
 	AddScript(script, targetBefore) {
 		// TODO: Improve
+		const loader = targetBefore.parentElement.querySelector('.loading');
+		if (loader) {
+			targetBefore = loader;
+		}
 		const settingsIcon = this.GetIconSVG('040-settings-1');
 		UItools.addHandler(settingsIcon, this.handlers.EditScript);
 		settingsIcon.dataset.scriptID = script.id;
@@ -555,6 +639,48 @@ export default class {
 			targetBefore.parentElement,
 			false,
 			targetBefore
+		);
+	}
+
+	AddModal(content) {
+		UItools.render(
+			UItools.wrap(
+				[
+					UItools.wrap(
+						[
+							content,
+							UItools.addHandler(window.UI.GetIconSVG('059-cancel'), this.handlers.CloseModal)
+						],
+						'content'
+					)
+				],
+				'modal'
+			),
+			document.body
+		);
+	}
+
+	AddAudioModal() {
+		window.UI.AddModal(UItools.getText('AudioModal'));
+		if (!this.AudioManager.permission) {
+			this.AudioManager.RequestPermission((succ) => {
+				console.log(succ);
+				this.mic.classList.remove('error');
+			}, (err) => {
+				console.warn(err);
+				window.UI.Notify('Microphone permissions denied', 'warning');
+			});
+		}
+	}
+
+	AddLoader(before) {
+		console.log('Adding loader');
+		const loader = this.GetLoader();
+		return UItools.render(
+			loader,
+			before.parentElement,
+			true,
+			before
 		);
 	}
 

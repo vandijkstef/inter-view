@@ -160,11 +160,20 @@ export default class {
 
 	RadioDiv(e) {
 		console.log(e.target, e.target.parentElement);
-		// TODO: What are we doing with this?
+		// TODO: What are we doing with this? -> Its fired when user uses keyboard to change the values
+		window.UI.ScriptSelection();
 	}
 
 	DivRadio(e) {
+		// TODO: This is used when the user clicks the div, to update
 		document.querySelector(`input[value=${e.target.id}]`).checked = true;
+		console.log(e.target, e.target.parentElement);
+		window.UI.ScriptSelection();
+	}
+
+	CloseModal() {
+		const modal = this.parentElement.parentElement;
+		modal.parentElement.removeChild(modal);
 	}
 
 }

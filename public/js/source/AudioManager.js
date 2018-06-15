@@ -13,11 +13,11 @@ export default class {
 		navigator.getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
 	}
 
-	requestPermission() {
+	RequestPermission(success, failure) {
 		if(navigator.getUserMedia) {
 			this.chunks = [];
-			this.permission = true;
-			navigator.getUserMedia({audio: true}, this.onSuccess, this.onError);
+			// this.permission = true;
+			navigator.getUserMedia({audio: true}, success, failure);
 		}
 	}
 
@@ -44,7 +44,7 @@ export default class {
 		};
 	}
 
-	startRecording(callback) {
+	StartRecording(callback) {
 		if(this.mediaRecorder !== null) {
 			// If you have permission, start recording
 			if(this.hasPermission() === true) {
@@ -63,7 +63,7 @@ export default class {
 		}
 	}
 
-	stopRecording(callback) {
+	StopRecording(callback) {
 		if(this.mediaRecorder !== null) {
 			// Only stop recording if the state is recording.
 			if(this.mediaRecorder.state === 'recording') {
@@ -82,7 +82,7 @@ export default class {
 		}
 	}
 
-	play(callback) {
+	Play(callback) {
 		if(this.audio !== null) {
 			// Play the audio
 			this.playing = true;
@@ -96,7 +96,7 @@ export default class {
 		}
 	}
 
-	pause(callback) {
+	Pause(callback) {
 		if(this.audio !== null) {
 			this.audio.pause();
 			this.playing = false;
@@ -108,7 +108,7 @@ export default class {
 		}
 	}
 
-	stop(callback) {
+	Stop(callback) {
 		if(this.audio !== null) {
 			this.audio.pause();
 			this.audio.currentTime = 0;
@@ -121,7 +121,7 @@ export default class {
 		}
 	}
 
-	loop(bool, callback) {
+	Loop(bool, callback) {
 		if( this.audio !== null ) {
 			(bool == true) ? this.audio.loop = true : this.audio.loop = false;
 		} else {
@@ -131,7 +131,7 @@ export default class {
 		}
 	}
 
-	stepBackward(callback) {
+	StepBackward(callback) {
 		if(this.audio !== null) {
 			this.audio.currentTime = 0;
 		} else {
@@ -141,7 +141,7 @@ export default class {
 		}
 	}
 
-	stepForward(callback) {
+	StepForward(callback) {
 		if(this.audio !== null) {
 			this.audio.currentTime = this.audio.duration;
 		} else {
@@ -151,7 +151,7 @@ export default class {
 		}
 	}
 
-	clear(callback) {
+	Clear(callback) {
 		this.audio = null;
 		this.playing = false;
 
@@ -160,12 +160,30 @@ export default class {
 		}
 	}
 	
-	setOutputFileType(fileType) {
+	SetOutputFileType(fileType) {
 		this.outputType = 'audio/' + fileType + '; codecs=opus';
 	}
 
-	hasPermission() {
-		return (this.permission === true) ? true : false;
+	HasPermission(callback) {
+		console.log('here');
+		if (navigator.permissions) {
+			navigator.permissions.query({name:'microphone'}).then((result) => {
+				console.log(result.state);
+				if (result.state === 'granted') {
+					this.permission = true;
+				}
+				return callback(this.permission);
+			});
+		} else {
+			console.log('here');
+			navigator.mediaDevices.enumerateDevices().then(devices => 
+				devices.forEach((device) => {
+					console.log(device.label);
+				})
+			);
+			return callback(this.permission);
+		}
+		// return this.permission;
 	}
 
 	isLooping() {
@@ -180,14 +198,21 @@ export default class {
 		return this.playing;
 	}
 
-	getRecording() {
+	isFinished() {
+		if(this.audio !== null) {
+			return this.audio.ended;
+		}
+		return null;
+	}
+
+	GetRecording() {
 		if(this.audio !== null) {
 			return this.audio;
 		}
 		return null;
 	}
 
-	getRecordingFile() {
+	GetRecordingFile() {
 		if(this.theblob !== null) {
 			return this.theblob;
 		}
@@ -195,23 +220,16 @@ export default class {
 	}
 
 
-	getStream() {
+	GetStream() {
 		if(this.mediaStream !== null) {
 			return this.mediaStream;
 		}
 		return null;
 	}
 
-	getOutputType() {
+	GetOutputType() {
 		if(this.outputType !== null) {
 			return this.outputType;
-		}
-		return null;
-	}
-
-	isFinished() {
-		if(this.audio !== null) {
-			return this.audio.ended;
 		}
 		return null;
 	}

@@ -30,14 +30,13 @@ import API from './API.js';
 			} else {
 				UI.RenderHome();
 			}
-			UI.Notify('I\'m a notification. Please give some nice CSS');
-			UI.Notify('Oh, don\'t you dare clicking me!');
 		});
 	}
 
 	// Functions (TODO: maybe set them external?)
 	// Handle login
 
+	// TODO: Test auth every XX seconds
 	function TestAuth(callback) {
 		api.call({
 			action: 'testauth'
@@ -47,10 +46,5 @@ import API from './API.js';
 	}
 
 }
-
-// TODO: PE Form building -> Input type file + record attrib
-// Dus.. Alles onder elkaar zetten als 1 form
-
-// TODO: Server-side/client-side template literal thingies
 
 // TODO: Create loading spinner/icon/smthing
