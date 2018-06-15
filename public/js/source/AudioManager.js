@@ -34,16 +34,18 @@ export default class {
 		data.mediaStream = stream;
 
 		data.mediaRecorder.onstop = () => {
-			data.chunks = [];
+			console.log('onstop');
+			this.chunks = [];
 		}; // End of onstop action.
 
 		data.mediaRecorder.ondataavailable = (e) => {
-			data.chunks.push(e.data);
+			this.chunks.push(e.data);
 			// Retrieve the audio.
-			const audioURL = window.URL.createObjectURL(data.chunks[0]);
-			const blob = new Blob(data.chunks, { 'type' : data.outputType });
+			const audioURL = window.URL.createObjectURL(this.chunks[0]);
+			const blob = new Blob(this.chunks, { 'type' : data.outputType });
 			data.audio = new Audio(audioURL);
-			data.theblob = blob;
+			this.theblob = blob;
+			console.log('Got dat blob');
 		};
 		return data;
 	}
@@ -70,11 +72,13 @@ export default class {
 		}
 	}
 
-	StopRecording(callback) {
-		if(this.mediaRecorder !== null) {
+	StopRecording(data, callback) {
+		if(data.mediaRecorder !== null) {
 			// Only stop recording if the state is recording.
-			if(this.mediaRecorder.state === 'recording') {
-				this.mediaRecorder.stop();
+			if(data.mediaRecorder.state === 'recording') {
+				console.log('Stopping...');
+				data.mediaRecorder.stop(data);
+				callback(false);
 			} else {
 				// Otherwise, say that no recording could be stopped.
 				if(callback) {
@@ -115,11 +119,13 @@ export default class {
 		}
 	}
 
-	Stop(callback) {
-		if(this.audio !== null) {
-			this.audio.pause();
-			this.audio.currentTime = 0;
-			this.playing = false;
+	Stop(data, callback) {
+		console.log(data, data.audio);
+		if(data.audio !== null) {
+			data.audio.pause();
+			data.audio.currentTime = 0;
+			data.playing = false;
+			console.log('Stopped');
 		// Otherwise go to the callback.
 		} else {
 			if(callback) {

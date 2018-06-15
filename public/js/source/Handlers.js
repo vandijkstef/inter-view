@@ -138,7 +138,6 @@ export default class {
 
 	GoNextQuestion(e) {
 		e.preventDefault();
-		// TODO: Test question amount, render next question, OR go to...
 		window.UI.script.currentQuestion++;
 		if (window.UI.script.currentQuestion < window.UI.script.questions.length) {
 			window.UI.RenderQuestions();

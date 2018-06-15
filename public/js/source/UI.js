@@ -355,6 +355,8 @@ export default class {
 			return;
 		}
 		this.Clear(this.main);
+		// const nextButton = UItools.getButton('=>', '', '', this.handlers.GoNextQuestion);
+		const nextButton = UItools.getButton('=>', '', '');
 		UItools.render(
 			[
 				UItools.getForm('preMeta',
@@ -362,7 +364,7 @@ export default class {
 						UItools.wrap(
 							[
 								UItools.getText(this.script.questions[this.script.currentQuestion].question),
-								UItools.getButton('=>', '', '', this.handlers.GoNextQuestion)
+								nextButton
 							]
 						)
 					],
@@ -382,7 +384,27 @@ export default class {
 					console.warn(err);
 				} else {
 					console.log('Audio recording started');
-
+					UItools.addHandler(nextButton, (e) => {
+						console.log('Trying to stop recording');
+						e.preventDefault();
+						this.micWrap.AudioManager.StopRecording(audioData, (err) => {
+							console.log('Recording Stopped');
+							if (err) {
+								console.warn(err);
+							} else {
+								setTimeout(() => { // Apparently forcing it to wait a loop makes this solid
+									const data = this.micWrap.AudioManager.GetRecordingFile();
+									console.log(data);
+								});
+								window.UI.script.currentQuestion++;
+								if (window.UI.script.currentQuestion < window.UI.script.questions.length) {
+									// window.UI.RenderQuestions();
+								} else {
+									window.UI.handlers.GoPostMeta(e);
+								}
+							}
+						});
+					});
 				}
 			});
 		});
