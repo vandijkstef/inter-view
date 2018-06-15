@@ -395,6 +395,46 @@ export default class {
 								setTimeout(() => { // Apparently forcing it to wait a loop makes this solid
 									const data = this.micWrap.AudioManager.GetRecordingFile();
 									console.log(data);
+									const reader = new FileReader();
+									reader.addEventListener('loadend', () => {
+					
+										// TODO: Download as file locally
+										// const a = document.createElement('a');
+										// document.body.appendChild(a);
+										// a.style = 'display: none';
+										// const url = this.micWrap.AudioManager.audioURL;
+										// console.log(url)
+										// a.href = url;
+										// a.download = 'test' + '.wav';
+										// const audioEl = document.createElement('audio');
+										// audioEl.controls = true;
+										// const sourceEl = document.createElement('source');
+										// // console.log(reader.result.toString());
+										// sourceEl.src = a.href;
+										// sourceEl.type = 'audio/' + 'wav' + '; codecs=opus';
+										// document.body.appendChild(audioEl);
+										// audioEl.appendChild(sourceEl);
+										// document.body.appendChild(a);
+										// window.URL.revokeObjectURL(url);
+										// document.body.removeChild(a);
+										// window.URL.revokeObjectURL(url);
+										// a.click();
+
+										// TODO: Upload to server
+										const base64FileData = reader.result.toString();
+										const obj = {
+											// userId: userData._id,
+											audioBlob: base64FileData,
+											// questionNr: (interview.questionNr + 1),
+											type: 'audio'
+										};
+										const api = new API();
+										api.call(obj, (a, b) => {
+											console.log(a, b);
+										});
+									});
+									reader.readAsDataURL(data);
+									// window.DownloadBlob(data);
 								});
 								window.UI.script.currentQuestion++;
 								if (window.UI.script.currentQuestion < window.UI.script.questions.length) {

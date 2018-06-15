@@ -2,7 +2,7 @@ export default class {
 	constructor() {
 		this.permission = false;
 		this.mediaRecorder = null;
-		this.outputType = 'audio/wav';
+		// this.outputType = 'audio/wav';
 		this.audio = null;
 		this.theblob = null;
 		this.mediaStream = null;
@@ -41,9 +41,9 @@ export default class {
 		data.mediaRecorder.ondataavailable = (e) => {
 			this.chunks.push(e.data);
 			// Retrieve the audio.
-			const audioURL = window.URL.createObjectURL(this.chunks[0]);
-			const blob = new Blob(this.chunks, { 'type' : data.outputType });
-			data.audio = new Audio(audioURL);
+			this.audioURL = window.URL.createObjectURL(this.chunks[0]);
+			const blob = new Blob(this.chunks);
+			data.audio = new Audio(this.audioURL);
 			this.theblob = blob;
 			console.log('Got dat blob');
 		};
