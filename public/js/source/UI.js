@@ -97,15 +97,16 @@ export default class {
 	GetMic(enabled, configurable) {
 		console.log('GetMic', enabled, configurable);
 		const mic = this.GetIconSVG('021-microphone', 'mic');
-		const micWrap = UItools.addHandler(UItools.wrap(mic), this.AddAudioModal);
-		micWrap.mic = mic;
-		micWrap.AudioManager = new AudioManager();
-		micWrap.AudioManager.HasPermission((permission) => {
+		this.micWrap = UItools.addHandler(UItools.wrap(mic), this.AddAudioModal);
+		this.micWrap.mic = mic;
+		this.micWrap.AudioManager = new AudioManager();
+		this.micWrap.AudioManager.HasPermission((permission) => {
+			this.micWrap.permission = permission;
 			if (!permission) {
 				mic.classList.add('error');
 			}
 		});
-		return micWrap;
+		return this.micWrap;
 	}
 	
 	GetScrollWindow(content, id) {
@@ -158,7 +159,7 @@ export default class {
 	RenderHome() {
 		this.Clear(this.main);
 		this.StartScriptButton = UItools.getButton('Start Script', '', '', this.handlers.StartScript);
-		this.StartScriptButton.disabled = true;
+		this.ScriptButtonState(false);
 		this.ScriptPreview = this.GetScrollWindow(UItools.getText('Select a script on the left side'));
 
 		const newScriptButton = UItools.getButton('New Script', ['secondary', 'shadowed'], '', this.handlers.EditScript);
@@ -238,7 +239,7 @@ export default class {
 
 	ScriptSelection() {
 		// TODO: Add loading spinner
-		this.StartScriptButton.disabled = true;
+		this.ScriptButtonState(false);
 		const selection = document.querySelectorAll('input[name=script]');
 		let selected;
 		selection.forEach((option) => {
@@ -267,9 +268,32 @@ export default class {
 				this.ScriptPreview
 			);
 			if (script.questions.length > 0) {
-				this.StartScriptButton.disabled = false;
+				// this.StartScriptButton.disabled = false;
+				this.ScriptButtonState(true);
 			}
 		});
+	}
+
+	ScriptButtonState(validScript) {
+		if (!this.StartScriptButton) {
+			console.warn('Can\'t change state, no script button set');
+			return;
+		} else {
+			if (validScript) {
+				this.StartScriptButton.disabled = false;
+				console.log(this.micWrap);
+				if (this.micWrap.permission) {
+					this.StartScriptButton.classList.remove('warning');
+					return false;
+				} else {
+					this.StartScriptButton.classList.add('warning');
+					return 'warning';
+				}
+			} else {
+				this.StartScriptButton.disabled = true;
+				return true;	
+			}	
+		}
 	}
 
 	SetScript(script) {
@@ -349,6 +373,19 @@ export default class {
 			],
 			this.main
 		);
+		console.log('Setting up audio recording for ' + this.script.currentQuestion);
+		this.micWrap.AudioManager.RequestPermission((stream) => {
+			const audioData = this.micWrap.AudioManager.onSuccess(stream);
+			console.log(audioData);
+			this.micWrap.AudioManager.StartRecording(audioData, (err) => {
+				if (err) {
+					console.warn(err);
+				} else {
+					console.log('Audio recording started');
+
+				}
+			});
+		});
 	}
 
 	RenderPostMeta() {
@@ -665,11 +702,16 @@ export default class {
 		if (!this.AudioManager.permission) {
 			this.AudioManager.RequestPermission((succ) => {
 				console.log(succ);
+				window.UI.micWrap.permission = true;
 				this.mic.classList.remove('error');
 			}, (err) => {
+				window.UI.micWrap.permission = false;
 				console.warn(err);
 				window.UI.Notify('Microphone permissions denied', 'warning');
 			});
+		} else {
+			window.UI.micWrap.permission = true;
+			console.log('already permissioned');
 		}
 	}
 

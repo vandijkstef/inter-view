@@ -225,6 +225,12 @@ label {
 			background-color: lighten($main, 8);
 		}
 	}
+	&.warning {
+		background-color: $orange;
+		&:hover, &:focus {
+			background-color: lighten($orange, 8);
+		}
+	}
 	&:disabled {
 		background-color: $grey;
 		cursor: not-allowed;

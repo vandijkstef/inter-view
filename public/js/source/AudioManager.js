@@ -13,51 +13,58 @@ export default class {
 		navigator.getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
 	}
 
-	RequestPermission(success, failure) {
+	RequestPermission(success) {
 		if(navigator.getUserMedia) {
 			this.chunks = [];
 			// this.permission = true;
-			navigator.getUserMedia({audio: true}, success, failure);
+			navigator.getUserMedia({audio: true}, success, this.onError);
 		}
 	}
 
 	onError(err) {
-		console.log('ERROR: ' + err);
+		console.log('AUDIOMANAGER: ERROR: ' + err);
 	}
 
 	onSuccess(stream) {
+		const data = {
+			permission: true
+		};
 		// Initialize the media recorder
-		this.mediaRecorder = new MediaRecorder(stream);
-		this.mediaStream = stream;
+		data.mediaRecorder = new MediaRecorder(stream);
+		data.mediaStream = stream;
 
-		this.mediaRecorder.onstop = () => {
-			this.chunks = [];
+		data.mediaRecorder.onstop = () => {
+			data.chunks = [];
 		}; // End of onstop action.
 
-		this.mediaRecorder.ondataavailable = (e) => {
-			this.chunks.push(e.data);
+		data.mediaRecorder.ondataavailable = (e) => {
+			data.chunks.push(e.data);
 			// Retrieve the audio.
-			const audioURL = window.URL.createObjectURL(this.chunks[0]);
-			const blob = new Blob(this.chunks, { 'type' : this.outputType });
-			this.audio = new Audio(audioURL);
-			this.theblob = blob;
+			const audioURL = window.URL.createObjectURL(data.chunks[0]);
+			const blob = new Blob(data.chunks, { 'type' : data.outputType });
+			data.audio = new Audio(audioURL);
+			data.theblob = blob;
 		};
+		return data;
 	}
 
-	StartRecording(callback) {
-		if(this.mediaRecorder !== null) {
+	StartRecording(data, callback) {
+		if(data.mediaRecorder !== null) {
 			// If you have permission, start recording
-			if(this.hasPermission() === true) {
-				this.mediaRecorder.start();
+			if(data.permission === true) {
+				data.mediaRecorder.start();
+				if (callback) {
+					callback(false);
+				}
 			} else {
 				// If you don't have permission, try running the callback.
-				if(callback) {
+				if (callback) {
 					callback('You do not have permission to record.');
 				}
 			}
 		// If the media recorder has not been created yet...
 		} else {
-			if(callback) {
+			if (callback) {
 				callback( 'You need to give permission to your browser before recording.' );
 			}
 		}

@@ -87,6 +87,7 @@ export default class {
 			this.api.call(data, (data) => {
 				if (data.err) {
 					console.warn(data.err);
+					window.UI.Notify(data.err, 'warning');
 				} else if (data.status) {
 					window.UI.RenderHome(data.scriptID);
 				} else {
@@ -107,19 +108,26 @@ export default class {
 
 		if (typeof selection === 'object') {
 			console.warn('No selection made');
+			window.UI.Notify('No script selected');
 			return;
 		}
 
-		let script = JSON.parse(localStorage.getItem(selection));
-		if (!script) {
-			window.UI.FetchScript(selection.split('_')[1], (scriptData) => {
-				script = scriptData;
+		console.log(window.UI.micWrap.permission);
+		if (window.UI.micWrap.permission === true) {
+			let script = JSON.parse(localStorage.getItem(selection));
+			if (!script) {
+				window.UI.FetchScript(selection.split('_')[1], (scriptData) => {
+					script = scriptData;
+					window.UI.SetScript(script);
+					window.UI.RenderPreMeta();
+				});
+			} else {
 				window.UI.SetScript(script);
 				window.UI.RenderPreMeta();
-			});
+			}
 		} else {
-			window.UI.SetScript(script);
-			window.UI.RenderPreMeta();
+			console.warn('Check mic settings');
+			window.UI.Notify('Please check your mic settings');
 		}
 	}
 
