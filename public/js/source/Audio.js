@@ -21,7 +21,7 @@ export default class {
 		}, success, fail);
 	}
 
-	GotStream(stream) {
+	GotStream(stream, mic) {
 		const audioContext = new AudioContext();
 		const inputPoint = audioContext.createGain();
 
@@ -35,7 +35,9 @@ export default class {
 		inputPoint.connect( analyserNode );
 
 		window.audioRecorder = new window.Recorder(inputPoint);
-
+		if (mic) {
+			window.audioRecorder.mic = mic;
+		}
 		const zeroGain = audioContext.createGain();
 		zeroGain.gain.value = 0.0;
 		inputPoint.connect( zeroGain );
@@ -48,14 +50,17 @@ export default class {
 	SendAudio(filename) {
 		window.audioRecorder.exportWAV((blob) => {
 
+			// TODO: Push the audio into PouchDB
+
 			// Download the wav on users device
 			window.Recorder.Download(blob, filename, (status) => {
 				if (status) {
 					window.audioRecorder.clear();
-					window.audioRecorder.record();
+					// window.audioRecorder.record();
 				}
 			});
 
+			// Upload the audio
 			const formData = new FormData();
 			formData.append('audio', blob, filename);
 
@@ -64,23 +69,21 @@ export default class {
 				body: formData
 			}).then((data) => {
 				console.log(data);
+				// TODO: Remove audio from Pouch when the server acknowledges the file
 			});
 			
 		});
 	}
 
 	HasPermission(callback) {
-		console.log('here');
 		if (navigator.permissions) {
 			navigator.permissions.query({name:'microphone'}).then((result) => {
-				console.log(result.state);
 				if (result.state === 'granted') {
 					this.permission = true;
 				}
 				return callback(this.permission);
 			});
 		} else {
-			console.log('here');
 			navigator.mediaDevices.enumerateDevices().then(devices => 
 				devices.forEach((device) => {
 					console.log(device.label);

@@ -61,10 +61,16 @@ DEALINGS IN THE SOFTWARE.
 		};
 	
 		this.record = function(){
+			if (this.mic) {
+				this.mic.classList.add('recording');
+			}
 			recording = true;
 		};
 	
 		this.stop = function(){
+			if (this.mic) {
+				this.mic.classList.remove('recording');
+			}
 			recording = false;
 		};
 	

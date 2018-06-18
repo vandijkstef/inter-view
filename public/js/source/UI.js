@@ -89,6 +89,28 @@ export default class {
 		);
 	}
 
+	GetInterviewHeader(script) {
+		return UItools.wrap(
+			[
+				UItools.getText('progress'),
+				UItools.wrap(
+					[
+						this.GetLogo(),
+						UItools.getText('rating'),
+						UItools.wrap(
+							[
+								UItools.getText('timerone'),
+								UItools.getText('timertwo'),
+								this.GetMic(true, false)
+							]
+						)
+					]
+				)
+			],
+			'', '', 'header'
+		);
+	}
+
 	GetNav(nav) {
 		console.log('GetNav', nav);
 		return UItools.wrap(UItools.getText('nav'));
@@ -357,8 +379,10 @@ export default class {
 		this.Clear(this.main);
 		// const nextButton = UItools.getButton('=>', '', '', this.handlers.GoNextQuestion);
 		const nextButton = UItools.getButton('=>', '', '');
+		const micWrap = this.GetMic();
 		UItools.render(
-			[
+			[	
+				this.GetInterviewHeader(),
 				UItools.getForm('preMeta',
 					[
 						UItools.wrap(
@@ -376,78 +400,28 @@ export default class {
 			this.main
 		);
 		console.log('Setting up audio recording for ' + this.script.currentQuestion);
-		// this.micWrap.AudioManager.RequestPermission((stream) => {
-		// 	const audioData = this.micWrap.AudioManager.onSuccess(stream);
-		// 	console.log(audioData);
-		// 	this.micWrap.AudioManager.StartRecording(audioData, (err) => {
-		// 		if (err) {
-		// 			console.warn(err);
-		// 		} else {
-		// 			console.log('Audio recording started');
-		// 			UItools.addHandler(nextButton, (e) => {
-		// 				console.log('Trying to stop recording');
-		// 				e.preventDefault();
-		// 				this.micWrap.AudioManager.StopRecording(audioData, (err) => {
-		// 					console.log('Recording Stopped');
-		// 					if (err) {
-		// 						console.warn(err);
-		// 					} else {
-		// 						setTimeout(() => { // Apparently forcing it to wait a loop makes this solid
-		// 							const data = this.micWrap.AudioManager.GetRecordingFile();
-		// 							console.log(data);
-		// 							const reader = new FileReader();
-		// 							reader.addEventListener('loadend', () => {
-					
-		// 								// TODO: Download as file locally
-		// 								// const a = document.createElement('a');
-		// 								// document.body.appendChild(a);
-		// 								// a.style = 'display: none';
-		// 								// const url = this.micWrap.AudioManager.audioURL;
-		// 								// console.log(url)
-		// 								// a.href = url;
-		// 								// a.download = 'test' + '.wav';
-		// 								// const audioEl = document.createElement('audio');
-		// 								// audioEl.controls = true;
-		// 								// const sourceEl = document.createElement('source');
-		// 								// // console.log(reader.result.toString());
-		// 								// sourceEl.src = a.href;
-		// 								// sourceEl.type = 'audio/' + 'wav' + '; codecs=opus';
-		// 								// document.body.appendChild(audioEl);
-		// 								// audioEl.appendChild(sourceEl);
-		// 								// document.body.appendChild(a);
-		// 								// window.URL.revokeObjectURL(url);
-		// 								// document.body.removeChild(a);
-		// 								// window.URL.revokeObjectURL(url);
-		// 								// a.click();
+		micWrap.audio.InitAudio((stream) => {
+			micWrap.audio.GotStream(stream, micWrap.mic);
+			window.audioRecorder.record();
+			console.log('Audio recording started');
+			UItools.addHandler(nextButton, (e) => {
+				e.preventDefault();
+				console.log('Stopping recording');
+				window.audioRecorder.stop();
+				micWrap.audio.SendAudio(`${this.script.id}-${this.script.currentQuestion}-intervieweeID`);
+				window.UI.script.currentQuestion++;
+				if (window.UI.script.currentQuestion < window.UI.script.questions.length) {
+					window.UI.RenderQuestions();
+				} else {
 
-		// 								// TODO: Upload to server
-		// 								const base64FileData = reader.result.toString();
-		// 								const obj = {
-		// 									// userId: userData._id,
-		// 									audioBlob: base64FileData,
-		// 									// questionNr: (interview.questionNr + 1),
-		// 									type: 'audio'
-		// 								};
-		// 								const api = new API();
-		// 								api.call(obj, (a, b) => {
-		// 									console.log(a, b);
-		// 								});
-		// 							});
-		// 							reader.readAsDataURL(data);
-		// 							// window.DownloadBlob(data);
-		// 						});
-		// 						window.UI.script.currentQuestion++;
-		// 						if (window.UI.script.currentQuestion < window.UI.script.questions.length) {
-		// 							// window.UI.RenderQuestions();
-		// 						} else {
-		// 							window.UI.handlers.GoPostMeta(e);
-		// 						}
-		// 					}
-		// 				});
-		// 			});
-		// 		}
-		// 	});
-		// });
+					window.UI.handlers.GoPostMeta(e);
+				}
+			});
+		}, (err) => {
+			console.warn('This should never error:', err);
+			window.UI.Notify('Unspecified error: Notice dev');
+		});
+
 	}
 
 	RenderPostMeta() {

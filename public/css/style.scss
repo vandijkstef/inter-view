@@ -256,6 +256,9 @@ label {
 	}
 	&.mic {
 		width: 2.6em;
+		&.recording {
+			fill: $green;
+		}
 	}
 	&.error {
 		fill: $red;
