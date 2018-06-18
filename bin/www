@@ -12,6 +12,7 @@ const isElevated = require('is-elevated');
 
 isElevated().then((elevated) => {
 	if (elevated) {
+		// TODO: Test if we can dynamically find a name
 		if (fs.existsSync('./localhost.key') && fs.existsSync('./localhost.crt')) {
 			const options = {
 				key: fs.readFileSync('./localhost.key'),
