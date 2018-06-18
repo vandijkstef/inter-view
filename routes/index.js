@@ -141,4 +141,10 @@ router.post('/api', function(req, res) {
 	
 });
 
+router.post('/audio', function(req, res) {
+	const data = {};
+	data.test = 'test';
+	res.json(data);
+});
+
 module.exports = router;
