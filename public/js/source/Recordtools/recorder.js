@@ -19,7 +19,7 @@ DEALINGS IN THE SOFTWARE.
 
 (function(window){
 
-	let WORKER_PATH = 'js/recorderWorker.js';
+	let WORKER_PATH = '/js/source/Recordtools/recorderWorker.js';
   
 	let Recorder = function(source, cfg){
 		let config = cfg || {};
@@ -106,11 +106,18 @@ DEALINGS IN THE SOFTWARE.
 		this.node.connect(this.context.destination);   // if the script node is not connected to an output the "onaudioprocess" event is not triggered in chrome.
 	};
 	
-	Recorder.setupDownload = function(blob, filename){
-		let url = (window.URL || window.webkitURL).createObjectURL(blob);
-		let link = document.getElementById('save');
+	Recorder.Download = function(blob, filename, callback){
+		let url = window.URL.createObjectURL(blob);
+		let link = document.createElement('a');
+		link.style.display = 'none';
 		link.href = url;
 		link.download = filename || 'output.wav';
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+		if (callback) {
+			callback(true);
+		}
 	};
 	
 	window.Recorder = Recorder;

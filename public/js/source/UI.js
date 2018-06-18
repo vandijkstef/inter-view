@@ -1,7 +1,7 @@
 import UItools from './UItools/UItools.js';
 import FormHandlers from './Handlers.js';
 import API from './API.js';
-import AudioManager from './AudioManager.js';
+import Audio from './Audio.js';
 
 export default class {
 
@@ -99,8 +99,8 @@ export default class {
 		const mic = this.GetIconSVG('021-microphone', 'mic');
 		this.micWrap = UItools.addHandler(UItools.wrap(mic), this.AddAudioModal);
 		this.micWrap.mic = mic;
-		this.micWrap.AudioManager = new AudioManager();
-		this.micWrap.AudioManager.HasPermission((permission) => {
+		this.micWrap.audio = new Audio();
+		this.micWrap.audio.HasPermission((permission) => {
 			this.micWrap.permission = permission;
 			if (!permission) {
 				mic.classList.add('error');
@@ -376,78 +376,78 @@ export default class {
 			this.main
 		);
 		console.log('Setting up audio recording for ' + this.script.currentQuestion);
-		this.micWrap.AudioManager.RequestPermission((stream) => {
-			const audioData = this.micWrap.AudioManager.onSuccess(stream);
-			console.log(audioData);
-			this.micWrap.AudioManager.StartRecording(audioData, (err) => {
-				if (err) {
-					console.warn(err);
-				} else {
-					console.log('Audio recording started');
-					UItools.addHandler(nextButton, (e) => {
-						console.log('Trying to stop recording');
-						e.preventDefault();
-						this.micWrap.AudioManager.StopRecording(audioData, (err) => {
-							console.log('Recording Stopped');
-							if (err) {
-								console.warn(err);
-							} else {
-								setTimeout(() => { // Apparently forcing it to wait a loop makes this solid
-									const data = this.micWrap.AudioManager.GetRecordingFile();
-									console.log(data);
-									const reader = new FileReader();
-									reader.addEventListener('loadend', () => {
+		// this.micWrap.AudioManager.RequestPermission((stream) => {
+		// 	const audioData = this.micWrap.AudioManager.onSuccess(stream);
+		// 	console.log(audioData);
+		// 	this.micWrap.AudioManager.StartRecording(audioData, (err) => {
+		// 		if (err) {
+		// 			console.warn(err);
+		// 		} else {
+		// 			console.log('Audio recording started');
+		// 			UItools.addHandler(nextButton, (e) => {
+		// 				console.log('Trying to stop recording');
+		// 				e.preventDefault();
+		// 				this.micWrap.AudioManager.StopRecording(audioData, (err) => {
+		// 					console.log('Recording Stopped');
+		// 					if (err) {
+		// 						console.warn(err);
+		// 					} else {
+		// 						setTimeout(() => { // Apparently forcing it to wait a loop makes this solid
+		// 							const data = this.micWrap.AudioManager.GetRecordingFile();
+		// 							console.log(data);
+		// 							const reader = new FileReader();
+		// 							reader.addEventListener('loadend', () => {
 					
-										// TODO: Download as file locally
-										// const a = document.createElement('a');
-										// document.body.appendChild(a);
-										// a.style = 'display: none';
-										// const url = this.micWrap.AudioManager.audioURL;
-										// console.log(url)
-										// a.href = url;
-										// a.download = 'test' + '.wav';
-										// const audioEl = document.createElement('audio');
-										// audioEl.controls = true;
-										// const sourceEl = document.createElement('source');
-										// // console.log(reader.result.toString());
-										// sourceEl.src = a.href;
-										// sourceEl.type = 'audio/' + 'wav' + '; codecs=opus';
-										// document.body.appendChild(audioEl);
-										// audioEl.appendChild(sourceEl);
-										// document.body.appendChild(a);
-										// window.URL.revokeObjectURL(url);
-										// document.body.removeChild(a);
-										// window.URL.revokeObjectURL(url);
-										// a.click();
+		// 								// TODO: Download as file locally
+		// 								// const a = document.createElement('a');
+		// 								// document.body.appendChild(a);
+		// 								// a.style = 'display: none';
+		// 								// const url = this.micWrap.AudioManager.audioURL;
+		// 								// console.log(url)
+		// 								// a.href = url;
+		// 								// a.download = 'test' + '.wav';
+		// 								// const audioEl = document.createElement('audio');
+		// 								// audioEl.controls = true;
+		// 								// const sourceEl = document.createElement('source');
+		// 								// // console.log(reader.result.toString());
+		// 								// sourceEl.src = a.href;
+		// 								// sourceEl.type = 'audio/' + 'wav' + '; codecs=opus';
+		// 								// document.body.appendChild(audioEl);
+		// 								// audioEl.appendChild(sourceEl);
+		// 								// document.body.appendChild(a);
+		// 								// window.URL.revokeObjectURL(url);
+		// 								// document.body.removeChild(a);
+		// 								// window.URL.revokeObjectURL(url);
+		// 								// a.click();
 
-										// TODO: Upload to server
-										const base64FileData = reader.result.toString();
-										const obj = {
-											// userId: userData._id,
-											audioBlob: base64FileData,
-											// questionNr: (interview.questionNr + 1),
-											type: 'audio'
-										};
-										const api = new API();
-										api.call(obj, (a, b) => {
-											console.log(a, b);
-										});
-									});
-									reader.readAsDataURL(data);
-									// window.DownloadBlob(data);
-								});
-								window.UI.script.currentQuestion++;
-								if (window.UI.script.currentQuestion < window.UI.script.questions.length) {
-									// window.UI.RenderQuestions();
-								} else {
-									window.UI.handlers.GoPostMeta(e);
-								}
-							}
-						});
-					});
-				}
-			});
-		});
+		// 								// TODO: Upload to server
+		// 								const base64FileData = reader.result.toString();
+		// 								const obj = {
+		// 									// userId: userData._id,
+		// 									audioBlob: base64FileData,
+		// 									// questionNr: (interview.questionNr + 1),
+		// 									type: 'audio'
+		// 								};
+		// 								const api = new API();
+		// 								api.call(obj, (a, b) => {
+		// 									console.log(a, b);
+		// 								});
+		// 							});
+		// 							reader.readAsDataURL(data);
+		// 							// window.DownloadBlob(data);
+		// 						});
+		// 						window.UI.script.currentQuestion++;
+		// 						if (window.UI.script.currentQuestion < window.UI.script.questions.length) {
+		// 							// window.UI.RenderQuestions();
+		// 						} else {
+		// 							window.UI.handlers.GoPostMeta(e);
+		// 						}
+		// 					}
+		// 				});
+		// 			});
+		// 		}
+		// 	});
+		// });
 	}
 
 	RenderPostMeta() {
@@ -761,19 +761,16 @@ export default class {
 
 	AddAudioModal() {
 		window.UI.AddModal(UItools.getText('AudioModal'));
-		if (!this.AudioManager.permission) {
-			this.AudioManager.RequestPermission((succ) => {
-				console.log(succ);
-				window.UI.micWrap.permission = true;
+		if (!this.audio.permission) {
+			this.audio.InitAudio((stream) => {
+				this.audio.GotStream(stream);
+				this.audio.permission = true;
 				this.mic.classList.remove('error');
 			}, (err) => {
-				window.UI.micWrap.permission = false;
-				console.warn(err);
+				this.audio.permission = false;
+				console.warn('Error getting audio', err);
 				window.UI.Notify('Microphone permissions denied', 'warning');
 			});
-		} else {
-			window.UI.micWrap.permission = true;
-			console.log('already permissioned');
 		}
 	}
 
