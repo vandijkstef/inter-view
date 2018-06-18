@@ -3,7 +3,7 @@
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
-		"start": "npm run build && node ./bin/www",
+		"start": "npm run rollup && node ./bin/www",
 		"watch": "nodemon ./bin/www",
 		"babel": "babel public/js/source/script.js --out-file public/js/script.js",
 		"rollup": "rollup public/js/source/script.js --format iife --name 'bundle' --file public/js/bundle.js && minify public/js/bundle.js --out-file public/js/bundle.min.js",
