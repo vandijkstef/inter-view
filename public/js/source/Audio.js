@@ -22,6 +22,7 @@ export default class {
 	}
 
 	GotStream(stream, mic) {
+		window.AudioContext = window.AudioContext || window.webkitAudioContext;
 		const audioContext = new AudioContext();
 		const inputPoint = audioContext.createGain();
 

@@ -113,27 +113,44 @@ export default class {
 		}
 
 		console.log(window.UI.micWrap.permission);
-		if (window.UI.micWrap.permission === true) {
-			let script = JSON.parse(localStorage.getItem(selection));
-			if (!script) {
-				window.UI.FetchScript(selection.split('_')[1], (scriptData) => {
-					script = scriptData;
-					window.UI.SetScript(script);
-					window.UI.RenderPreMeta();
-				});
-			} else {
+		// if (window.UI.micWrap.permission === true) {
+		let script = JSON.parse(localStorage.getItem(selection));
+		if (!script) {
+			window.UI.FetchScript(selection.split('_')[1], (scriptData) => {
+				script = scriptData;
 				window.UI.SetScript(script);
 				window.UI.RenderPreMeta();
-			}
+			});
 		} else {
-			console.warn('Check mic settings');
-			window.UI.Notify('Please check your mic settings');
+			window.UI.SetScript(script);
+			window.UI.RenderPreMeta();
 		}
+		// } else {
+		// 	console.warn('Check mic settings');
+		// 	window.UI.Notify('Please check your mic settings');
+		// }
 	}
 
 	GoQuestions(e) {
 		e.preventDefault();
-		window.UI.RenderQuestions();
+		const inputData = document.querySelectorAll('input');
+		const data = [];
+		inputData.forEach((input) => {
+			data.push({
+				key: input.name,
+				value: input.value,
+				type: input.type
+			});
+		});
+		const api = new API();
+		api.call({
+			action: 'new_respondent',
+			meta: data
+		}, (data) => {
+			if (data.status && data.insertID) {
+				window.UI.RenderQuestions(data.insertID);
+			}
+		});
 	}
 
 	GoNextQuestion(e) {

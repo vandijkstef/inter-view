@@ -89,25 +89,32 @@ export default class {
 		);
 	}
 
-	GetInterviewHeader(script) {
+	GetInterviewHeader() {
+		const progress = UItools.createElement('progress', '', 'progress');
+		progress.setAttribute('max', 100);
+		progress.value = (this.script.currentQuestion / this.script.questions.length) * 100;
 		return UItools.wrap(
 			[
-				UItools.getText('progress'),
+				progress,
 				UItools.wrap(
 					[
 						this.GetLogo(),
 						UItools.getText('rating'),
 						UItools.wrap(
 							[
-								UItools.getText('timerone'),
-								UItools.getText('timertwo'),
+								UItools.wrap(
+									[
+										UItools.getText('timerone'),
+										UItools.getText('timertwo')
+									]
+								),
 								this.GetMic(true, false)
 							]
 						)
 					]
 				)
 			],
-			'', '', 'header'
+			'interview', '', 'header'
 		);
 	}
 
@@ -371,31 +378,41 @@ export default class {
 		);
 	}
 
-	RenderQuestions() {
+	RenderQuestions(insertID) {
 		if (!this.script && !this.scriptStarted) {
 			console.warn('Questions shall not be taken');
 			return;
+		}
+		if (this.script && !this.script.respondent && insertID) {
+			this.script.respondent = insertID;
+		}
+		if (!this.script.answers) {
+			this.script.answers = [];
 		}
 		this.Clear(this.main);
 		// const nextButton = UItools.getButton('=>', '', '', this.handlers.GoNextQuestion);
 		const nextButton = UItools.getButton('=>', '', '');
 		const micWrap = this.GetMic();
+		const currentQuestion = Object.assign({}, this.script.questions[this.script.currentQuestion]);
+		currentQuestion.state = 'opened';
+		// TODO: Push currentQuestion to server/cache it
+		this.script.answers.push(currentQuestion);
 		UItools.render(
 			[	
 				this.GetInterviewHeader(),
-				UItools.getForm('preMeta',
+				UItools.getForm('interview',
 					[
 						UItools.wrap(
 							[
-								UItools.getText(this.script.questions[this.script.currentQuestion].question),
-								nextButton
+								UItools.getText(this.script.questions[this.script.currentQuestion].question)
 							]
-						)
+						),
+						nextButton
 					],
 					'/',
 					false
 					// ['grid', 'col-50']
-				)
+				),	
 			],
 			this.main
 		);
@@ -408,12 +425,12 @@ export default class {
 				e.preventDefault();
 				console.log('Stopping recording');
 				window.audioRecorder.stop();
-				micWrap.audio.SendAudio(`${this.script.id}-${this.script.currentQuestion}-intervieweeID`);
+				currentQuestion.state = 'done';
+				micWrap.audio.SendAudio(`${this.script.id}-${this.script.currentQuestion}-${this.script.respondent}`);
 				window.UI.script.currentQuestion++;
 				if (window.UI.script.currentQuestion < window.UI.script.questions.length) {
 					window.UI.RenderQuestions();
 				} else {
-
 					window.UI.handlers.GoPostMeta(e);
 				}
 			});
@@ -457,7 +474,6 @@ export default class {
 					],
 					'/',
 					false
-					// ['grid', 'col-50']
 				)
 			],
 			this.main
@@ -499,7 +515,6 @@ export default class {
 					],
 					'/',
 					false
-					// ['grid', 'col-50']
 				)
 			],
 			this.main
