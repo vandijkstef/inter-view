@@ -4,6 +4,17 @@ const path = require('path');
 const DB = require('../scripts/DB.js');
 const crypto = require('crypto');
 
+const multer = require('multer');
+const storage = multer.diskStorage({
+	destination: function (req, file, cb) {
+		cb(null, __basedir + '/uploads/');
+	},
+	filename: function (req, file, cb) {
+		cb(null, file.originalname + '-' + Date.now() + '.wav');
+	}
+});
+const upload = multer({ storage: storage });
+
 /* GET home page. */
 router.get('/', function(req, res) {
 	res.sendFile(path.join(__dirname + '/public/index.html'));
@@ -120,15 +131,52 @@ router.post('/api', function(req, res) {
 				});
 			} else {
 				const db = new DB();
+				console.log(req.body);
 				db.Update('scripts', {id: req.body.id, title: req.body.title, description: req.body.description}, (status) => {
-					// TODO: Update Meta
-					// TODO: Update questions
+					req.body.metas.forEach((meta) => {
+						const db = new DB(); // Recreate DB so we have a seperate connection, which we can neatly close
+						// TODO: Test if this is a changed one or not
+						if (meta.id === 'new') {
+							db.Insert('scripts_meta', {script_id: req.body.id, key: meta.key, type: meta.type, order: meta.order}, () => {
+								// Silence is golden..
+							});
+						} else {
+							db.Update('scripts_meta', {id: meta.id, script_id: req.body.id, key: meta.key, type: meta.type, order: meta.order}, (err, status) => {
+								console.log(err, status);
+							});
+						}
+					});
+					req.body.questions.forEach((question) => {
+						const db = new DB();
+						if (question.id === 'new') {
+							db.Insert('questions', {script_id: req.body.id, question: question.text, order: question.order}, () => {
+								// Silence is golden..
+							});
+						} else { 
+							db.Update('questions', {script_id: req.body.id, question: question.text, order: question.order}, (err, status) => {
+								console.log(err, status);
+							});
+						}
+					});
 					data.status = status;
 					res.json(data);
 				});
 			}
 		} else {
 			data.err = 'Cannot store script: Not authenticated';
+			res.json(data);
+		}
+		break;
+	case 'new_respondent':
+		if (req.session.user) {
+			const db = new DB();
+			db.Insert('respondent', {psuedo: 'test'}, (insertID) => {
+				data.insertID = insertID;
+				data.status = true;
+				res.json(data);
+			});
+		} else {
+			data.err = 'Cannot set respondent id: Not authenticated';
 			res.json(data);
 		}
 		break;
@@ -141,9 +189,10 @@ router.post('/api', function(req, res) {
 	
 });
 
-router.post('/audio', function(req, res) {
+router.post('/audio', upload.single('audio'), function(req, res) {
 	const data = {};
 	data.test = 'test';
+	console.log('got audio?', req.body, req.file);
 	res.json(data);
 });
 
