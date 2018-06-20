@@ -15,6 +15,11 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
+function AuthError(data, res) {
+	data.autherror = true;
+	res.json(data);
+}
+
 /* GET home page. */
 router.get('/', function(req, res) {
 	res.sendFile(path.join(__dirname + '/public/index.html'));
@@ -36,6 +41,7 @@ router.post('/api', function(req, res) {
 			db.Select('users', {username: req.body.username, password: hash}, (userData) => {
 				if (userData.length === 1) {
 					req.session.user = {
+						id: userData[0].id,
 						name: userData[0].displayname
 					};
 					data.status = true;
@@ -50,12 +56,12 @@ router.post('/api', function(req, res) {
 					});
 				} else {
 					data.err = 'Invalid login';
-					res.json(data);
+					AuthError(data, res);
 				}
 			});
 		} else {
 			data.err = 'Invalid login data';
-			res.json(data);
+			AuthError(data, res);
 		}
 		break;
 	case 'testauth':
@@ -79,7 +85,7 @@ router.post('/api', function(req, res) {
 			});
 		} else {
 			data.err = 'Cannot fetch script: Not authenticated';
-			res.json(data);
+			AuthError(data, res);
 		}
 		break;
 	case 'script_fetch':
@@ -105,10 +111,11 @@ router.post('/api', function(req, res) {
 			});
 		} else {
 			data.err = 'Cannot fetch script: Not authenticated';
-			res.json(data);
+			AuthError(data, res);
 		}
 		break;
 	case 'script_store':
+		console.log(req.body);
 		if (req.session.user) {
 			const db = new DB();
 			if (req.body.id === 'new') {
@@ -117,7 +124,7 @@ router.post('/api', function(req, res) {
 					data.scriptID = insertID;
 					req.body.metas.forEach((meta) => {
 						const db = new DB(); // Recreate DB so we have a seperate connection, which we can neatly close
-						db.Insert('scripts_meta', {script_id: insertID, key: meta.key, type: meta.type, order: meta.order}, () => {
+						db.Insert('scripts_meta', {script_id: insertID, key: meta.key, type: meta.type, order: meta.order, post: meta.post}, () => {
 							// Silence is golden..
 						});
 					});
@@ -137,11 +144,11 @@ router.post('/api', function(req, res) {
 						const db = new DB(); // Recreate DB so we have a seperate connection, which we can neatly close
 						// TODO: Test if this is a changed one or not
 						if (meta.id === 'new') {
-							db.Insert('scripts_meta', {script_id: req.body.id, key: meta.key, type: meta.type, order: meta.order}, () => {
+							db.Insert('scripts_meta', {script_id: req.body.id, key: meta.key, type: meta.type, order: meta.order, post: meta.post}, () => {
 								// Silence is golden..
 							});
 						} else {
-							db.Update('scripts_meta', {id: meta.id, script_id: req.body.id, key: meta.key, type: meta.type, order: meta.order}, (err, status) => {
+							db.Update('scripts_meta', {id: meta.id, script_id: req.body.id, key: meta.key, type: meta.type, order: meta.order, post: meta.post}, (err, status) => {
 								console.log(err, status);
 							});
 						}
@@ -164,7 +171,7 @@ router.post('/api', function(req, res) {
 			}
 		} else {
 			data.err = 'Cannot store script: Not authenticated';
-			res.json(data);
+			AuthError(data, res);
 		}
 		break;
 	case 'new_respondent':
@@ -177,11 +184,42 @@ router.post('/api', function(req, res) {
 			});
 		} else {
 			data.err = 'Cannot set respondent id: Not authenticated';
+			AuthError(data, res);
+		}
+		break;
+	case 'new_answer':
+		if (req.session.user) {
+			const db = new DB();
+			console.log(req.session.user);
+			db.Insert('response', {
+				question_id: req.body.question,
+				respondent_id: req.body.respondent,
+				interviewer_id: req.session.user.id,
+				// TODO: Rating/Tags
+				// TODO: Audiofile stuff
+			}, (insertID) => {
+				console.log('answer', insertID);
+			});
+		} else {
+			data.err = 'Cannot store answer: Not authenticated';
 			res.json(data);
 		}
 		break;
+	case 'get_respondents':
+		if (req.session.user) {
+			const db = new DB();
+			db.Insert('respondent', {psuedo: 'test'}, (insertID) => {
+				data.insertID = insertID;
+				data.status = true;
+				res.json(data);
+			});
+		} else {
+			data.err = 'Cannot get respondents: Not authenticated';
+			AuthError(data, res);
+		}
+		break;
 	default:
-		data.err = 'Not implemented: ' + req.body.action;
+		data.err = 'Action not available: ' + req.body.action;
 		data.req = req.body;
 		res.json(data);
 		break;
