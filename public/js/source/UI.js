@@ -120,7 +120,8 @@ export default class {
 
 	GetNav(nav) {
 		console.log('GetNav', nav);
-		return UItools.wrap(UItools.getText('nav'));
+		// TODO: Maybe do a full nav handler on the complete navigation
+		return UItools.wrap(UItools.addHandler(UItools.getText('nav'), this.handlers.OpenResults));
 	}
 
 	GetMic(enabled, configurable) {
@@ -144,6 +145,35 @@ export default class {
 
 	GetLoader() {
 		return UItools.createElement('loading');
+	}
+
+	GetResult() {
+		// This should show an interview/respondent
+		return UItools.wrap(
+			[
+				this.GetResultEntry(),
+				this.GetResultDetail()
+			],
+			'entry'
+		);
+	}
+
+	GetResultEntry() {
+		// This should show individual answers
+		return UItools.wrap(
+			[
+				UItools.getText('Main section, (pseudo)title, meta and status')
+			]
+		);
+	}
+
+	GetResultDetail() {
+		// This should show individual answers
+		return UItools.wrap(
+			[
+				UItools.getText('Detail')
+			]
+		);
 	}
 	
 	// TODO: I might wanna rework Notify into a seperate class
@@ -264,6 +294,61 @@ export default class {
 				loader.parentElement.removeChild(loader);
 			});
 		}
+	}
+
+	RenderResults() {
+		this.Clear(this.main);
+		const resultsWindow = this.GetScrollWindow(
+			[
+				this.GetResult()
+			]
+		);
+		const scriptSelection = UItools.getSelect('script', []);
+		UItools.addHandler(scriptSelection, this.handlers.ResultsChangeScript, 'change');
+		UItools.render(
+			[
+				this.GetHeader('Results'),
+				UItools.wrap(
+					[
+						UItools.wrap(
+							[
+								scriptSelection,
+							]
+						),
+						resultsWindow
+					],
+					['row-TWB', 'grid']
+				)
+			],
+			this.main
+		);
+
+		// Script selection
+		const api = new API();
+		// TODO: Only show scripts that have results?
+		api.call({
+			action: 'scripts_fetch'
+		}, (data) => {
+			if (data.status) {
+				data.scripts.forEach((script) => {
+					UItools.addSelectOption({
+						value: script.id,
+						label: `${script.title} (${script.id})`
+					}, scriptSelection);
+				});
+				this.handlers.ResultsChangeScript();
+			} else {
+				console.log('Couldn\'t fetch results');
+			}
+		});
+	}
+
+	ShowResultsForScript(scriptID) {
+		console.log('ja', scriptID);
+
+		// Get Respondents (on script selection)
+		
+		// Get Responses (on respondent selection)
 	}
 
 	ScriptSelection() {
@@ -395,6 +480,7 @@ export default class {
 		const micWrap = this.GetMic();
 		const currentQuestion = Object.assign({}, this.script.questions[this.script.currentQuestion]);
 		currentQuestion.state = 'opened';
+		console.log(currentQuestion);
 		// TODO: Push currentQuestion to server/cache it
 		this.script.answers.push(currentQuestion);
 		UItools.render(
@@ -426,7 +512,20 @@ export default class {
 				console.log('Stopping recording');
 				window.audioRecorder.stop();
 				currentQuestion.state = 'done';
-				micWrap.audio.SendAudio(`${this.script.id}-${this.script.currentQuestion}-${this.script.respondent}`);
+				micWrap.audio.SendAudio(`${this.script.id}-${this.script.currentQuestion}-${currentQuestion.id}-${this.script.respondent}`);
+				const api = new API();
+				api.call({
+					action: 'new_answer',
+					respondent: this.script.respondent,
+					question: currentQuestion.id,
+					script: this.script.id
+				}, (data) => {
+					if (data.status) {
+						console.log(data);
+					} else {
+						console.warn('didn\'t upload data', data);
+					}
+				});
 				window.UI.script.currentQuestion++;
 				if (window.UI.script.currentQuestion < window.UI.script.questions.length) {
 					window.UI.RenderQuestions();
@@ -644,18 +743,20 @@ export default class {
 				type: 'text'
 			};
 		}
-		const metaTypeSelect = UItools.getInput(false, 'select', 'metaType', [{value: 'text', label: 'Text'}, {value:'email', label: 'E-mail'}], 'Meta Key', '', true);
+		const metaTypeSelect = UItools.getInput(false, 'select', 'metaType', [{value: 'text', label: 'Text'}, {value:'email', label: 'E-mail'}], '', '', true); // Why not just use getSelect?
 		metaTypeSelect.value = metaData.type;
+		const metaPostSelect = UItools.getInput('Post', 'checkbox', 'metaPost', metaData.post);
 		UItools.render(
 			UItools.wrap(
 				[
 					UItools.getInput(false, 'hidden', 'metaID', metaData.id),
 					UItools.getInput(false, 'hidden', 'metaOrder', metaData.order),
 					UItools.getInput(false, 'text', 'metaKey', metaData.key, 'Meta Key', '', true),
-					metaTypeSelect
+					metaTypeSelect,
+					metaPostSelect
 				],
 				'',
-				'',
+				`script-${metaData.id}`,
 				'fieldset'
 			),
 			metaButton.parentElement,
