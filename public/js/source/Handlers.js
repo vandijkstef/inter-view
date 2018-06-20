@@ -153,7 +153,8 @@ export default class {
 		const api = new API();
 		api.call({
 			action: 'new_respondent',
-			meta: data
+			meta: data,
+			script: window.UI.script.id
 		}, (data) => {
 			if (data.status && data.insertID) {
 				window.UI.RenderQuestions(data.insertID);
@@ -167,6 +168,7 @@ export default class {
 		if (window.UI.script.currentQuestion < window.UI.script.questions.length) {
 			window.UI.RenderQuestions();
 		} else {
+			console.warn('is this being executed once?'); // TODO: I think I have this duplicated...
 			window.UI.handlers.GoPostMeta(e);
 		}
 	}

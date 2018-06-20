@@ -423,7 +423,9 @@ export default class {
 		this.scriptStarted = true;
 		const preMetas = [];
 		this.script.metas.forEach((meta) => {
-			preMetas.push(UItools.getInput(meta.key, meta.type, `meta_${meta.id}`));
+			if (!meta.post) {
+				preMetas.push(UItools.getInput(meta.key, meta.type, `meta_${meta.id}`));
+			}
 		});
 		this.Clear(this.main);
 		UItools.render(
@@ -545,6 +547,12 @@ export default class {
 			console.warn('The Meta will not post');
 			return;
 		}
+		const postMetas = [];
+		this.script.metas.forEach((meta) => {
+			if (meta.post) {
+				postMetas.push(UItools.getInput(meta.key, meta.type, `meta_${meta.id}`));
+			}
+		});
 		this.Clear(this.main);
 		UItools.render(
 			[
@@ -554,7 +562,10 @@ export default class {
 						UItools.wrap(
 							[
 								UItools.createElement(),
-								UItools.getText('METAS HERE PLOX'),
+								UItools.wrap(
+									postMetas,
+									'metabox'
+								),
 								UItools.wrap(
 									[
 										UItools.wrap(
@@ -648,7 +659,12 @@ export default class {
 				}
 				return callback(data.script);
 			} else {
-				this.Notify(data.err);
+				if (localStorage.getItem(`script_${id}`)) {
+					localStorage.removeItem(`script_${id}`);
+					this.Notify('Script removed from server: Clearing cached script');
+				} else {
+					this.Notify(data.err);
+				}
 			}
 		});
 	}

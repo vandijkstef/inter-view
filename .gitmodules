@@ -1,3 +1,6 @@
 [submodule "public/js/source/UItools"]
 	path = public/js/source/UItools
 	url = https://github.com/vandijkstef/UItools.git
+[submodule "public/random-name"]
+	path = public/random-name
+	url = https://github.com/dominictarr/random-name.git

@@ -94,6 +94,7 @@ router.post('/api', function(req, res) {
 			db.Select('scripts', {id: req.body.scriptID}, (script) => {
 				if (!script[0]) {
 					data.err = `No script for ${req.body.scriptID}`;
+					data.NOSCRIPT = true;
 					res.json(data);
 				} else {
 					data.status = true;
@@ -177,9 +178,20 @@ router.post('/api', function(req, res) {
 	case 'new_respondent':
 		if (req.session.user) {
 			const db = new DB();
-			db.Insert('respondent', {psuedo: 'test'}, (insertID) => {
+			// TODO: Get Pseudo
+			db.Insert('respondent', {psuedo: 'test', script_id: req.body.script}, (insertID) => {
 				data.insertID = insertID;
 				data.status = true;
+				req.body.meta.forEach((meta) => {
+					const db = new DB();
+					db.Insert('respondent_meta', {
+						respondent_id: insertID,
+						meta_id: meta.key.split('_')[1],
+						value: meta.value
+					}, () => {
+						// Silence is golden...
+					});
+				});
 				res.json(data);
 			});
 		} else {
