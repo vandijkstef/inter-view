@@ -55,12 +55,20 @@ export default class {
 			const metaOrders = FD.getAll('metaOrder');
 			const metaKeys = FD.getAll('metaKey');
 			const metaTypes = FD.getAll('metaType');
+			const metaPostInputs = document.querySelectorAll('input[name=metaPost]');
+			const metaPosts = [];
+			metaPostInputs.forEach((input) => {
+				metaPosts.push(input.checked);
+			})
+			console.log(metaPosts);
 			for(let i = 0; i < metaIDs.length; i++) {
+				// document.querySelector(`fieldset#script-${`)
 				metaData.push({
 					id: metaIDs[i],
 					order: metaOrders[i],
 					key: metaKeys[i],
-					type: metaTypes[i]
+					type: metaTypes[i],
+					post: metaPosts[i]
 				});
 			}
 			const questionData = [];
@@ -190,14 +198,40 @@ export default class {
 
 	DivRadio(e) {
 		// TODO: This is used when the user clicks the div, to update
-		document.querySelector(`input[value=${e.target.id}]`).checked = true;
-		console.log(e.target, e.target.parentElement);
+		let el = e.target;
+		// TODO: Serious? This can be done better, but it works
+		if (!el.id) {
+			console.log('refetch once', el);
+			el = el.parentElement;
+			if (!el.id) {
+				console.log('refetch twice', el);
+				el = el.parentElement;
+				if (!el.id) {
+					console.log('refetch trice', el);
+					el = el.parentElement;
+				}
+			}
+		}
+		document.querySelector(`input[value=${el.id}]`).checked = true;
 		window.UI.ScriptSelection();
 	}
 
 	CloseModal() {
 		const modal = this.parentElement.parentElement;
 		modal.parentElement.removeChild(modal);
+	}
+
+	OpenResults() {
+		window.UI.RenderResults();
+	}
+
+	ResultsChangeScript() {
+		let select = this;
+		if (select.tagName !== 'SELECT') {
+			console.log('Probably initialising');
+			select = document.querySelector('select[name=script]');
+		}
+		window.UI.ShowResultsForScript(select.value);
 	}
 
 }
