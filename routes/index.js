@@ -241,9 +241,29 @@ router.post('/api', function(req, res) {
 
 router.post('/audio', upload.single('audio'), function(req, res) {
 	const data = {};
-	data.test = 'test';
-	console.log('got audio?', req.body, req.file);
-	res.json(data);
+	if (req.file) {
+		const db = new DB();
+		const ids = req.file.originalname.split('-');
+		db.Select('response', {
+			question_id: ids[2],
+			respondent_id: ids[3]
+		}, (responseData) => {
+			if (responseData[0]) {
+				const db = new DB();
+				db.Update('response', {
+					id: responseData[0].id,
+					audiofile: req.file.filename
+				}, () => {
+					data.status = true;
+					res.json(data);
+				});
+			} else {
+				console.log('Response not yet in database: audio not linked');
+				res.json(data);
+			}
+		});
+	}
+	
 });
 
 module.exports = router;
