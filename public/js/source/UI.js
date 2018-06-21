@@ -78,13 +78,15 @@ export default class {
 
 	GetHeader(title, nav, micEnabled, micConfigurable) {
 		this.SetTitle(title);
+		const content = [];
+		content.push(this.GetLogo());
+		content.push(UItools.getText(title, '', '', 'h1'));
+		if (nav) {
+			content.push(this.GetNav(nav));
+		}
+		content.push(this.GetMic(micEnabled, micConfigurable));
 		return UItools.wrap(
-			[
-				this.GetLogo(),
-				UItools.getText(title, '', '', 'h1'),
-				this.GetNav(nav),
-				this.GetMic(micEnabled, micConfigurable)
-			],
+			content,
 			'', '', 'header'
 		);
 	}
@@ -121,7 +123,7 @@ export default class {
 	GetNav(nav) {
 		console.log('GetNav', nav);
 		// TODO: Maybe do a full nav handler on the complete navigation
-		return UItools.wrap(UItools.addHandler(UItools.getText('nav'), this.handlers.OpenResults));
+		return UItools.wrap(UItools.addHandler(UItools.getText(nav), this.handlers.OpenResults));
 	}
 
 	GetMic(enabled, configurable) {
@@ -225,7 +227,7 @@ export default class {
 
 		UItools.render(
 			[
-				this.GetHeader('Script Selection'),
+				this.GetHeader('Script Selection', 'Results'),
 				UItools.addHandler(
 					UItools.getForm('scriptSelect',
 						[
@@ -307,7 +309,7 @@ export default class {
 		UItools.addHandler(scriptSelection, this.handlers.ResultsChangeScript, 'change');
 		UItools.render(
 			[
-				this.GetHeader('Results'),
+				this.GetHeader('Results', 'Home'),
 				UItools.wrap(
 					[
 						UItools.wrap(
@@ -526,6 +528,7 @@ export default class {
 						console.log(data);
 					} else {
 						console.warn('didn\'t upload data', data);
+						window.UI.Notify('Data not uploaded');
 					}
 				});
 				window.UI.script.currentQuestion++;
@@ -541,7 +544,8 @@ export default class {
 		});
 
 	}
-
+	// TODO: Do I set scriptStarted to false?
+	// TODO: Use scriptstarted to set/restore a state
 	RenderPostMeta() {
 		if (!this.script && !this.scriptStarted) {
 			console.warn('The Meta will not post');
@@ -553,6 +557,30 @@ export default class {
 				postMetas.push(UItools.getInput(meta.key, meta.type, `meta_${meta.id}`));
 			}
 		});
+		const endButton = UItools.addHandler(UItools.getButton('End Interview', '', ''), (e) => {
+			e.preventDefault();
+			const inputData = document.querySelectorAll('input');
+			const data = [];
+			inputData.forEach((input) => {
+				data.push({
+					key: input.name,
+					value: input.value,
+					type: input.type
+				});
+			});
+			const api = new API();
+			api.call({
+				action: 'post_meta',
+				meta: data,
+				script: window.UI.script.id
+			}, (data) => {
+				if (data.status && data.insertID) {
+					window.UI.RenderQuestions(data.insertID);
+				}
+			});
+			window.UI.RenderPostInterview();
+		});
+
 		this.Clear(this.main);
 		UItools.render(
 			[
@@ -574,7 +602,7 @@ export default class {
 												UItools.getText(this.script.description) // TODO: Extra description
 											]
 										),
-										UItools.getButton('End Interview', '', '', this.handlers.GoPostInterview)
+										endButton
 									],
 									['grid', 'row-BB']
 								)
