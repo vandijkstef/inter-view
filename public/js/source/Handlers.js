@@ -178,11 +178,6 @@ export default class {
 		window.UI.RenderPostMeta();
 	}
 
-	GoPostInterview(e) {
-		e.preventDefault();
-		window.UI.RenderPostInterview();
-	}
-
 	StoreInterview(e) {
 		e.preventDefault();
 		console.log('this should store the interview');
@@ -199,22 +194,8 @@ export default class {
 	}
 
 	DivRadio(e) {
-		// TODO: This is used when the user clicks the div, to update
 		let el = e.target;
-		// TODO: Serious? This can be done better, but it works
-		if (!el.id) {
-			console.log('refetch once', el);
-			el = el.parentElement;
-			if (!el.id) {
-				console.log('refetch twice', el);
-				el = el.parentElement;
-				if (!el.id) {
-					console.log('refetch trice', el);
-					el = el.parentElement;
-				}
-			}
-		}
-		document.querySelector(`input[value=${el.id}]`).checked = true;
+		document.querySelector(`input[value=${this.id}]`).checked = true;
 		window.UI.ScriptSelection();
 	}
 
