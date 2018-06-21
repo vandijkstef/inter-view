@@ -23,6 +23,9 @@ Please make sure ESlint is used to test the code, using the `/.eslintrc.json` fi
 ### Installation and running
 Make sure you have all modules installed using `npm install`.
 
+Additionally, setup the database using the included `iviewdb.sql` file.
+Copy the `.env-example` file to a `.env` file. Note that the included salt is linked to the default account (User: `admin` | Pass: `admin`)
+
 To build and run the project use:
 ```
 npm start
