@@ -242,6 +242,9 @@ label {
 		outline: none;
 		text-decoration: underline;
 	}
+	&.small {
+		width: auto;
+	}
 	&.shadowed {
 		box-shadow: 0 0.1em .4em darken($grey, 10);
 		&:active {
