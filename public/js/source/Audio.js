@@ -69,7 +69,7 @@ export default class {
 				method: 'POST',
 				body: formData
 			}).then((data) => {
-				console.log(data);
+				// console.log(data);
 				// TODO: Remove audio from Pouch when the server acknowledges the file
 			});
 			
@@ -87,7 +87,7 @@ export default class {
 		} else {
 			navigator.mediaDevices.enumerateDevices().then(devices => 
 				devices.forEach((device) => {
-					console.log(device.label);
+					// console.log(device.label);
 				})
 			);
 			return callback(this.permission);
