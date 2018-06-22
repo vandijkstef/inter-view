@@ -204,6 +204,7 @@ export default class {
 			UItools.render(
 				[
 					UItools.getText(response.question_id),
+					UItools.getInput(false, 'checkbox', 'selected', true, response.audio),
 					UItools.getText(response.audio)
 				],
 				entry.responses
@@ -337,6 +338,8 @@ export default class {
 		);
 		const scriptSelection = UItools.getSelect('script', []);
 		UItools.addHandler(scriptSelection, this.handlers.ResultsChangeScript, 'change');
+		const filter = UItools.addHandler(UItools.getButton('filter', 'small'), this.AddFilterModal);
+		const download = UItools.addHandler(UItools.getButton('Download selected', 'small'), this.handlers.DownloadSelected);
 		UItools.render(
 			[
 				this.GetHeader('Results', 'Home'),
@@ -345,6 +348,8 @@ export default class {
 						UItools.wrap(
 							[
 								scriptSelection,
+								filter,
+								download
 							]
 						),
 						resultsWindow
@@ -976,6 +981,10 @@ export default class {
 				window.UI.Notify('Microphone permissions denied', 'warning');
 			});
 		}
+	}
+
+	AddFilterModal() {
+		window.UI.AddModal(UItools.getText('FilterModal'));
 	}
 
 	AddLoader(before) {
