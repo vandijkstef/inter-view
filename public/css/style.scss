@@ -364,6 +364,20 @@ form[name=interview] {
 		}
 	}
 }
+
+.results {
+}
+.entry {
+	background-color: $white;
+	border-radius: $radius;
+	.responses, .metas {
+		border: 2px solid rgba($main, .2);
+		border-radius: $radius;
+		p {
+			margin: 0;
+		}
+	}
+}
   
   
 @keyframes scaleout {

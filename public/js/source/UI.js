@@ -87,7 +87,7 @@ export default class {
 		content.push(this.GetMic(micEnabled, micConfigurable));
 		return UItools.wrap(
 			content,
-			'', '', 'header'
+			'', '', 'header' 
 		);
 	}
 
@@ -121,13 +121,10 @@ export default class {
 	}
 
 	GetNav(nav) {
-		console.log('GetNav', nav);
-		// TODO: Maybe do a full nav handler on the complete navigation
-		return UItools.wrap(UItools.addHandler(UItools.getText(nav), this.handlers.OpenResults));
+		return UItools.wrap(UItools.addHandler(UItools.getText(nav), this.handlers.SwitchResults));
 	}
 
 	GetMic(enabled, configurable) {
-		console.log('GetMic', enabled, configurable);
 		const mic = this.GetIconSVG('021-microphone', 'mic');
 		this.micWrap = UItools.addHandler(UItools.wrap(mic), this.AddAudioModal);
 		this.micWrap.mic = mic;
@@ -149,33 +146,69 @@ export default class {
 		return UItools.createElement('loading');
 	}
 
-	GetResult() {
+	GetResult(respondent) {
 		// This should show an interview/respondent
+		console.log(respondent);
 		return UItools.wrap(
 			[
-				this.GetResultEntry(),
-				this.GetResultDetail()
+				this.GetResultEntry(respondent)
 			],
 			'entry'
 		);
 	}
 
-	GetResultEntry() {
+	GetResultEntry(respondent) {
 		// This should show individual answers
 		return UItools.wrap(
 			[
-				UItools.getText('Main section, (pseudo)title, meta and status')
+				UItools.getText(respondent.pseudo),
+				UItools.getText(respondent.id)
 			]
 		);
 	}
 
-	GetResultDetail() {
-		// This should show individual answers
-		return UItools.wrap(
-			[
-				UItools.getText('Detail')
-			]
-		);
+	AddResultDetail(response, entry) {
+		// This should handle individual answers or metadata
+		
+		if (response.meta_id && response.value) {
+			if (!entry.metas) {
+				entry.metas = UItools.wrap(
+					[],
+					'metas'
+				);
+				UItools.render(
+					entry.metas,
+					entry
+				);
+			}
+			UItools.render(
+				[
+					UItools.getText(response.meta_id),
+					UItools.getText(response.value)
+				],
+				entry.metas
+			);
+		}
+
+		if (response.question_id) {
+			if (!entry.responses) {
+				entry.responses = UItools.wrap(
+					[],
+					'responses'
+				);
+				UItools.render(
+					entry.responses,
+					entry
+				);
+			}
+			UItools.render(
+				[
+					UItools.getText(response.question_id),
+					UItools.getText(response.audio)
+				],
+				entry.responses
+			);
+		}
 	}
 	
 	// TODO: I might wanna rework Notify into a seperate class
@@ -281,7 +314,6 @@ export default class {
 			}
 		}
 		if (navigator.onLine) {
-			console.log('loader');
 			const loader = this.AddLoader(newScriptButton);
 			const api = new API();
 			api.call({
@@ -292,7 +324,6 @@ export default class {
 						this.AddScript(script, newScriptButton);
 					}
 				});
-				console.log('removing loader');
 				loader.parentElement.removeChild(loader);
 			});
 		}
@@ -301,9 +332,8 @@ export default class {
 	RenderResults() {
 		this.Clear(this.main);
 		const resultsWindow = this.GetScrollWindow(
-			[
-				this.GetResult()
-			]
+			[],
+			'results'
 		);
 		const scriptSelection = UItools.getSelect('script', []);
 		UItools.addHandler(scriptSelection, this.handlers.ResultsChangeScript, 'change');
@@ -340,17 +370,58 @@ export default class {
 				});
 				this.handlers.ResultsChangeScript();
 			} else {
-				console.log('Couldn\'t fetch results');
+				this.Notify('Couldn\'t fetch results');
 			}
 		});
 	}
 
 	ShowResultsForScript(scriptID) {
-		console.log('ja', scriptID);
-
-		// Get Respondents (on script selection)
-		
-		// Get Responses (on respondent selection)
+		const api = new API();
+		api.call({
+			action: 'get_respondents',
+			script: scriptID
+		}, (data) => {
+			const resultsWindow = document.querySelector('#results');
+			let resultEntry;
+			const resData = {};
+			data.respondents.forEach((response) => {
+				if (!resData[response.id]) {
+					resData[response.id] = {};
+					resData[response.id].id = response.id;
+					resData[response.id].pseudo = response.psuedo;
+					resData[response.id].answers = {};
+					resData[response.id].metas = {};
+				}
+				if (response.meta_id) {
+					resData[response.id].metas[response.meta_id] = {
+						meta_id: response.meta_id,
+						value: response.value
+					};
+				}
+				if (response.audiofile) {
+					resData[response.id].answers[response.question_id] = {
+						question_id: response.question_id,
+						audio: response.audiofile
+					};
+				}
+			});
+			for (const respondent_id in resData) {
+				const respondent = resData[respondent_id];
+				resultEntry = this.GetResult(respondent);
+				UItools.render(
+					resultEntry,
+					resultsWindow
+				);
+				for (const meta_id in resData[respondent_id].metas) {
+					const meta = resData[respondent_id].metas[meta_id];
+					this.AddResultDetail(meta, resultEntry);
+				}
+				for (const question_id in resData[respondent_id].answers) {
+					const answer = resData[respondent_id].answers[question_id];
+					this.AddResultDetail(answer, resultEntry);
+				}
+			}
+		});
 	}
 
 	ScriptSelection() {
@@ -397,7 +468,6 @@ export default class {
 		} else {
 			if (validScript) {
 				this.StartScriptButton.disabled = false;
-				console.log(this.micWrap);
 				if (this.micWrap.permission) {
 					this.StartScriptButton.classList.remove('warning');
 					return false;
@@ -418,12 +488,13 @@ export default class {
 	}
 
 	RenderPreMeta() {
-		if (!this.script || this.scriptStarted) {
+		if (!this.script || this.script.scriptStarted) {
 			console.warn('Flow isn\'t accepting your jokes bruh');
 			return;
 		}
-		this.scriptStarted = true;
+		this.script.scriptStarted = true;
 		const preMetas = [];
+		preMetas.push(UItools.getInput('pseudo', 'text', `pseudo`));
 		this.script.metas.forEach((meta) => {
 			if (!meta.post) {
 				preMetas.push(UItools.getInput(meta.key, meta.type, `meta_${meta.id}`));
@@ -468,7 +539,7 @@ export default class {
 	}
 
 	RenderQuestions(insertID) {
-		if (!this.script && !this.scriptStarted) {
+		if (!this.script && !this.script.scriptStarted) {
 			console.warn('Questions shall not be taken');
 			return;
 		}
@@ -484,7 +555,6 @@ export default class {
 		const micWrap = this.GetMic();
 		const currentQuestion = Object.assign({}, this.script.questions[this.script.currentQuestion]);
 		currentQuestion.state = 'opened';
-		console.log(currentQuestion);
 		// TODO: Push currentQuestion to server/cache it
 		this.script.answers.push(currentQuestion);
 		UItools.render(
@@ -506,14 +576,11 @@ export default class {
 			],
 			this.main
 		);
-		console.log('Setting up audio recording for ' + this.script.currentQuestion);
 		micWrap.audio.InitAudio((stream) => {
 			micWrap.audio.GotStream(stream, micWrap.mic);
 			window.audioRecorder.record();
-			console.log('Audio recording started');
 			UItools.addHandler(nextButton, (e) => {
 				e.preventDefault();
-				console.log('Stopping recording');
 				window.audioRecorder.stop();
 				currentQuestion.state = 'done';
 				micWrap.audio.SendAudio(`${this.script.id}-${this.script.currentQuestion}-${currentQuestion.id}-${this.script.respondent}`);
@@ -525,7 +592,7 @@ export default class {
 					script: this.script.id
 				}, (data) => {
 					if (data.status) {
-						console.log(data);
+						// console.log(data);
 					} else {
 						console.warn('didn\'t upload data', data);
 						window.UI.Notify('Data not uploaded');
@@ -547,7 +614,7 @@ export default class {
 	// TODO: Do I set scriptStarted to false?
 	// TODO: Use scriptstarted to set/restore a state
 	RenderPostMeta() {
-		if (!this.script && !this.scriptStarted) {
+		if (!this.script && !this.script.scriptStarted) {
 			console.warn('The Meta will not post');
 			return;
 		}
@@ -572,10 +639,13 @@ export default class {
 			api.call({
 				action: 'post_meta',
 				meta: data,
-				script: window.UI.script.id
+				script: window.UI.script.id,
+				respondent: window.UI.script.respondent
 			}, (data) => {
-				if (data.status && data.insertID) {
-					window.UI.RenderQuestions(data.insertID);
+				if (data.status) {
+					console.log('postmeta: uploaded');
+				} else {
+					console.log('postmeta: failed');
 				}
 			});
 			window.UI.RenderPostInterview();
@@ -619,7 +689,7 @@ export default class {
 	}
 
 	RenderPostInterview() {
-		if (!this.script && !this.scriptStarted) {
+		if (!this.script && !this.script.scriptStarted) {
 			console.warn('U want to Post interview without interviewing?');
 			return;
 		}
@@ -909,7 +979,6 @@ export default class {
 	}
 
 	AddLoader(before) {
-		console.log('Adding loader');
 		const loader = this.GetLoader();
 		return UItools.render(
 			loader,
