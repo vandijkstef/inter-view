@@ -209,4 +209,21 @@ export default class {
 		window.UI.ShowResultsForScript(select.value);
 	}
 
+	DownloadSelected() {
+		const selected = document.querySelectorAll('.responses input[type=checkbox]:checked');
+		// Do I want to download the files one by one, or let them zip on the server?
+		// How many files can we actually serve in one push? Probably not much because of HTTP connection limit.
+		// Lets try what happens if we just do all at once
+		// It works, but it aint ideal
+		selected.forEach((item) => {
+			let link = document.createElement('a');
+			link.style.display = 'none';
+			link.href = `/audio/${item.dataset.value}`;
+			link.download = item.dataset.value;
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+		});
+	}
+
 }
