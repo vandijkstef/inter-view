@@ -10,13 +10,18 @@ class DB {
 		});
 	}
 
-	Select(table, where, callback) {
+	Select(table, where, callback, options) { // Only use server-side code in options
 		this.connection.connect();
-		// if (typeof columns === 'function') {
-		// 	callback = columns;
-		// 	columns = '*';
-		// }
-		let query = `SELECT * FROM ??`;
+		let query = `SELECT `;
+		if (options && options.SELECT) {
+			query += options.SELECT;
+		} else {
+			query += '*';
+		}
+		query += ` FROM ??`;
+		if (options && options.JOIN) {
+			query += options.JOIN + ' ';
+		}
 		if (where) {
 			if (typeof where === 'function') {
 				callback = where;
@@ -40,6 +45,9 @@ class DB {
 					query += string;
 				}
 			}
+		}
+		if (options && options.ORDER) {
+			query += 'ORDER BY ' + options.ORDER;
 		}
 		query = mysql.format(query, [table, where]);
 		this.connection.query(query, (error, results) => {
@@ -103,6 +111,17 @@ class DB {
 			this.connection.end();
 		});  
 	}
+
+	// TODO: Common query method - use by other methods
+	Query(query, callback) {
+		this.connection.connect();
+		this.connection.query(query, (error, results) => {
+			if (error) throw error;
+			callback(results);
+			this.connection.end();
+		}); 
+	}
+
 }
 
 module.exports = DB;
