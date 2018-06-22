@@ -20,9 +20,18 @@ function AuthError(data, res) {
 	res.json(data);
 }
 
-/* GET home page. */
 router.get('/', function(req, res) {
 	res.sendFile(path.join(__dirname + '/public/index.html'));
+});
+
+router.get('/audio/:file', function(req, res) {
+	if (req.session.user) {
+		// TODO: test if file exsists and properly handle error
+		res.sendFile(path.join(__basedir + '/uploads/' + req.params.file));
+	} else {
+		res.status(403);
+		res.send('Sorry, thats not allowed');
+	}
 });
 
 router.post('/api', function(req, res) {
