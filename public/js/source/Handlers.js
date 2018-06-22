@@ -59,8 +59,7 @@ export default class {
 			const metaPosts = [];
 			metaPostInputs.forEach((input) => {
 				metaPosts.push(input.checked);
-			})
-			console.log(metaPosts);
+			});
 			for(let i = 0; i < metaIDs.length; i++) {
 				// document.querySelector(`fieldset#script-${`)
 				metaData.push({
@@ -120,8 +119,6 @@ export default class {
 			return;
 		}
 
-		console.log(window.UI.micWrap.permission);
-		// if (window.UI.micWrap.permission === true) {
 		let script = JSON.parse(localStorage.getItem(selection));
 		if (!script) {
 			window.UI.FetchScript(selection.split('_')[1], (scriptData) => {
@@ -133,10 +130,6 @@ export default class {
 			window.UI.SetScript(script);
 			window.UI.RenderPreMeta();
 		}
-		// } else {
-		// 	console.warn('Check mic settings');
-		// 	window.UI.Notify('Please check your mic settings');
-		// }
 	}
 
 	GoQuestions(e) {
@@ -181,20 +174,16 @@ export default class {
 	StoreInterview(e) {
 		e.preventDefault();
 		console.log('this should store the interview');
-		// TODO: This might fit better in the UI class for now. Note to self: The UI class needs to be cleaned from logic more than it is right now. Maybe even find a different way to expose the needed methods (something router-like?)
-		window.UI.scriptStarted = false;
+		// TODO: Update stuff..
 		window.UI.script = null;
 		window.UI.RenderHome();
 	}
 
-	RadioDiv(e) {
-		console.log(e.target, e.target.parentElement);
-		// TODO: What are we doing with this? -> Its fired when user uses keyboard to change the values
+	RadioDiv() {
 		window.UI.ScriptSelection();
 	}
 
-	DivRadio(e) {
-		let el = e.target;
+	DivRadio() {
 		document.querySelector(`input[value=${this.id}]`).checked = true;
 		window.UI.ScriptSelection();
 	}
@@ -204,14 +193,17 @@ export default class {
 		modal.parentElement.removeChild(modal);
 	}
 
-	OpenResults() {
-		window.UI.RenderResults();
+	SwitchResults() {
+		if (this.innerText === 'Home') {
+			window.UI.RenderHome();
+		} else {
+			window.UI.RenderResults();
+		}
 	}
 
 	ResultsChangeScript() {
 		let select = this;
 		if (select.tagName !== 'SELECT') {
-			console.log('Probably initialising');
 			select = document.querySelector('select[name=script]');
 		}
 		window.UI.ShowResultsForScript(select.value);
