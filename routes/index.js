@@ -116,7 +116,6 @@ router.post('/api', function(req, res) {
 		}
 		break;
 	case 'script_store':
-		console.log(req.body);
 		if (req.session.user) {
 			const db = new DB();
 			if (req.body.id === 'new') {
@@ -139,7 +138,6 @@ router.post('/api', function(req, res) {
 				});
 			} else {
 				const db = new DB();
-				console.log(req.body);
 				db.Update('scripts', {id: req.body.id, title: req.body.title, description: req.body.description}, (status) => {
 					req.body.metas.forEach((meta) => {
 						const db = new DB(); // Recreate DB so we have a seperate connection, which we can neatly close
@@ -149,8 +147,8 @@ router.post('/api', function(req, res) {
 								// Silence is golden..
 							});
 						} else {
-							db.Update('scripts_meta', {id: meta.id, script_id: req.body.id, key: meta.key, type: meta.type, order: meta.order, post: meta.post}, (err, status) => {
-								console.log(err, status);
+							db.Update('scripts_meta', {id: meta.id, script_id: req.body.id, key: meta.key, type: meta.type, order: meta.order, post: meta.post}, () => {
+								// Silence is golden...
 							});
 						}
 					});
@@ -161,8 +159,8 @@ router.post('/api', function(req, res) {
 								// Silence is golden..
 							});
 						} else { 
-							db.Update('questions', {script_id: req.body.id, question: question.text, order: question.order}, (err, status) => {
-								console.log(err, status);
+							db.Update('questions', {script_id: req.body.id, question: question.text, order: question.order}, () => {
+								// Silence is golden
 							});
 						}
 					});
@@ -179,18 +177,27 @@ router.post('/api', function(req, res) {
 		if (req.session.user) {
 			const db = new DB();
 			// TODO: Get Pseudo
-			db.Insert('respondent', {psuedo: 'test', script_id: req.body.script}, (insertID) => {
+			let pseudo = '';
+			req.body.meta.forEach((meta) => {
+				if (meta.key === 'pseudo') {
+					pseudo = meta.value;
+				}
+			});
+			console.log(pseudo);
+			db.Insert('respondent', {psuedo: pseudo, script_id: req.body.script}, (insertID) => {
 				data.insertID = insertID;
 				data.status = true;
 				req.body.meta.forEach((meta) => {
-					const db = new DB();
-					db.Insert('respondent_meta', {
-						respondent_id: insertID,
-						meta_id: meta.key.split('_')[1],
-						value: meta.value
-					}, () => {
-						// Silence is golden...
-					});
+					if (meta.key !== 'pseudo') {
+						const db = new DB();
+						db.Insert('respondent_meta', {
+							respondent_id: insertID,
+							meta_id: meta.key.split('_')[1],
+							value: meta.value
+						}, () => {
+							// Silence is golden...
+						});
+					}
 				});
 				res.json(data);
 			});
@@ -202,15 +209,15 @@ router.post('/api', function(req, res) {
 	case 'new_answer':
 		if (req.session.user) {
 			const db = new DB();
-			console.log(req.session.user);
 			db.Insert('response', {
 				question_id: req.body.question,
 				respondent_id: req.body.respondent,
 				interviewer_id: req.session.user.id,
 				// TODO: Rating/Tags
 				// TODO: Audiofile stuff
-			}, (insertID) => {
-				console.log('answer', insertID);
+			}, () => {
+				data.status = true;
+				res.json(data);
 			});
 		} else {
 			data.err = 'Cannot store answer: Not authenticated';
@@ -220,13 +227,52 @@ router.post('/api', function(req, res) {
 	case 'get_respondents':
 		if (req.session.user) {
 			const db = new DB();
-			db.Insert('respondent', {psuedo: 'test'}, (insertID) => {
-				data.insertID = insertID;
+			db.Select('respondent', {script_id: req.body.script}, (respondents) => {
 				data.status = true;
+				data.respondents = respondents;
 				res.json(data);
+			}, {
+				JOIN: 'LEFT JOIN response ON respondent.`id` = response.`respondent_id` LEFT JOIN respondent_meta ON respondent.`id` = respondent_meta.`respondent_id`',
+				ORDER: 'respondent.`id`',
+				SELECT: '`respondent`.*, `response`.`question_id`, `response`.`interviewer_id`, `response`.`audiofile`, `respondent_meta`.`meta_id`, `respondent_meta`.`value`'
 			});
 		} else {
 			data.err = 'Cannot get respondents: Not authenticated';
+			AuthError(data, res);
+		}
+		break;
+	case 'get_responses': // TODO: Currently unused?
+		if (req.session.user) {
+			const db = new DB();
+			if (req.body.respondent) { // Return data on single respondent
+				db.Select('response', {respondent_id: req.body.respondent}, (responses) => {
+					data.status = true;
+					data.responses = responses;
+					res.json(data);
+				});
+			} else {
+				data.err = 'Cannot get responses: No respondent set';
+				res.json(data);
+			}
+		} else {
+			data.err = 'Cannot get responses: Not authenticated';
+			AuthError(data, res);
+		}
+		break;
+	case 'post_meta':
+		if (req.session.user) {
+			req.body.meta.forEach((meta) => {
+				const db = new DB();
+				db.Insert('respondent_meta', {
+					respondent_id: req.body.respondent,
+					meta_id: meta.key.split('_')[1],
+					value: meta.value
+				}, () => {
+					// Silence is golden...
+				});
+			});
+		} else {
+			data.err = 'Cannot store post meta: Not authenticated';
 			AuthError(data, res);
 		}
 		break;
@@ -263,7 +309,6 @@ router.post('/audio', upload.single('audio'), function(req, res) {
 			}
 		});
 	}
-	
 });
 
 module.exports = router;
