@@ -39,7 +39,8 @@
 		"babel-cli": "^6.26.0",
 		"babel-minify": "^0.4.3",
 		"babel-preset-env": "^1.7.0",
-		"rollup": "^0.60.1"
+		"rollup": "^0.60.1",
+		"rollup-plugin-node-resolve": "^3.3.0"
 	},
 	"babel": {
 		"presets": [

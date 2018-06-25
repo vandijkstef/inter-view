@@ -379,6 +379,9 @@ form[name=interview] {
 		p {
 			margin: 0;
 		}
+		& > div:not(:last-of-type) {
+			border-bottom: 2px solid rgba($main, .1);
+		}
 	}
 }
   

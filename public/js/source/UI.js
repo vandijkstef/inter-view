@@ -1,7 +1,7 @@
 import UItools from './UItools/UItools.js';
 import FormHandlers from './Handlers.js';
 import API from './API.js';
-import Audio from './Audio.js';
+import Elements from './Elements.js';
 
 export default class {
 
@@ -14,6 +14,7 @@ export default class {
 		
 		// Setup the required tools
 		this.handlers = new FormHandlers();
+		this.elements = new Elements();
 
 		// Build the base page (hello function?)
 		this.body = document.body;
@@ -58,115 +59,6 @@ export default class {
 		}
 	}
 
-	GetLogo() {
-		return UItools.getImage('/img/logo.svg', 'Inter-view Logo');
-	}
-	
-	GetIcon(icon, classes, id) {
-		classes = UItools.forceArray(classes);
-		classes.push('icon');
-		return UItools.getImage(`/img/icons/svg/${icon}.svg`, 'TODO: Title from filename', classes, id);
-	}
-
-	GetIconSVG(icon, classes = [], id) { // TODO: GetIconSVG -> Get actual SVG data, don't wrap in image
-		classes = UItools.forceArray(classes);
-		classes.push('icon');
-		const title = icon.split('-')[1];
-		classes.push(title);
-		return UItools.getSVG(`/img/icons/svg/${icon}.svg`, title, classes, id);
-	}
-
-	GetHeader(title, nav, micEnabled, micConfigurable) {
-		this.SetTitle(title);
-		const content = [];
-		content.push(this.GetLogo());
-		content.push(UItools.getText(title, '', '', 'h1'));
-		if (nav) {
-			content.push(this.GetNav(nav));
-		}
-		content.push(this.GetMic(micEnabled, micConfigurable));
-		return UItools.wrap(
-			content,
-			'', '', 'header' 
-		);
-	}
-
-	GetInterviewHeader() {
-		const progress = UItools.createElement('progress', '', 'progress');
-		progress.setAttribute('max', 100);
-		progress.value = (this.script.currentQuestion / this.script.questions.length) * 100;
-		return UItools.wrap(
-			[
-				progress,
-				UItools.wrap(
-					[
-						this.GetLogo(),
-						UItools.getText('rating'),
-						UItools.wrap(
-							[
-								UItools.wrap(
-									[
-										UItools.getText('timerone'),
-										UItools.getText('timertwo')
-									]
-								),
-								this.GetMic(true, false)
-							]
-						)
-					]
-				)
-			],
-			'interview', '', 'header'
-		);
-	}
-
-	GetNav(nav) {
-		return UItools.wrap(UItools.addHandler(UItools.getText(nav), this.handlers.SwitchResults));
-	}
-
-	GetMic(enabled, configurable) {
-		const mic = this.GetIconSVG('021-microphone', 'mic');
-		this.micWrap = UItools.addHandler(UItools.wrap(mic), this.AddAudioModal);
-		this.micWrap.mic = mic;
-		this.micWrap.audio = new Audio();
-		this.micWrap.audio.HasPermission((permission) => {
-			this.micWrap.permission = permission;
-			if (!permission) {
-				mic.classList.add('error');
-			}
-		});
-		return this.micWrap;
-	}
-	
-	GetScrollWindow(content, id) {
-		return UItools.wrap(content, 'scrollwindow', id);
-	}
-
-	GetLoader() {
-		return UItools.createElement('loading');
-	}
-
-	GetResult(respondent) {
-		// This should show an interview/respondent
-		console.log(respondent);
-		return UItools.wrap(
-			[
-				this.GetResultEntry(respondent)
-			],
-			'entry'
-		);
-	}
-
-	GetResultEntry(respondent) {
-		// This should show individual answers
-		return UItools.wrap(
-			[
-				UItools.getText(respondent.pseudo),
-				UItools.getText(respondent.id)
-			]
-		);
-	}
-
 	AddResultDetail(response, entry) {
 		// This should handle individual answers or metadata
 		
@@ -182,10 +74,12 @@ export default class {
 				);
 			}
 			UItools.render(
-				[
-					UItools.getText(response.meta_id),
-					UItools.getText(response.value)
-				],
+				UItools.wrap(
+					[
+						UItools.getText(response.meta_id),
+						UItools.getText(response.value)
+					]
+				),
 				entry.metas
 			);
 		}
@@ -202,11 +96,13 @@ export default class {
 				);
 			}
 			UItools.render(
-				[
-					UItools.getText(response.question_id),
-					UItools.getInput(false, 'checkbox', 'selected', true, response.audio),
-					UItools.getText(response.audio)
-				],
+				UItools.wrap(
+					[
+						// UItools.getText(response.question_id),
+						UItools.getInput(false, 'checkbox', 'selected', true, response.audio),
+						UItools.getText(response.audio)
+					]
+				),
 				entry.responses
 			);
 		}
@@ -238,7 +134,7 @@ export default class {
 			UItools.addHandler(
 				UItools.getForm(
 					'login', [
-						this.GetLogo(),
+						this.elements.GetLogo(),
 						UItools.getInput(UItools.getLabel('Username'), 'text', 'username'),
 						UItools.getInput(UItools.getLabel('Password'), 'password', 'password')
 					],
@@ -255,26 +151,26 @@ export default class {
 		this.Clear(this.main);
 		this.StartScriptButton = UItools.getButton('Start Script', '', '', this.handlers.StartScript);
 		this.ScriptButtonState(false);
-		this.ScriptPreview = this.GetScrollWindow(UItools.getText('Select a script on the left side'));
+		this.ScriptPreview = this.elements.GetScrollWindow(UItools.getText('Select a script on the left side'));
 
 		const newScriptButton = UItools.getButton('New Script', ['secondary', 'shadowed'], '', this.handlers.EditScript);
 
 		UItools.render(
 			[
-				this.GetHeader('Script Selection', 'Results'),
+				this.elements.GetHeader('Script Selection', 'Results'),
 				UItools.addHandler(
 					UItools.getForm('scriptSelect',
 						[
 							UItools.wrap(
 								[
-									this.GetScrollWindow(
+									this.elements.GetScrollWindow(
 										[
 											newScriptButton
 										],
 										'scripts'
 									),
 									UItools.wrap(
-										this.GetIcon('014-next', 'point'),
+										this.elements.GetIcon('014-next', 'point'),
 										['flex', 'center']
 									),
 									UItools.wrap(
@@ -332,7 +228,7 @@ export default class {
 
 	RenderResults() {
 		this.Clear(this.main);
-		const resultsWindow = this.GetScrollWindow(
+		const resultsWindow = this.elements.GetScrollWindow(
 			[],
 			'results'
 		);
@@ -342,7 +238,7 @@ export default class {
 		const download = UItools.addHandler(UItools.getButton('Download selected', 'small'), this.handlers.DownloadSelected);
 		UItools.render(
 			[
-				this.GetHeader('Results', 'Home'),
+				this.elements.GetHeader('Results', 'Home'),
 				UItools.wrap(
 					[
 						UItools.wrap(
@@ -412,7 +308,7 @@ export default class {
 			});
 			for (const respondent_id in resData) {
 				const respondent = resData[respondent_id];
-				resultEntry = this.GetResult(respondent);
+				resultEntry = this.elements.GetResult(respondent);
 				UItools.render(
 					resultEntry,
 					resultsWindow
@@ -473,7 +369,7 @@ export default class {
 		} else {
 			if (validScript) {
 				this.StartScriptButton.disabled = false;
-				if (this.micWrap.permission) {
+				if (window.UI.micWrap.permission) {
 					this.StartScriptButton.classList.remove('warning');
 					return false;
 				} else {
@@ -508,7 +404,7 @@ export default class {
 		this.Clear(this.main);
 		UItools.render(
 			[
-				this.GetHeader('Interviewee Pre Meta'),
+				this.elements.GetHeader('Interviewee Pre Meta'),
 				UItools.getForm(
 					'preMeta',
 					[
@@ -557,14 +453,14 @@ export default class {
 		this.Clear(this.main);
 		// const nextButton = UItools.getButton('=>', '', '', this.handlers.GoNextQuestion);
 		const nextButton = UItools.getButton('=>', '', '');
-		const micWrap = this.GetMic();
+		const micWrap = this.elements.GetMic();
 		const currentQuestion = Object.assign({}, this.script.questions[this.script.currentQuestion]);
 		currentQuestion.state = 'opened';
 		// TODO: Push currentQuestion to server/cache it
 		this.script.answers.push(currentQuestion);
 		UItools.render(
 			[	
-				this.GetInterviewHeader(),
+				this.elements.GetInterviewHeader(),
 				UItools.getForm('interview',
 					[
 						UItools.wrap(
@@ -659,7 +555,7 @@ export default class {
 		this.Clear(this.main);
 		UItools.render(
 			[
-				this.GetHeader('Interviewee Post Meta'),
+				this.elements.GetHeader('Interviewee Post Meta'),
 				UItools.getForm('postMeta',
 					[
 						UItools.wrap(
@@ -701,7 +597,7 @@ export default class {
 		this.Clear(this.main);
 		UItools.render(
 			[
-				this.GetHeader('Interview Review'),
+				this.elements.GetHeader('Interview Review'),
 				UItools.getForm('review',
 					[
 						UItools.wrap(
@@ -790,7 +686,7 @@ export default class {
 
 		UItools.render(
 			[
-				this.GetHeader(title),
+				this.elements.GetHeader(title),
 				UItools.getForm('name',
 					[
 						UItools.wrap(
@@ -805,7 +701,7 @@ export default class {
 								UItools.wrap(
 									[
 										UItools.getText('Metadata', '', '', 'h2'),
-										this.GetScrollWindow(
+										this.elements.GetScrollWindow(
 											[
 												addMetaButton
 											]
@@ -819,7 +715,7 @@ export default class {
 						UItools.wrap(
 							[
 								UItools.getText('Questions', '', '', 'h2'),
-								this.GetScrollWindow(
+								this.elements.GetScrollWindow(
 									[
 										addQuestionButton
 									]
@@ -914,7 +810,7 @@ export default class {
 		if (loader) {
 			targetBefore = loader;
 		}
-		const settingsIcon = this.GetIconSVG('040-settings-1');
+		const settingsIcon = this.elements.GetIconSVG('040-settings-1');
 		UItools.addHandler(settingsIcon, this.handlers.EditScript);
 		settingsIcon.dataset.scriptID = script.id;
 		UItools.render(
@@ -932,7 +828,7 @@ export default class {
 							),
 							UItools.wrap(
 								[
-									this.GetIconSVG('035-checked'),
+									this.elements.GetIconSVG('035-checked'),
 									settingsIcon
 								],
 								'controls'
@@ -957,7 +853,7 @@ export default class {
 					UItools.wrap(
 						[
 							content,
-							UItools.addHandler(window.UI.GetIconSVG('059-cancel'), this.handlers.CloseModal)
+							UItools.addHandler(this.elements.GetIconSVG('059-cancel'), this.handlers.CloseModal)
 						],
 						'content'
 					)
@@ -988,7 +884,7 @@ export default class {
 	}
 
 	AddLoader(before) {
-		const loader = this.GetLoader();
+		const loader = this.elements.GetLoader();
 		return UItools.render(
 			loader,
 			before.parentElement,
