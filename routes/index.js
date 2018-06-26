@@ -222,6 +222,7 @@ router.post('/api', function(req, res) {
 				question_id: req.body.question,
 				respondent_id: req.body.respondent,
 				interviewer_id: req.session.user.id,
+				rating: req.body.rating
 				// TODO: Rating/Tags
 				// TODO: Audiofile stuff
 			}, () => {
