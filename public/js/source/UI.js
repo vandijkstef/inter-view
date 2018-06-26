@@ -131,17 +131,14 @@ export default class {
 		this.main.classList.add('login');
 		this.SetTitle('Login');
 		UItools.render(
-			UItools.addHandler(
-				UItools.getForm(
-					'login', [
-						this.elements.GetLogo(),
-						UItools.getInput(UItools.getLabel('Username'), 'text', 'username'),
-						UItools.getInput(UItools.getLabel('Password'), 'password', 'password')
-					],
-					'/',
-					UItools.getInput('', 'submit', '', 'Login', '', 'shadowed')
-				),
-				this.handlers.LoginHandler
+			UItools.getForm(
+				'login', [
+					this.elements.GetLogo(),
+					UItools.getInput(UItools.getLabel('Username'), 'text', 'username'),
+					UItools.getInput(UItools.getLabel('Password'), 'password', 'password')
+				],
+				'/',
+				UItools.addHandler(UItools.getInput('', 'submit', '', 'Login', '', 'shadowed'), this.handlers.LoginHandler)
 			),
 			this.main
 		);
