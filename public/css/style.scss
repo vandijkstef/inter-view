@@ -163,6 +163,11 @@ input, textarea {
 	margin-bottom: 1em;
 	margin-top: .5em;
 	border-radius: $radius;
+	&[type=radio].hide {
+		opacity: 0;
+		clip: rect(0,0,0,0);
+		position: absolute;
+	}
 }
 
 label {
@@ -219,11 +224,15 @@ label {
 }
 
 .scrollwindow {
-	background-color: rgba($main, .10);
+	background-color: rgba($main, .1);
 	overflow-y: scroll;
 	max-height: inherit;
 	padding: .6rem;
 	border-radius: $radius;
+	transition: $trans;
+	&:focus-within {
+		background-color: rgba($main, .15);
+	}
 }
 
 .button, input[type=submit], button {
@@ -235,6 +244,7 @@ label {
 	border: none;
 	border-radius: $radius;
 	width: 100%;
+	cursor: pointer;
 	&:hover, &:focus {
 		background-color: lighten($green, 4);
 	}
@@ -243,6 +253,7 @@ label {
 		text-decoration: underline;
 	}
 	&.small {
+		padding: .4rem .8rem;
 		width: auto;
 	}
 	&.shadowed {
@@ -267,6 +278,18 @@ label {
 		background-color: $grey;
 		cursor: not-allowed;
 	}
+	&.transparent {
+		color: $black;
+		background-color: rgba($black, 0);
+		border: 1px solid rgba($main, 0);
+		&:hover, &:focus {
+			background-color: rgba($black, 0.1);
+		}
+		&:focus {
+			border: 1px solid $main;
+		}
+	}
+
 }
 
 .buttonRow {
@@ -280,6 +303,7 @@ label {
 }
 
 .icon {
+	min-width: 2em;
 	max-width: 4em;
 	&.point {
 		fill: $grey;
@@ -297,11 +321,10 @@ label {
 	}
 }
 
+
+
 #scripts {
 	input[type=radio] {
-		opacity: 0;
-		clip: rect(0,0,0,0);
-		position: absolute;
 		&:checked + div {
 			border-color: $main;
 		}
@@ -316,6 +339,11 @@ label {
 		margin-bottom: 1rem;
 		p {
 			margin-top: 0;
+		}
+	}
+	&:focus-within {
+		& > div {
+			border: 2px solid rgba($main, .4);
 		}
 	}
 }
@@ -382,6 +410,22 @@ form[name=interview] {
 		& > div:not(:last-of-type) {
 			border-bottom: 2px solid rgba($main, .1);
 		}
+	}
+}
+
+.rating {
+	.icon {
+		fill: rgba($grey, 0);
+		&:hover {
+			fill: rgba($grey, 0.5);
+		}
+		&.selected {
+			fill: rgba($grey, 1);
+		}
+	}
+	path {
+		stroke: $grey;
+		stroke-width: 25px;
 	}
 }
   
