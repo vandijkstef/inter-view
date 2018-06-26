@@ -1,11 +1,12 @@
 import UIm from './UI.js';
 import API from './API.js';
+import Controls from './Controls.js';
 
 {
 	// App variables
 	const api = new API('api');
 	const UI = new UIm();
-
+	const controls = new Controls();
 	// TODO: Create router, or.. do I need that?
 
 	// Prevent navigation
@@ -44,6 +45,8 @@ import API from './API.js';
 			return callback(data.status);
 		});
 	}
+
+	document.addEventListener('keyup', controls.Keyboard);
 
 }
 
