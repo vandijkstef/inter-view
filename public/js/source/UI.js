@@ -167,7 +167,7 @@ export default class {
 										'scripts'
 									),
 									UItools.wrap(
-										this.elements.GetIcon('014-next', 'point'),
+										this.elements.GetIconSVG('014-next', 'point'),
 										['flex', 'center']
 									),
 									UItools.wrap(
@@ -448,9 +448,13 @@ export default class {
 			this.script.answers = [];
 		}
 		this.Clear(this.main);
+		window.timers.question = performance.now();
+		if (this.script.currentQuestion === 0) {
+			window.timers.script = performance.now();
+		}
 		// const nextButton = UItools.getButton('=>', '', '', this.handlers.GoNextQuestion);
 		const nextButton = UItools.getButton('=>', '', '');
-		const micWrap = this.elements.GetMic();
+		// const micWrap = this.elements.GetMic();
 		const currentQuestion = Object.assign({}, this.script.questions[this.script.currentQuestion]);
 		currentQuestion.state = 'opened';
 		// TODO: Push currentQuestion to server/cache it
@@ -474,20 +478,28 @@ export default class {
 			],
 			this.main
 		);
-		micWrap.audio.InitAudio((stream) => {
-			micWrap.audio.GotStream(stream, micWrap.mic);
+		window.UI.micWrap.audio.InitAudio((stream) => {
+			window.UI.micWrap.audio.GotStream(stream, window.UI.micWrap.mic);
 			window.audioRecorder.record();
 			UItools.addHandler(nextButton, (e) => {
 				e.preventDefault();
 				window.audioRecorder.stop();
 				currentQuestion.state = 'done';
-				micWrap.audio.SendAudio(`${this.script.id}-${this.script.currentQuestion}-${currentQuestion.id}-${this.script.respondent}`);
+				window.UI.micWrap.audio.SendAudio(`${this.script.id}-${this.script.currentQuestion}-${currentQuestion.id}-${this.script.respondent}`);
+				const ratings = document.querySelectorAll('input[name=rating]');
+				let rating;
+				ratings.forEach((rate) => {
+					if (rate.checked) {
+						rating = rate.value.split('_')[1];
+					}
+				});
 				const api = new API();
 				api.call({
 					action: 'new_answer',
 					respondent: this.script.respondent,
 					question: currentQuestion.id,
-					script: this.script.id
+					script: this.script.id,
+					rating: rating
 				}, (data) => {
 					if (data.status) {
 						// console.log(data);
@@ -812,7 +824,7 @@ export default class {
 		settingsIcon.dataset.scriptID = script.id;
 		UItools.render(
 			[
-				UItools.addHandler(UItools.getInput(false, 'radio', 'script', `script_${script.id}`), this.handlers.RadioDiv, 'change'),
+				UItools.addHandler(UItools.getInput(false, 'radio', 'script', `script_${script.id}`, '', 'hide'), this.handlers.RadioDiv, 'change'),
 				UItools.addHandler(
 					UItools.wrap(
 						[
