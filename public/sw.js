@@ -1,45 +1,40 @@
-self.addEventListener('install', event => event.waitUntil(
-	caches.open('iview')
-		.then(cache => cache.addAll([
-			'/index.html',
-			'/css/style.css',
-			// '/js/client.js'
-		]))
-		.then(self.skipWaiting())
-		
-));
+const cacheName = 'iview';
+const reqFiles = [
+	'/',
+	'/css/style.css',
+	'/js/bundle.min.js',
+	'/js/source/Recordtools/recorder.js',
+	'/img/logo.svg',
+	'/manifest.json'
+];
 
-self.addEventListener('fetch', (event) => {
-	const req = event.request;
-	event.respondWith(
-		fetch(req)
-			.catch((err) => {
-				console.log(err);
-				fetchOfflinePage();
+self.addEventListener('install', (e) => {
+	e.waitUntil(
+		caches.open(cacheName)
+			.then((cache) => {
+				return cache.addAll(reqFiles);
+			})
+			.then(() => {
+				return self.skipWaiting();
 			})
 	);
 });
 
-function fetchOfflinePage() {
-	return caches.open('iview')
-		.then(cache => cache.match('/index.html'));
-}
+self.addEventListener('fetch', (e) => {
+	e.respondWith(
+		caches.match(e.request)
+			.then((response) => {
+				if (response) {
+					console.log('Got response: ' + e.request.url);
+					return response;
+				}
+				console.log('From server: ' + e.request.url);
+				return fetch(e.request);
+			})
+	);
+});
 
-// function fetchCoreFile(url) {
-// 	return caches.open('bs-v1-core')
-// 		.then(cache => cache.match(url))
-// 		.then(response => response ? response : Promise.reject());
-// }
-
-// function getCachedPage(request) {
-// 	return caches.open('bs-v1-pages')
-// 		.then(cache => cache.match(request))
-// 		.then(response => response ? response : Promise.reject());
-// }
-
-// function cachePage(request, response) {
-// 	const clonedResponse = response.clone();
-// 	caches.open('bs-v1-pages')
-// 		.then(cache => cache.put(request, clonedResponse));
-// 	return response;
-// }
+self.addEventListener('activate', (e) => {
+	console.log('activating SW');
+	e.waitUntil(self.clients.claim());
+});
