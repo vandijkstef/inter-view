@@ -226,4 +226,15 @@ export default class {
 		});
 	}
 
+	SetRating() {
+		const stars = this.parentElement.querySelectorAll('.icon.star');
+		for (let i = 0; i < stars.length; i++) {
+			if (i < this.dataset.value) {
+				stars[i].classList.add('selected');
+			} else {
+				stars[i].classList.remove('selected');
+			}
+		}
+	}
+
 }
