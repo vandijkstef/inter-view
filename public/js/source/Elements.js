@@ -39,19 +39,23 @@ export default class {
 		const progress = UItools.createElement('progress', '', 'progress');
 		progress.setAttribute('max', 100);
 		progress.value = (window.UI.script.currentQuestion / window.UI.script.questions.length) * 100;
+		const questionTimer = UItools.getText(this.GetTime(window.timers.question));
+		const scriptTimer = UItools.getText(this.GetTime(window.timers.script));
+		this.TimerUpdater(questionTimer, window.timers.question);
+		this.TimerUpdater(scriptTimer, window.timers.script);
 		return UItools.wrap(
 			[
 				progress,
 				UItools.wrap(
 					[
 						this.GetLogo(),
-						UItools.getText('rating'),
+						this.GetRating(),
 						UItools.wrap(
 							[
 								UItools.wrap(
 									[
-										UItools.getText('timerone'),
-										UItools.getText('timertwo')
+										questionTimer,
+										scriptTimer
 									]
 								),
 								this.GetMic(true, false)
@@ -64,13 +68,41 @@ export default class {
 		);
 	}
 
+	GetTime(timer) {
+		// TODO: Improve time display
+		return Math.floor((performance.now() - timer) / 1000);
+	}
+
+	TimerUpdater(element, timer) {
+		element.innerText = this.GetTime(timer);
+		setTimeout(() => {
+			this.TimerUpdater(element, timer);
+		}, 1000);
+	}
+
+	GetRating() {
+		const stars = [];
+		for (let i = 1; i < 6; i++) {
+			const starIcon = UItools.addHandler(
+				UItools.getInput(UItools.wrap(this.GetIconSVG('071-star'), '', '', 'label'), 'radio', 'rating', i, '', 'hide'),
+				window.UI.handlers.SetRating
+			);
+			starIcon.dataset.value = i;
+			stars.push(starIcon);
+		}
+		return UItools.wrap(
+			stars,
+			'rating'
+		);
+	}
+
 	GetNav(nav) {
-		return UItools.wrap(UItools.addHandler(UItools.getText(nav), window.UI.handlers.SwitchResults));
+		return UItools.wrap(UItools.addHandler(UItools.getText(nav), window.UI.handlers.SwitchResults), ['small', 'transparent'], '', 'button');
 	}
 
 	GetMic(enabled, configurable = true) {
 		const mic = this.GetIconSVG('021-microphone', 'mic');
-		window.UI.micWrap = UItools.addHandler(UItools.wrap(mic), window.UI.AddAudioModal);
+		window.UI.micWrap = UItools.addHandler(UItools.wrap(mic, ['small', 'transparent'], '', 'button'), window.UI.AddAudioModal);
 		window.UI.micWrap.mic = mic;
 		window.UI.micWrap.audio = new Audio();
 		window.UI.micWrap.audio.HasPermission((permission) => {
