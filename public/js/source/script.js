@@ -3,6 +3,9 @@ import API from './API.js';
 import Controls from './Controls.js';
 
 {
+	// First, clear our base page
+	document.body.innerHTML = '';
+
 	// App variables
 	const api = new API('api');
 	const UI = new UIm();
