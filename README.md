@@ -63,7 +63,7 @@ This application makes use of a wide variety of (fairly) modern web-browser tech
 Currently, no contributions are accepted. However, you are free to fork the project and build on it.
 
 ## Licence
-<!-- How about a license here?  (or is it a licence?) 🤷 -->
+The project is under the MIT License. Please refer to `LICENCE.md`.
 
 ## Acknowledgments
 * ☕️️️️
