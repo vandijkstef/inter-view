@@ -44,7 +44,7 @@ export default class {
 		inputPoint.connect( zeroGain );
 		zeroGain.connect( audioContext.destination );
 
-		window.audioRecorder.clear();
+		// window.audioRecorder.clear();
 		// window.audioRecorder.record();
 	}
 
@@ -56,8 +56,7 @@ export default class {
 			// Download the wav on users device
 			window.Recorder.Download(blob, filename, (status) => {
 				if (status) {
-					window.audioRecorder.clear();
-					// window.audioRecorder.record();
+					// The worker should have killed itself
 				}
 			});
 
