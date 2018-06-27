@@ -492,20 +492,14 @@ export default class {
 				window.audioRecorder.stop();
 				currentQuestion.state = 'done';
 				window.UI.micWrap.audio.SendAudio(`${this.script.id}-${this.script.currentQuestion}-${currentQuestion.id}-${this.script.respondent}`);
-				const ratings = document.querySelectorAll('input[name=rating]');
-				let rating;
-				ratings.forEach((rate) => {
-					if (rate.checked) {
-						rating = rate.value.split('_')[1];
-					}
-				});
 				const api = new API();
+				this.script.answers[this.script.currentQuestion].rating = window.UI.handlers.GetRatingValue(document.querySelector('.rating'));
 				api.call({
 					action: 'new_answer',
 					respondent: this.script.respondent,
 					question: currentQuestion.id,
 					script: this.script.id,
-					rating: rating
+					rating: this.script.answers[this.script.currentQuestion].rating
 				}, (data) => {
 					if (data.status) {
 						// console.log(data);

@@ -176,11 +176,10 @@ export default class {
 		const answers = [];
 		const updatedAnswers = e.target.form.querySelectorAll('.answer');
 		updatedAnswers.forEach((answer) => {
-			const rating = window.UI.handlers.GetRatingValue(answer.querySelector('.rating'));
 			answers.push({
 				id: answer.querySelector('input[name=questionID]').value,
 				notes: answer.querySelector('textarea[name=notes]').value,
-				rating: rating
+				rating: window.UI.handlers.GetRatingValue(answer.querySelector('.rating'))
 			});
 		});
 		const api = new API();
@@ -246,13 +245,26 @@ export default class {
 		});
 	}
 
-	SetRating() {
-		const stars = this.parentElement.querySelectorAll('.icon.star');
+	SetRating(e, stars, rating) {
+		if (stars === undefined) {
+			stars = this.parentElement.querySelectorAll('.icon.star');
+		}
+		if (rating === undefined) {
+			rating = this.dataset.value;
+		}
 		for (let i = 0; i < stars.length; i++) {
-			if (i < this.dataset.value) {
-				stars[i].classList.add('selected');
+			if (i < rating) {
+				try {
+					stars[i].querySelector('.icon').classList.add('selected');
+				} catch {
+					stars[i].classList.add('selected');
+				}
 			} else {
-				stars[i].classList.remove('selected');
+				try {
+					stars[i].querySelector('.icon').classList.remove('selected');
+				} catch {
+					stars[i].classList.remove('selected');
+				}
 			}
 		}
 	}

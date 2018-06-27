@@ -82,17 +82,22 @@ export default class {
 
 	GetRating(questionID, value) {
 		const stars = [];
+		if (value === undefined) {
+			value = false;
+		}
 		for (let i = 1; i < 6; i++) {
 			const starIcon = UItools.addHandler(
 				UItools.getInput(UItools.wrap(this.GetIconSVG('071-star'), '', '', 'label'), 'radio', 'rating_' + questionID, i, '', 'hide'),
 				window.UI.handlers.SetRating
 			);
 			starIcon.dataset.value = i;
-			if (i === value) {
-				starIcon.checked = true;
+			if (i === parseInt(value)) {
+				starIcon.querySelector('input').checked = true;
 			}
 			stars.push(starIcon);
 		}
+		
+		window.UI.handlers.SetRating(null, stars, value);
 		return UItools.wrap(
 			stars,
 			'rating'
