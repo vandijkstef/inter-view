@@ -356,8 +356,15 @@ label {
 }
 
 .controls {
-	width: 1.6em;
+	// width: 1.6em;
+	margin-right: -1rem;
+	button {
+		margin-top: 1rem;
+	}
 	svg {
+		max-width: 1.6em;
+		display: block;
+		margin: 0 auto;
 		fill: $grey;
 	}
 }
@@ -388,11 +395,9 @@ label {
 form[name=interview] {
 	margin: 0 -1rem -1rem -1rem;
 	grid-template-columns: 1fr 3.5em;
-	& > button {
-		margin-top: 3.5em;
-	}
 	& > div {
 		text-align: center;
+		margin: 0 auto;
 		p {
 			background-color: rgba($main, 0.1);
 			font-size: 2.4em;
@@ -422,17 +427,26 @@ form[name=interview] {
 
 .rating {
 	display: flex;
+	justify-content: space-around;
+	&:focus-within {
+		.icon {
+			fill: rgba($orange, .2);
+		}
+	}
 	.icon {
-		fill: rgba($grey, 0);
+		fill: rgba($orange, 0);
 		&:hover {
-			fill: rgba($grey, 0.5);
+			fill: rgba($orange, .5);
 		}
 		&.selected {
-			fill: rgba($grey, 1);
+			fill: rgba($orange, 1);
+			&:hover {
+				fill: rgba($orange, .8);
+			}
 		}
 	}
 	path {
-		stroke: $grey;
+		stroke: $orange;
 		stroke-width: 25px;
 	}
 }
