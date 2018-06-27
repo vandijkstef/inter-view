@@ -452,9 +452,7 @@ export default class {
 		if (this.script.currentQuestion === 0) {
 			window.timers.script = performance.now();
 		}
-		// const nextButton = UItools.getButton('=>', '', '', this.handlers.GoNextQuestion);
-		const nextButton = UItools.getButton('=>', '', '');
-		// const micWrap = this.elements.GetMic();
+		const nextButton = UItools.getButton(this.elements.GetIconSVG('014-next'), 'secondary', '');
 		const currentQuestion = Object.assign({}, this.script.questions[this.script.currentQuestion]);
 		currentQuestion.state = 'opened';
 		// TODO: Push currentQuestion to server/cache it
@@ -604,6 +602,11 @@ export default class {
 			return;
 		}
 		this.Clear(this.main);
+		const answers = [];
+		window.UI.script.answers.forEach((answer, i) => {
+			answers.push(this.elements.GetPostInterviewAnswer(answer, i));
+		});
+		answers.push(this.elements.GetSummary());
 		UItools.render(
 			[
 				this.elements.GetHeader('Interview Review'),
@@ -611,16 +614,14 @@ export default class {
 					[
 						UItools.wrap(
 							[
-								UItools.createElement(),
-								UItools.wrap(
-									UItools.getText('PostMetas')
+								this.elements.GetScrollWindow(
+									answers	
 								),
 								UItools.wrap(
 									[
 										UItools.wrap(
 											[
-												UItools.getText(this.script.title, '', '', 'h2'),
-												UItools.getText(this.script.description) // TODO: Extra description
+												UItools.getText(this.script.title, '', '', 'h2')
 											]
 										),
 										UItools.getButton('Save Interview', '', '', this.handlers.StoreInterview)
@@ -628,7 +629,7 @@ export default class {
 									['grid', 'row-BB']
 								)
 							],
-							['grid', 'col-131']
+							['grid', 'col-21']
 						)
 					],
 					'/',

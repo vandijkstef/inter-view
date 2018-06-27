@@ -72,7 +72,7 @@ img {
 	border-radius: $radius;
 	margin: 1rem;
 	box-shadow: 0 3px 6px rgba($main, .2);
-	&.login {
+	&.login, &.small {
 		position: unset;
 		display: block;
 		height: auto;
@@ -164,6 +164,7 @@ input, textarea {
 	margin-top: .5em;
 	border-radius: $radius;
 	&[type=radio].hide {
+		max-width: 0;
 		opacity: 0;
 		clip: rect(0,0,0,0);
 		position: absolute;
@@ -198,6 +199,9 @@ label {
 	}
 	&.col-131 {
 		grid-template-columns: 1fr 50% 1fr;
+	}
+	&.col-21 {
+		grid-template-columns: 2fr 1fr;
 	}
 	&.row-50 {
 		grid-template-rows: 50% 50%;
@@ -263,9 +267,12 @@ label {
 		}
 	}
 	&.secondary {
-		background-color: $main;
+		background-color: $dblue;
+		svg {
+			fill: white;
+		}
 		&:hover, &:focus {
-			background-color: lighten($main, 8);
+			background-color: lighten($dblue, 8);
 		}
 	}
 	&.warning {
@@ -414,6 +421,7 @@ form[name=interview] {
 }
 
 .rating {
+	display: flex;
 	.icon {
 		fill: rgba($grey, 0);
 		&:hover {
@@ -427,6 +435,14 @@ form[name=interview] {
 		stroke: $grey;
 		stroke-width: 25px;
 	}
+}
+
+.postentry {
+	border: 2px solid rgba($main, .2);
+	background-color: $white;
+	border-radius: $radius;
+	padding: 1rem 1rem;
+	margin-bottom: 1rem;
 }
   
   

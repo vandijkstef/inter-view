@@ -49,7 +49,7 @@ export default class {
 				UItools.wrap(
 					[
 						this.GetLogo(),
-						this.GetRating(),
+						this.GetRating(window.UI.script.questions[window.UI.script.currentQuestion].id),
 						UItools.wrap(
 							[
 								UItools.wrap(
@@ -80,14 +80,17 @@ export default class {
 		}, 1000);
 	}
 
-	GetRating() {
+	GetRating(questionID, value) {
 		const stars = [];
 		for (let i = 1; i < 6; i++) {
 			const starIcon = UItools.addHandler(
-				UItools.getInput(UItools.wrap(this.GetIconSVG('071-star'), '', '', 'label'), 'radio', 'rating', i, '', 'hide'),
+				UItools.getInput(UItools.wrap(this.GetIconSVG('071-star'), '', '', 'label'), 'radio', 'rating_' + questionID, i, '', 'hide'),
 				window.UI.handlers.SetRating
 			);
 			starIcon.dataset.value = i;
+			if (i === value) {
+				starIcon.checked = true;
+			}
 			stars.push(starIcon);
 		}
 		return UItools.wrap(
@@ -143,6 +146,27 @@ export default class {
 				UItools.getText(respondent.pseudo),
 				UItools.getText(respondent.id)
 			]
+		);
+	}
+
+	GetPostInterviewAnswer(answer, i) {
+		return UItools.wrap(
+			[
+				UItools.getText(i + 1, 'number'),
+				UItools.getText(answer.question, 'question'),
+				this.GetRating(answer.id),
+				UItools.getInput(UItools.getLabel('Notes'), 'textarea', 'notes_' + i)
+			],
+			['postentry', 'answer']
+		);
+	}
+
+	GetSummary() {
+		return UItools.wrap(
+			[
+				UItools.getInput(UItools.getLabel('Summary'), 'textarea', 'summary', '', 'General notes on this interview')
+			],
+			['postentry', 'summary']
 		);
 	}
 }

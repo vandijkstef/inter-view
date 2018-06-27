@@ -227,6 +227,7 @@ export default class {
 	}
 
 	SetRating() {
+		console.log(this);
 		const stars = this.parentElement.querySelectorAll('.icon.star');
 		for (let i = 0; i < stars.length; i++) {
 			if (i < this.dataset.value) {
