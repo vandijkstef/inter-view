@@ -278,6 +278,8 @@ router.post('/api', function(req, res) {
 					// Silence is golden...
 				});
 			});
+			data.status = true;
+			res.json(data);
 		} else {
 			data.err = 'Cannot store post meta: Not authenticated';
 			AuthError(data, res);
