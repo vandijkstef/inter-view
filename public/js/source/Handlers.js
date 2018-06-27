@@ -186,8 +186,9 @@ export default class {
 		api.call({
 			action: 'update_responses',
 			respondent: window.UI.script.respondent,
+			respondent_notes: document.querySelector('textarea[name=summary]').value,
 			responses: answers,
-			script: window.UI.script.id
+			script: window.UI.script.id,
 		}, (data) => {
 			if (!data.status) {
 				console.warn(data);

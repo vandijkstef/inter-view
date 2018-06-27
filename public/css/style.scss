@@ -100,6 +100,8 @@ main {
 	height: 100%;
 	top: 0;
 	.content {
+		display: grid;
+		grid-template-columns: 20fr 1fr;
 		position: absolute;
 		width: 80%;
 		height: 80%;
@@ -406,7 +408,7 @@ form[name=interview] {
 	& > div {
 		text-align: center;
 		margin: 0 auto;
-		p {
+		p:first-of-type {
 			background-color: rgba($main, 0.1);
 			font-size: 2.4em;
 			padding: 1em;
@@ -416,20 +418,26 @@ form[name=interview] {
 	}
 }
 
-.results {
-}
 .entry {
-	background-color: $white;
-	border-radius: $radius;
+	> div {
+		margin-bottom: 1rem;
+	}
 	.responses, .metas {
 		border: 2px solid rgba($main, .2);
 		border-radius: $radius;
+		& > * {
+			padding: 1rem;
+			margin: 0;
+		}
+		& > div:nth-of-type(2n - 1) {
+			background-color: rgba($main, .2);
+		}
 		p {
 			margin: 0;
 		}
-		& > div:not(:last-of-type) {
-			border-bottom: 2px solid rgba($main, .1);
-		}
+	}
+	.key {
+		font-weight: bold;
 	}
 }
 
@@ -459,12 +467,24 @@ form[name=interview] {
 	}
 }
 
-.postentry, #preview p, .metaentry, .questionentry {
+.postentry, #preview p, .metaentry, .questionentry, .entry {
 	border: 2px solid rgba($main, .2);
 	background-color: $white;
 	border-radius: $radius;
 	padding: 1rem 1rem;
 	margin-bottom: 1rem;
+}
+
+.inputwrapper {
+	&.checkbox {
+		display: flex;
+		align-items: baseline;
+		input {
+			order: -1;
+			width: auto;
+			margin-bottom: 0;
+		}
+	}
 }
   
   

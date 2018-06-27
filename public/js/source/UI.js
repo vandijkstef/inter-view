@@ -61,11 +61,12 @@ export default class {
 
 	AddResultDetail(response, entry) {
 		// This should handle individual answers or metadata
-		
 		if (response.meta_id && response.value) {
 			if (!entry.metas) {
 				entry.metas = UItools.wrap(
-					[],
+					[
+						UItools.getText('Meta Data', '', '', 'h3')
+					],
 					'metas'
 				);
 				UItools.render(
@@ -76,7 +77,7 @@ export default class {
 			UItools.render(
 				UItools.wrap(
 					[
-						UItools.getText(response.meta_id),
+						UItools.getText(response.key, 'key'),
 						UItools.getText(response.value)
 					]
 				),
@@ -87,7 +88,9 @@ export default class {
 		if (response.question_id) {
 			if (!entry.responses) {
 				entry.responses = UItools.wrap(
-					[],
+					[
+						UItools.getText('Answers', '', '', 'h3')
+					],
 					'responses'
 				);
 				UItools.render(
@@ -99,8 +102,8 @@ export default class {
 				UItools.wrap(
 					[
 						// UItools.getText(response.question_id),
-						UItools.getInput(false, 'checkbox', 'selected', true, response.audio),
-						UItools.getText(response.audio)
+						UItools.getText(response.question, 'key'),
+						UItools.getInput(UItools.getLabel(response.audio), 'checkbox', 'selected', true, response.audio)
 					]
 				),
 				entry.responses
@@ -274,52 +277,65 @@ export default class {
 	}
 
 	ShowResultsForScript(scriptID) {
-		const api = new API();
-		api.call({
-			action: 'get_respondents',
-			script: scriptID
-		}, (data) => {
-			const resultsWindow = document.querySelector('#results');
-			let resultEntry;
-			const resData = {};
-			data.respondents.forEach((response) => {
-				if (!resData[response.id]) {
-					resData[response.id] = {};
-					resData[response.id].id = response.id;
-					resData[response.id].pseudo = response.psuedo;
-					resData[response.id].answers = {};
-					resData[response.id].metas = {};
-				}
-				if (response.meta_id) {
-					resData[response.id].metas[response.meta_id] = {
-						meta_id: response.meta_id,
-						value: response.value
-					};
-				}
-				if (response.audiofile) {
-					resData[response.id].answers[response.question_id] = {
-						question_id: response.question_id,
-						audio: response.audiofile
-					};
+		if (navigator.onLine) {
+			const scrollwindow = document.querySelector('#results.scrollwindow');
+			const loader = this.AddLoader(scrollwindow);
+			this.Clear(scrollwindow);
+			const api = new API();
+			api.call({
+				action: 'get_respondents',
+				script: scriptID
+			}, (data) => {
+				console.log(data);
+				loader.parentElement.removeChild(loader);
+				const resultsWindow = document.querySelector('#results');
+				// Clean all the data received from the server // TODO: Move this to server?
+				let resultEntry;
+				const resData = {};
+				data.respondents.forEach((response) => {
+					if (!resData[response.id]) {
+						resData[response.id] = {};
+						resData[response.id].id = response.id;
+						resData[response.id].pseudo = response.psuedo;
+						resData[response.id].notes = response.notes;
+						resData[response.id].answers = {};
+						resData[response.id].metas = {};
+					}
+					if (response.meta_id) {
+						resData[response.id].metas[response.meta_id] = {
+							meta_id: response.meta_id,
+							value: response.value,
+							key: response.key
+						};
+					}
+					if (response.audiofile) {
+						resData[response.id].answers[response.question_id] = {
+							question_id: response.question_id,
+							audio: response.audiofile,
+							question: response.question
+						};
+					}
+				});
+				for (const respondent_id in resData) {
+					const respondent = resData[respondent_id];
+					resultEntry = this.elements.GetResult(respondent);
+					UItools.render(
+						resultEntry,
+						resultsWindow
+					);
+					for (const meta_id in resData[respondent_id].metas) {
+						const meta = resData[respondent_id].metas[meta_id];
+						this.AddResultDetail(meta, resultEntry);
+					}
+					for (const question_id in resData[respondent_id].answers) {
+						const answer = resData[respondent_id].answers[question_id];
+						this.AddResultDetail(answer, resultEntry);
+					}
 				}
 			});
-			for (const respondent_id in resData) {
-				const respondent = resData[respondent_id];
-				resultEntry = this.elements.GetResult(respondent);
-				UItools.render(
-					resultEntry,
-					resultsWindow
-				);
-				for (const meta_id in resData[respondent_id].metas) {
-					const meta = resData[respondent_id].metas[meta_id];
-					this.AddResultDetail(meta, resultEntry);
-				}
-				for (const question_id in resData[respondent_id].answers) {
-					const answer = resData[respondent_id].answers[question_id];
-					this.AddResultDetail(answer, resultEntry);
-				}
-			}
-		});
+		} else {
+			console.warn('This page shouldn\'t function offline');
+		}
 	}
 
 	ScriptSelection() {
@@ -399,7 +415,7 @@ export default class {
 		}
 		this.script.scriptStarted = true;
 		const preMetas = [];
-		preMetas.push(UItools.getInput('pseudo', 'text', `pseudo`));
+		preMetas.push(UItools.getInput('Pseudonym (or name)', 'text', `pseudo`, '', 'John Doe'));
 		this.script.metas.forEach((meta) => {
 			if (!meta.post) {
 				preMetas.push(UItools.getInput(meta.key, meta.type, `meta_${meta.id}`));
@@ -464,16 +480,21 @@ export default class {
 		currentQuestion.state = 'opened';
 		// TODO: Push currentQuestion to server/cache it
 		this.script.answers.push(currentQuestion);
+		const content = [
+			this.elements.GetRating(this.script.questions[this.script.currentQuestion].id),
+			UItools.getText(this.script.questions[this.script.currentQuestion].question)
+		];
+		// Show next question if available
+		if (this.script.questions[this.script.currentQuestion+1]) {
+			content.push(UItools.getText('Next question: ' + this.script.questions[this.script.currentQuestion+1].question));
+		}
 		UItools.render(
 			[	
 				this.elements.GetInterviewHeader(),
 				UItools.getForm('interview',
 					[
 						UItools.wrap(
-							[
-								this.elements.GetRating(this.script.questions[this.script.currentQuestion].id),
-								UItools.getText(this.script.questions[this.script.currentQuestion].question)
-							]
+							content
 						),
 						nextButton
 					],
@@ -857,14 +878,19 @@ export default class {
 		);
 	}
 
-	AddModal(content) {
+	AddModal(title, content) {
 		UItools.render(
 			UItools.wrap(
 				[
 					UItools.wrap(
 						[
-							content,
-							UItools.addHandler(this.elements.GetIconSVG('059-cancel'), this.handlers.CloseModal)
+							title,
+							UItools.addHandler(this.elements.GetIconSVG('059-cancel'), this.handlers.CloseModal),
+							UItools.wrap(
+								[
+									UItools.getText('content')
+								]
+							)
 						],
 						'content'
 					)

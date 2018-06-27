@@ -29,8 +29,9 @@ router.get('/audio/:file', function(req, res) {
 		// TODO: test if file exsists and properly handle error
 		res.sendFile(path.join(__basedir + '/uploads/' + req.params.file));
 	} else {
-		res.status(403);
-		res.send('Sorry, thats not allowed');
+		// res.status(403);
+		// res.send('Sorry, thats not allowed');
+		res.redirect('/');
 	}
 });
 
@@ -184,12 +185,15 @@ router.post('/api', function(req, res) {
 	case 'new_respondent':
 		if (req.session.user) {
 			const db = new DB();
-			let pseudo = '';
+			let pseudo = null;
 			req.body.meta.forEach((meta) => {
-				if (meta.key === 'pseudo') {
+				if (meta.key === 'pseudo' && meta.value.length > 0) {
 					pseudo = meta.value;
 				}
 			});
+			if (pseudo === null) {
+				pseudo = 'John Doe';
+			}
 			db.Insert('respondent', {psuedo: pseudo, script_id: req.body.script}, (insertID) => {
 				data.insertID = insertID;
 				data.status = true;
@@ -233,14 +237,14 @@ router.post('/api', function(req, res) {
 	case 'get_respondents':
 		if (req.session.user) {
 			const db = new DB();
-			db.Select('respondent', {script_id: req.body.script}, (respondents) => {
+			db.Select('respondent', {'respondent.script_id': req.body.script}, (respondents) => {
 				data.status = true;
 				data.respondents = respondents;
 				res.json(data);
 			}, {
-				JOIN: 'LEFT JOIN response ON respondent.`id` = response.`respondent_id` LEFT JOIN respondent_meta ON respondent.`id` = respondent_meta.`respondent_id`',
+				JOIN: 'LEFT JOIN response ON respondent.`id` = response.`respondent_id` LEFT JOIN respondent_meta ON respondent.`id` = respondent_meta.`respondent_id` LEFT JOIN scripts_meta ON scripts_meta.`id` = respondent_meta.`meta_id` LEFT JOIN questions ON questions.`id` = response.`question_id`',
 				ORDER: 'respondent.`id`',
-				SELECT: '`respondent`.*, `response`.`question_id`, `response`.`interviewer_id`, `response`.`audiofile`, `respondent_meta`.`meta_id`, `respondent_meta`.`value`'
+				SELECT: '`respondent`.*, `response`.`question_id`, `response`.`interviewer_id`, `response`.`audiofile`, `respondent_meta`.`meta_id`, `respondent_meta`.`value`, `scripts_meta`.`key`, `questions`.`question`'
 			});
 		} else {
 			data.err = 'Cannot get respondents: Not authenticated';
@@ -288,19 +292,25 @@ router.post('/api', function(req, res) {
 	case 'update_responses':
 		if (req.session.user) {
 			console.log(req.body);
-			req.body.responses.forEach((response) => {
-				const db = new DB();
-				db.Select('response', {
-					question_id: response.id,
-					respondent_id: req.body.respondent
-				}, (dbResponse) => {
+			const db = new DB();
+			db.Update('respondent', {
+				id: req.body.respondent,
+				notes: req.body.respondent_notes
+			}, () => {
+				req.body.responses.forEach((response) => {
 					const db = new DB();
-					db.Update('response', {
-						id: dbResponse[0].id,
-						notes: response.notes,
-						rating: response.rating
-					}, () => {
-						// Silence is golden...
+					db.Select('response', {
+						question_id: response.id,
+						respondent_id: req.body.respondent
+					}, (dbResponse) => {
+						const db = new DB();
+						db.Update('response', {
+							id: dbResponse[0].id,
+							notes: response.notes,
+							rating: response.rating
+						}, () => {
+							// Silence is golden...
+						});
 					});
 				});
 			});

@@ -135,7 +135,6 @@ export default class {
 
 	GetResult(respondent) {
 		// This should show an interview/respondent
-		console.log(respondent);
 		return UItools.wrap(
 			[
 				this.GetResultEntry(respondent)
@@ -146,11 +145,14 @@ export default class {
 
 	GetResultEntry(respondent) {
 		// This should show individual answers
+		const content = [
+			UItools.getText(respondent.pseudo, '', '', 'h2')
+		];
+		if (respondent.notes) {
+			content.push(UItools.getText('Notes: ' + respondent.notes));
+		}
 		return UItools.wrap(
-			[
-				UItools.getText(respondent.pseudo),
-				UItools.getText(respondent.id)
-			]
+			content
 		);
 	}
 
