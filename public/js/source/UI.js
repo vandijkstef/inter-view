@@ -113,20 +113,24 @@ export default class {
 	
 	// TODO: I might wanna rework Notify into a seperate class
 	Notify(message, type) {
-		if (!this.notify) {
-			this.notify = UItools.render(UItools.createElement(['container', type], 'notify'), this.main, true);
+		if (!window.notify) {
+			window.notify = UItools.render(UItools.createElement('container', 'notify'), document.body, true);
 		}
+		const classes = ['animated', 'fadeInUp', type];
 		UItools.render(
 			UItools.addHandler(
-				UItools.getText(message),
+				UItools.getText(message, classes),
 				this.NotifyDestroy
 			),
-			this.notify
+			window.notify
 		);
 	}
 
 	NotifyDestroy(e) {
-		e.target.remove();
+		e.target.classList.add('fadeOutDown');
+		setTimeout(() => {
+			e.target.remove();
+		}, 500);
 	}
 
 	RenderLogin() {

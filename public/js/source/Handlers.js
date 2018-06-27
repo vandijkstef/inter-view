@@ -16,6 +16,7 @@ export default class {
 		}, (data) => {
 			if (data.err) {
 				console.warn(data.err);
+				window.UI.Notify('Invalid login credentials', 'error');
 			} else if (data.user) {
 				localStorage.setItem('user', JSON.stringify(data.user));
 				// TODO: Improve feedback true/false on login form, use Notify?s
