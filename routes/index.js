@@ -149,8 +149,7 @@ router.post('/api', function(req, res) {
 				const db = new DB();
 				db.Update('scripts', {id: req.body.id, title: req.body.title, description: req.body.description}, (status) => {
 					req.body.metas.forEach((meta) => {
-						const db = new DB(); // Recreate DB so we have a seperate connection, which we can neatly close
-						// TODO: Test if this is a changed one or not
+						const db = new DB();
 						if (meta.id === 'new') {
 							db.Insert('scripts_meta', {script_id: req.body.id, key: meta.key, type: meta.type, order: meta.order, post: meta.post}, () => {
 								// Silence is golden..
@@ -185,14 +184,12 @@ router.post('/api', function(req, res) {
 	case 'new_respondent':
 		if (req.session.user) {
 			const db = new DB();
-			// TODO: Get Pseudo
 			let pseudo = '';
 			req.body.meta.forEach((meta) => {
 				if (meta.key === 'pseudo') {
 					pseudo = meta.value;
 				}
 			});
-			console.log(pseudo);
 			db.Insert('respondent', {psuedo: pseudo, script_id: req.body.script}, (insertID) => {
 				data.insertID = insertID;
 				data.status = true;
@@ -223,8 +220,7 @@ router.post('/api', function(req, res) {
 				respondent_id: req.body.respondent,
 				interviewer_id: req.session.user.id,
 				rating: req.body.rating
-				// TODO: Rating/Tags
-				// TODO: Audiofile stuff
+				// TODO: Tags
 			}, () => {
 				data.status = true;
 				res.json(data);
@@ -252,6 +248,7 @@ router.post('/api', function(req, res) {
 		}
 		break;
 	case 'get_responses': // TODO: Currently unused?
+		console.log('I have the idea I aint using this..');
 		if (req.session.user) {
 			const db = new DB();
 			if (req.body.respondent) { // Return data on single respondent
