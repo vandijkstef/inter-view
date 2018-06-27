@@ -283,6 +283,32 @@ router.post('/api', function(req, res) {
 			AuthError(data, res);
 		}
 		break;
+	case 'update_responses':
+		if (req.session.user) {
+			console.log(req.body);
+			req.body.responses.forEach((response) => {
+				const db = new DB();
+				db.Select('response', {
+					question_id: response.id,
+					respondent_id: req.body.respondent
+				}, (dbResponse) => {
+					const db = new DB();
+					db.Update('response', {
+						id: dbResponse[0].id,
+						notes: response.notes,
+						rating: response.rating
+					}, () => {
+						// Silence is golden...
+					});
+				});
+			});
+			data.status = true;
+			res.json(data);
+		} else {
+			data.err = 'Cannot update responses: Not authenticated';
+			AuthError(data, res);
+		}
+		break;
 	default:
 		data.err = 'Action not available: ' + req.body.action;
 		data.req = req.body;

@@ -154,8 +154,9 @@ export default class {
 			[
 				UItools.getText(i + 1, 'number'),
 				UItools.getText(answer.question, 'question'),
-				this.GetRating(answer.id),
-				UItools.getInput(UItools.getLabel('Notes'), 'textarea', 'notes_' + i)
+				this.GetRating(answer.id, answer.rating),
+				UItools.getInput('', 'hidden', 'questionID', answer.id),
+				UItools.getInput(UItools.getLabel('Notes'), 'textarea', 'notes')
 			],
 			['postentry', 'answer']
 		);

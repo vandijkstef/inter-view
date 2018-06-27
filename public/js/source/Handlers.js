@@ -173,8 +173,27 @@ export default class {
 
 	StoreInterview(e) {
 		e.preventDefault();
-		console.log('this should store the interview');
-		// TODO: Update stuff..
+		const answers = [];
+		const updatedAnswers = e.target.form.querySelectorAll('.answer');
+		updatedAnswers.forEach((answer) => {
+			const rating = window.UI.handlers.GetRatingValue(answer.querySelector('.rating'));
+			answers.push({
+				id: answer.querySelector('input[name=questionID]').value,
+				notes: answer.querySelector('textarea[name=notes]').value,
+				rating: rating
+			});
+		});
+		const api = new API();
+		api.call({
+			action: 'update_responses',
+			respondent: window.UI.script.respondent,
+			responses: answers,
+			script: window.UI.script.id
+		}, (data) => {
+			if (!data.status) {
+				console.warn(data);
+			}
+		});
 		window.UI.script = null;
 		window.UI.RenderHome();
 	}
@@ -215,6 +234,7 @@ export default class {
 		// How many files can we actually serve in one push? Probably not much because of HTTP connection limit.
 		// Lets try what happens if we just do all at once
 		// It works, but it aint ideal
+		// TODO: Count files, decide if we wanna zip or not
 		selected.forEach((item) => {
 			let link = document.createElement('a');
 			link.style.display = 'none';
@@ -227,7 +247,6 @@ export default class {
 	}
 
 	SetRating() {
-		console.log(this);
 		const stars = this.parentElement.querySelectorAll('.icon.star');
 		for (let i = 0; i < stars.length; i++) {
 			if (i < this.dataset.value) {
@@ -235,6 +254,21 @@ export default class {
 			} else {
 				stars[i].classList.remove('selected');
 			}
+		}
+	}
+
+	GetRatingValue(rating) {
+		const values = rating.querySelectorAll('input[type=radio]');
+		if (values) {
+			let val = false;
+			values.forEach((value) => {
+				if (value.checked) {
+					val = value.value.split('_')[2];
+				}
+			});
+			return val;
+		} else {
+			return false;
 		}
 	}
 

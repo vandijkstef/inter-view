@@ -148,7 +148,7 @@ export default class {
 		this.Clear(this.main);
 		this.StartScriptButton = UItools.getButton('Start Script', '', '', this.handlers.StartScript);
 		this.ScriptButtonState(false);
-		this.ScriptPreview = this.elements.GetScrollWindow(UItools.getText('Select a script on the left side'));
+		this.ScriptPreview = this.elements.GetScrollWindow(UItools.getText('Select a script on the left side'), 'preview');
 
 		const newScriptButton = UItools.getButton('New Script', ['secondary', 'shadowed'], '', this.handlers.EditScript);
 
@@ -172,7 +172,7 @@ export default class {
 									),
 									UItools.wrap(
 										[
-											UItools.getText('Select script', '', '', 'h2'),
+											UItools.getText('Select script', '', '', 'h2'), // TODO: Update to script title
 											this.ScriptPreview,
 											UItools.wrap(
 												[
@@ -340,13 +340,20 @@ export default class {
 			this.Clear(this.ScriptPreview);
 			const entries = [];
 			script.metas.forEach((meta) => {
-				entries.push(UItools.getText(meta.key));
+				if (!meta.post) {
+					entries.push(UItools.getText(`Meta: ${meta.key}`));
+				}
 			});
 			script.questions.sort((a, b) => {
 				return a.order - b.order;
 			});
 			script.questions.forEach((question) => {
 				entries.push(UItools.getText(question.question));
+			});
+			script.metas.forEach((meta) => {
+				if (meta.post) {
+					entries.push(UItools.getText(`Meta: ${meta.key}`));
+				}
 			});
 			UItools.render(
 				entries,
@@ -721,7 +728,7 @@ export default class {
 									['grid', 'row-TWB']
 								)
 							],
-							['grid', 'row-50']
+							['grid', 'row-46']
 						),
 						UItools.wrap(
 							[
@@ -781,7 +788,7 @@ export default class {
 					metaTypeSelect,
 					metaPostSelect
 				],
-				'',
+				'metaentry',
 				`script-${metaData.id}`,
 				'fieldset'
 			),
@@ -806,7 +813,7 @@ export default class {
 						UItools.getInput(false, 'hidden', 'questionID', questionData.id),
 						UItools.getInput(false, 'hidden', 'questionOrder', questionData.order),
 						UItools.getInput(false, 'text', 'questionText', questionData.question, 'Enter question', '', true)
-					], '', '', 'fieldset'
+					], 'questionentry', '', 'fieldset'
 				)
 			],
 			questionButton.parentElement,
@@ -816,13 +823,11 @@ export default class {
 	}
 
 	AddScript(script, targetBefore) {
-		// TODO: Improve
 		const loader = targetBefore.parentElement.querySelector('.loading');
 		if (loader) {
 			targetBefore = loader;
 		}
 		const settingsIcon = UItools.getButton(this.elements.GetIconSVG('040-settings-1'), ['transparent', 'small'], '');
-		// this.elements.GetIconSVG('040-settings-1');
 		UItools.addHandler(settingsIcon, this.handlers.EditScript);
 		settingsIcon.dataset.scriptID = script.id;
 		UItools.render(
