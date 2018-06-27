@@ -63,6 +63,7 @@ function exportWAV(type){
 	let audioBlob = new Blob([dataview], { type: type });
 
 	this.postMessage(audioBlob);
+	close();
 }
 
 function exportMonoWAV(type){
