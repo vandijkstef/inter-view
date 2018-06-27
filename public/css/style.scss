@@ -211,6 +211,14 @@ label {
 			}
 		}
 	}
+	&.row-46 {
+		grid-template-rows: 40% 60%;
+		.grid {
+			&.row-TWB {
+				max-height: 59.5vh;
+			}
+		}
+	}
 	&.row-TWB {
 		grid-template-rows: 4em 1fr;
 	}
@@ -222,7 +230,7 @@ label {
 
 .flex {
 	display: flex;
-	.center {
+	&.center {
 		align-items: center;
 	}
 }
@@ -451,7 +459,7 @@ form[name=interview] {
 	}
 }
 
-.postentry {
+.postentry, #preview p, .metaentry, .questionentry {
 	border: 2px solid rgba($main, .2);
 	background-color: $white;
 	border-radius: $radius;
