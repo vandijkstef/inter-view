@@ -464,6 +464,7 @@ export default class {
 					[
 						UItools.wrap(
 							[
+								this.elements.GetRating(this.script.questions[this.script.currentQuestion].id),
 								UItools.getText(this.script.questions[this.script.currentQuestion].question)
 							]
 						),
@@ -820,7 +821,8 @@ export default class {
 		if (loader) {
 			targetBefore = loader;
 		}
-		const settingsIcon = this.elements.GetIconSVG('040-settings-1');
+		const settingsIcon = UItools.getButton(this.elements.GetIconSVG('040-settings-1'), ['transparent', 'small'], '');
+		// this.elements.GetIconSVG('040-settings-1');
 		UItools.addHandler(settingsIcon, this.handlers.EditScript);
 		settingsIcon.dataset.scriptID = script.id;
 		UItools.render(

@@ -6,13 +6,14 @@ export default class {
 		return UItools.getImage('/img/logo.svg', 'Inter-view Logo');
 	}
 	
-	GetIcon(icon, classes, id) {
-		classes = UItools.forceArray(classes);
-		classes.push('icon');
-		return UItools.getImage(`/img/icons/svg/${icon}.svg`, 'TODO: Title from filename', classes, id);
-	}
+	// GetIcon(icon, classes, id) {
+	// 	classes = UItools.forceArray(classes);
+	// 	classes.push('icon');
+	// 	const title = icon.split('-')[1];
+	// 	return UItools.getImage(`/img/icons/svg/${icon}.svg`, title, classes, id);
+	// }
 
-	GetIconSVG(icon, classes = [], id) { // TODO: GetIconSVG -> Get actual SVG data, don't wrap in image
+	GetIconSVG(icon, classes = [], id) {
 		classes = UItools.forceArray(classes);
 		classes.push('icon');
 		const title = icon.split('-')[1];
@@ -49,7 +50,6 @@ export default class {
 				UItools.wrap(
 					[
 						this.GetLogo(),
-						this.GetRating(window.UI.script.questions[window.UI.script.currentQuestion].id),
 						UItools.wrap(
 							[
 								UItools.wrap(
