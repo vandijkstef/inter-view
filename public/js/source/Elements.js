@@ -111,7 +111,7 @@ export default class {
 	}
 
 	GetNav(nav) {
-		return UItools.wrap(UItools.addHandler(UItools.getText(nav), window.UI.handlers.SwitchResults), ['small', 'transparent'], '', 'button');
+		return UItools.getButton(nav, ['small', 'transparent'], '', window.UI.handlers.SwitchResults);
 	}
 
 	GetMic(enabled, configurable = true) {

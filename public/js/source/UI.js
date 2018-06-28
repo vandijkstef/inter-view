@@ -239,8 +239,8 @@ export default class {
 		);
 		const scriptSelection = UItools.getSelect('script', []);
 		UItools.addHandler(scriptSelection, this.handlers.ResultsChangeScript, 'change');
-		const filter = UItools.addHandler(UItools.getButton('filter', 'small'), this.AddFilterModal);
-		const download = UItools.addHandler(UItools.getButton('Download selected', 'small'), this.handlers.DownloadSelected);
+		const filter = UItools.addHandler(UItools.getButton('Filter', ['small', 'inactive'], 'filterBtn'), this.AddFilterModal);
+		const download = UItools.addHandler(UItools.getButton('Download selected', ['small', 'secondary']), this.handlers.DownloadSelected);
 		UItools.render(
 			[
 				this.elements.GetHeader('Results', 'Home'),
@@ -251,7 +251,8 @@ export default class {
 								scriptSelection,
 								filter,
 								download
-							]
+							],
+							'resultActions'
 						),
 						resultsWindow
 					],
@@ -295,8 +296,10 @@ export default class {
 					loader.parentElement.removeChild(loader);
 					const resultsWindow = document.querySelector('#results');
 					let resultEntry;
+					window.questions = {};
 					for (const respondent_id in data.resData) {
 						const respondent = data.resData[respondent_id];
+						// console.log(respondent);
 						resultEntry = this.elements.GetResult(respondent);
 						UItools.render(
 							resultEntry,
@@ -307,6 +310,12 @@ export default class {
 							this.AddResultDetail(meta, resultEntry);
 						}
 						for (const question_id in data.resData[respondent_id].answers) {
+							if (!window.questions[question_id]) {
+								window.questions[question_id] = {
+									id: window.questions[question_id],
+									question: data.resData[respondent_id].answers[question_id].question
+								};
+							}
 							const answer = data.resData[respondent_id].answers[question_id];
 							this.AddResultDetail(answer, resultEntry);
 						}
@@ -776,12 +785,13 @@ export default class {
 		const metaTypeSelect = UItools.getInput(false, 'select', 'metaType', [{value: 'text', label: 'Text'}, {value:'email', label: 'E-mail'}], '', '', true); // Why not just use getSelect?
 		metaTypeSelect.value = metaData.type;
 		const metaPostSelect = UItools.getInput('Post', 'checkbox', 'metaPost', metaData.post);
+		const metaKey = UItools.getInput(false, 'text', 'metaKey', metaData.key, 'Meta Key', '', true);
 		UItools.render(
 			UItools.wrap(
 				[
 					UItools.getInput(false, 'hidden', 'metaID', metaData.id),
 					UItools.getInput(false, 'hidden', 'metaOrder', metaData.order),
-					UItools.getInput(false, 'text', 'metaKey', metaData.key, 'Meta Key', '', true),
+					metaKey,
 					metaTypeSelect,
 					metaPostSelect
 				],
@@ -793,6 +803,9 @@ export default class {
 			false,
 			metaButton
 		);
+		if (metaData.id === 'new') {
+			metaKey.focus();
+		}
 	}
 
 	AddQuestion(questionButton, questionData) {
@@ -803,13 +816,14 @@ export default class {
 				question: ''
 			};
 		}
+		const questionText = UItools.getInput(false, 'text', 'questionText', questionData.question, 'Enter question', '', true);
 		UItools.render(
 			[
 				UItools.wrap(
 					[
 						UItools.getInput(false, 'hidden', 'questionID', questionData.id),
 						UItools.getInput(false, 'hidden', 'questionOrder', questionData.order),
-						UItools.getInput(false, 'text', 'questionText', questionData.question, 'Enter question', '', true)
+						questionText
 					], 'questionentry', '', 'fieldset'
 				)
 			],
@@ -817,6 +831,9 @@ export default class {
 			false,
 			questionButton
 		);
+		if (questionData.id === 'new') {
+			questionText.focus();
+		}
 	}
 
 	AddScript(script, targetBefore) {
@@ -861,30 +878,32 @@ export default class {
 	}
 
 	AddModal(title, content) {
+		const closeBtn = UItools.getButton(this.elements.GetIconSVG('059-cancel'), 'transparent', '', this.handlers.CloseModal);
 		UItools.render(
 			UItools.wrap(
 				[
 					UItools.wrap(
 						[
 							title,
-							UItools.addHandler(this.elements.GetIconSVG('059-cancel'), this.handlers.CloseModal),
+							closeBtn,
 							UItools.wrap(
-								[
-									UItools.getText('content')
-								]
+								content
 							)
 						],
 						'content'
 					)
 				],
-				'modal'
+				'modal',
+				'',
+				'section'
 			),
 			document.body
 		);
+		closeBtn.focus();
 	}
 
 	AddAudioModal() {
-		window.UI.AddModal(UItools.getText('AudioModal'));
+		window.UI.AddModal(UItools.getText('Audio Settings', '', '', 'h1'), UItools.getText('test'));
 		if (!this.audio.permission) {
 			this.audio.InitAudio((stream) => {
 				this.audio.GotStream(stream);
@@ -899,7 +918,38 @@ export default class {
 	}
 
 	AddFilterModal() {
-		window.UI.AddModal(UItools.getText('FilterModal'));
+		const content = [];
+
+		// Enable/Disable questions
+		if (window.questions) {
+			content.push(UItools.getText('Filter questions', '', '', 'h2'));
+			for (const id in window.questions) {
+				content.push(UItools.getInput(UItools.getLabel(window.questions[id].question), 'checkbox', 'filter_' + id, true));
+			}
+		}
+
+		// Rating
+		content.push(UItools.getText('Rating', '', '', 'h2'));
+		const minRating = UItools.getInput(UItools.getLabel('Minimum rating'), 'range', 'rating', 0);
+		minRating.input.setAttribute('min', 0);
+		minRating.input.setAttribute('max', 5);
+		minRating.input.setAttribute('step', 1);
+		content.push(minRating);
+		const maxRating = UItools.getInput(UItools.getLabel('Maximum rating'), 'range', 'rating', 5);
+		maxRating.input.setAttribute('min', 0);
+		maxRating.input.setAttribute('max', 5);
+		maxRating.input.setAttribute('step', 1);
+		content.push(maxRating);
+
+		// Buttons
+		content.push(UItools.wrap(
+			[
+				UItools.getButton('Reset', 'warning', '', window.UI.handlers.ResetFilter),
+				UItools.getButton('Apply', '', '', window.UI.handlers.ApplyFilter)
+			],
+			'buttonRow'
+		));
+		window.UI.AddModal(UItools.getText('Filter', '', '', 'h1'), content);
 	}
 
 	AddLoader(before) {

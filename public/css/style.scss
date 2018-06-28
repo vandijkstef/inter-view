@@ -131,6 +131,7 @@ main {
 		left: 50%;
 		top: 50%;
 		transform: translate(-50%, -50%);
+		padding-left: 3rem;
 	}
 }
 
@@ -290,7 +291,7 @@ label {
 		text-decoration: underline;
 	}
 	&.small {
-		padding: .4rem .8rem;
+		// padding: .4rem 1.4rem; // This cant be here
 		width: auto;
 	}
 	&.shadowed {
@@ -314,8 +315,10 @@ label {
 			background-color: lighten($orange, 8);
 		}
 	}
-	&:disabled {
+	&:disabled, &.inactive {
 		background-color: $grey;
+	}
+	&:disabled {
 		cursor: not-allowed;
 	}
 	&.transparent {
@@ -458,6 +461,9 @@ form[name=interview] {
 		p {
 			margin: 0;
 		}
+		.rating {
+			max-width: 20em;
+		}
 	}
 	.key {
 		font-weight: bold;
@@ -509,7 +515,21 @@ form[name=interview] {
 		}
 	}
 }
-  
+
+.resultActions {
+	display: flex;
+	margin: 1rem 0;
+	select {
+		flex-grow: 1;
+		margin-right: 1rem;
+	}
+	& > *:not(:first-of-type) {
+		margin-left: 1rem;
+	}
+	.small {
+		padding: .4rem 1.4rem;
+	}
+}
   
 @keyframes scaleout {
 	0% { 

@@ -286,4 +286,44 @@ export default class {
 		}
 	}
 
+	ApplyFilter(e) {
+		const filterBtn = document.querySelector('#filterBtn');
+		const closeBtn = document.querySelector('.modal .cancel');
+		const questionsFilter = document.querySelectorAll('input[name^=filter]');
+		const questionsResults = document.querySelectorAll('.responses .inputwrapper.checkbox input');
+		const questions = [];
+		let hasUnchecked = false;
+		questionsFilter.forEach((input) => {
+			if (input.checked) {
+				questions.push(input.name.split('_')[1]);
+			} else {
+				hasUnchecked = true;
+			}
+		});
+		if (hasUnchecked) {
+			filterBtn.classList.remove('inactive');
+		} else {
+			filterBtn.classList.add('inactive');
+		}
+		questionsResults.forEach((response) => {
+			if (questions.includes(response.dataset.value.split('-')[2])) {
+				response.checked = true;
+			} else {
+				response.checked = false;
+			}
+		});
+		closeBtn.click();
+	}
+
+	ResetFilter(e) {
+		const filterBtn = document.querySelector('#filterBtn');
+		filterBtn.classList.add('inactive');
+		const closeBtn = document.querySelector('.modal .cancel');
+		const questionsResults = document.querySelectorAll('.responses .inputwrapper.checkbox input');
+		questionsResults.forEach((response) => {
+			response.checked = true;
+		});
+		closeBtn.click();
+	}
+
 }
