@@ -453,7 +453,7 @@ form[name=interview] {
 			margin: 0;
 		}
 		& > div:nth-of-type(2n - 1) {
-			background-color: rgba($main, .2);
+			background-color: rgba($main, .1);
 		}
 		p {
 			margin: 0;
@@ -532,6 +532,7 @@ form[name=interview] {
 		animation-name: fadeInUp;
 	}
 	&.fadeOutDown {
+		animation-duration: .5s;
 		animation-name: fadeOutDown;
 	}
 }

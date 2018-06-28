@@ -239,12 +239,39 @@ router.post('/api', function(req, res) {
 			const db = new DB();
 			db.Select('respondent', {'respondent.script_id': req.body.script}, (respondents) => {
 				data.status = true;
-				data.respondents = respondents;
+				// data.respondents = respondents;
+				const resData = {};
+				respondents.forEach((response) => {
+					if (!resData[response.id]) {
+						resData[response.id] = {};
+						resData[response.id].id = response.id;
+						resData[response.id].pseudo = response.psuedo;
+						resData[response.id].notes = response.notes;
+						resData[response.id].answers = {};
+						resData[response.id].metas = {};
+					}
+					if (response.meta_id) {
+						resData[response.id].metas[response.meta_id] = {
+							meta_id: response.meta_id,
+							value: response.value,
+							key: response.key
+						};
+					}
+					if (response.audiofile) {
+						resData[response.id].answers[response.question_id] = {
+							question_id: response.question_id,
+							audio: response.audiofile,
+							question: response.question,
+							rating: response.rating
+						};
+					}
+				});
+				data.resData = resData;
 				res.json(data);
 			}, {
 				JOIN: 'LEFT JOIN response ON respondent.`id` = response.`respondent_id` LEFT JOIN respondent_meta ON respondent.`id` = respondent_meta.`respondent_id` LEFT JOIN scripts_meta ON scripts_meta.`id` = respondent_meta.`meta_id` LEFT JOIN questions ON questions.`id` = response.`question_id`',
 				ORDER: 'respondent.`id`',
-				SELECT: '`respondent`.*, `response`.`question_id`, `response`.`interviewer_id`, `response`.`audiofile`, `respondent_meta`.`meta_id`, `respondent_meta`.`value`, `scripts_meta`.`key`, `questions`.`question`'
+				SELECT: '`respondent`.*, `response`.`question_id`, `response`.`interviewer_id`, `response`.`audiofile`, `response`.`rating`, `respondent_meta`.`meta_id`, `respondent_meta`.`value`, `scripts_meta`.`key`, `questions`.`question`'
 			});
 		} else {
 			data.err = 'Cannot get respondents: Not authenticated';

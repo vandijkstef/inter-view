@@ -103,7 +103,8 @@ export default class {
 					[
 						// UItools.getText(response.question_id),
 						UItools.getText(response.question, 'key'),
-						UItools.getInput(UItools.getLabel(response.audio), 'checkbox', 'selected', true, response.audio)
+						UItools.getInput(UItools.getLabel(response.audio), 'checkbox', 'selected', true, response.audio),
+						this.elements.GetRating(response.question_id, response.rating, true)
 					]
 				),
 				entry.responses
@@ -290,51 +291,28 @@ export default class {
 				action: 'get_respondents',
 				script: scriptID
 			}, (data) => {
-				console.log(data);
-				loader.parentElement.removeChild(loader);
-				const resultsWindow = document.querySelector('#results');
-				// Clean all the data received from the server // TODO: Move this to server?
-				let resultEntry;
-				const resData = {};
-				data.respondents.forEach((response) => {
-					if (!resData[response.id]) {
-						resData[response.id] = {};
-						resData[response.id].id = response.id;
-						resData[response.id].pseudo = response.psuedo;
-						resData[response.id].notes = response.notes;
-						resData[response.id].answers = {};
-						resData[response.id].metas = {};
+				if (data.resData) {
+					loader.parentElement.removeChild(loader);
+					const resultsWindow = document.querySelector('#results');
+					let resultEntry;
+					for (const respondent_id in data.resData) {
+						const respondent = data.resData[respondent_id];
+						resultEntry = this.elements.GetResult(respondent);
+						UItools.render(
+							resultEntry,
+							resultsWindow
+						);
+						for (const meta_id in data.resData[respondent_id].metas) {
+							const meta = data.resData[respondent_id].metas[meta_id];
+							this.AddResultDetail(meta, resultEntry);
+						}
+						for (const question_id in data.resData[respondent_id].answers) {
+							const answer = data.resData[respondent_id].answers[question_id];
+							this.AddResultDetail(answer, resultEntry);
+						}
 					}
-					if (response.meta_id) {
-						resData[response.id].metas[response.meta_id] = {
-							meta_id: response.meta_id,
-							value: response.value,
-							key: response.key
-						};
-					}
-					if (response.audiofile) {
-						resData[response.id].answers[response.question_id] = {
-							question_id: response.question_id,
-							audio: response.audiofile,
-							question: response.question
-						};
-					}
-				});
-				for (const respondent_id in resData) {
-					const respondent = resData[respondent_id];
-					resultEntry = this.elements.GetResult(respondent);
-					UItools.render(
-						resultEntry,
-						resultsWindow
-					);
-					for (const meta_id in resData[respondent_id].metas) {
-						const meta = resData[respondent_id].metas[meta_id];
-						this.AddResultDetail(meta, resultEntry);
-					}
-					for (const question_id in resData[respondent_id].answers) {
-						const answer = resData[respondent_id].answers[question_id];
-						this.AddResultDetail(answer, resultEntry);
-					}
+				} else {
+					this.Notify('Invalid data received', 'error');
 				}
 			});
 		} else {

@@ -80,16 +80,22 @@ export default class {
 		}, 1000);
 	}
 
-	GetRating(questionID, value) {
+	GetRating(questionID, value, nonInteractable) {
 		const stars = [];
 		if (value === undefined) {
 			value = false;
 		}
 		for (let i = 1; i < 6; i++) {
-			const starIcon = UItools.addHandler(
-				UItools.getInput(UItools.wrap(this.GetIconSVG('071-star'), '', '', 'label'), 'radio', 'rating_' + questionID, i, '', 'hide'),
-				window.UI.handlers.SetRating
-			);
+
+			let starIcon = UItools.getInput(UItools.wrap(this.GetIconSVG('071-star'), '', '', 'label'), 'radio', 'rating_' + questionID, i, '', 'hide');
+			if (nonInteractable) {
+				starIcon.querySelector('input').disabled = true;
+			} else {
+				starIcon = UItools.addHandler(
+					starIcon,
+					window.UI.handlers.SetRating
+				);
+			}
 			starIcon.dataset.value = i;
 			if (i === parseInt(value)) {
 				starIcon.querySelector('input').checked = true;
