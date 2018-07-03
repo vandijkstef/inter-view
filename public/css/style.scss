@@ -317,6 +317,9 @@ label {
 	}
 	&:disabled, &.inactive {
 		background-color: $grey;
+		&:hover, &:focus {
+			background-color: $grey;
+		}
 	}
 	&:disabled {
 		cursor: not-allowed;
