@@ -2,7 +2,7 @@ const cacheName = 'iview';
 const reqFiles = [
 	'/',
 	'/css/style.css',
-	'/js/bundle.min.js',
+	'/js/bundle.js',
 	'/js/source/Recordtools/recorder.js',
 	'/img/logo.svg',
 	'/manifest.json'
