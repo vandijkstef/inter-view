@@ -182,7 +182,7 @@ export default class {
 									),
 									UItools.wrap(
 										[
-											UItools.getText('Select script', '', '', 'h2'), // TODO: Update to script title
+											UItools.getText('Selected script', '', '', 'h2'), // TODO: Update to script title
 											this.ScriptPreview,
 											UItools.wrap(
 												[
