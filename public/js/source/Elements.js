@@ -26,7 +26,7 @@ export default class {
 		const content = [];
 		content.push(this.GetLogo());
 		content.push(UItools.getText(title, '', '', 'h1'));
-		if (nav) {
+		if (nav && !window.offline) {
 			content.push(this.GetNav(nav));
 		}
 		content.push(this.GetMic(micEnabled, micConfigurable));

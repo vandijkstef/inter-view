@@ -159,7 +159,9 @@ export default class {
 		this.ScriptPreview = this.elements.GetScrollWindow(UItools.getText('Select a script on the left side'), 'preview');
 
 		const newScriptButton = UItools.getButton('New Script', ['secondary', 'shadowed'], '', this.handlers.EditScript);
-
+		if (window.offline) {
+			newScriptButton.disabled = true;
+		}
 		UItools.render(
 			[
 				this.elements.GetHeader('Script Selection', 'Results'),
@@ -215,7 +217,7 @@ export default class {
 				this.AddScript(script, newScriptButton);
 			}
 		}
-		if (navigator.onLine) {
+		if (!window.offline) {
 			const loader = this.AddLoader(newScriptButton);
 			const api = new API();
 			api.call({
@@ -283,7 +285,7 @@ export default class {
 	}
 
 	ShowResultsForScript(scriptID) {
-		if (navigator.onLine) {
+		if (!window.offline) {
 			const scrollwindow = document.querySelector('#results.scrollwindow');
 			const loader = this.AddLoader(scrollwindow);
 			this.Clear(scrollwindow);
@@ -669,27 +671,33 @@ export default class {
 	FetchScript(id, callback) {
 		// TODO: Move this method out of UI
 		// TODO: Test if online, if not, try to retrieve from cache
-		const api = new API();
-		api.call({
-			action: 'script_fetch',
-			scriptID: id
-		}, (data) => {
-			if (data.status === true) {
-				localStorage.setItem(`script_${data.script.id}`, JSON.stringify(data.script));
-				const script = document.querySelector(`div#script_${data.script.id}`);
-				if (script) {
-					script.classList.add('cached');
-				}
-				return callback(data.script);
-			} else {
-				if (localStorage.getItem(`script_${id}`)) {
-					localStorage.removeItem(`script_${id}`);
-					this.Notify('Script removed from server: Clearing cached script');
-				} else {
-					this.Notify(data.err);
-				}
+		if (window.offline) {
+			if (localStorage.getItem(`script_${id}`)) {
+				return callback(JSON.parse(localStorage.getItem(`script_${id}`)));
 			}
-		});
+		} else {
+			const api = new API();
+			api.call({
+				action: 'script_fetch',
+				scriptID: id
+			}, (data) => {
+				if (data.status === true) {
+					localStorage.setItem(`script_${data.script.id}`, JSON.stringify(data.script));
+					const script = document.querySelector(`div#script_${data.script.id}`);
+					if (script) {
+						script.classList.add('cached');
+					}
+					return callback(data.script);
+				} else {
+					if (localStorage.getItem(`script_${id}`)) {
+						localStorage.removeItem(`script_${id}`);
+						this.Notify('Script removed from server: Clearing cached script');
+					} else {
+						this.Notify(data.err);
+					}
+				}
+			});
+		}
 	}
 
 	PostRenderScriptEdit(script) {
@@ -841,9 +849,15 @@ export default class {
 		if (loader) {
 			targetBefore = loader;
 		}
-		const settingsIcon = UItools.getButton(this.elements.GetIconSVG('040-settings-1'), ['transparent', 'small'], '');
-		UItools.addHandler(settingsIcon, this.handlers.EditScript);
-		settingsIcon.dataset.scriptID = script.id;
+		const icons = [
+			this.elements.GetIconSVG('035-checked')
+		];
+		if (!window.offline) {
+			const settingsIcon = UItools.getButton(this.elements.GetIconSVG('040-settings-1'), ['transparent', 'small'], '');
+			UItools.addHandler(settingsIcon, this.handlers.EditScript);
+			settingsIcon.dataset.scriptID = script.id;
+			icons.push(settingsIcon);
+		}
 		UItools.render(
 			[
 				UItools.addHandler(UItools.getInput(false, 'radio', 'script', `script_${script.id}`, '', 'hide'), this.handlers.RadioDiv, 'change'),
@@ -858,10 +872,7 @@ export default class {
 								]
 							),
 							UItools.wrap(
-								[
-									this.elements.GetIconSVG('035-checked'),
-									settingsIcon
-								],
+								icons,
 								'controls'
 							)
 						],
@@ -929,17 +940,17 @@ export default class {
 		}
 
 		// Rating
-		content.push(UItools.getText('Rating', '', '', 'h2'));
-		const minRating = UItools.getInput(UItools.getLabel('Minimum rating'), 'range', 'rating', 0);
-		minRating.input.setAttribute('min', 0);
-		minRating.input.setAttribute('max', 5);
-		minRating.input.setAttribute('step', 1);
-		content.push(minRating);
-		const maxRating = UItools.getInput(UItools.getLabel('Maximum rating'), 'range', 'rating', 5);
-		maxRating.input.setAttribute('min', 0);
-		maxRating.input.setAttribute('max', 5);
-		maxRating.input.setAttribute('step', 1);
-		content.push(maxRating);
+		// content.push(UItools.getText('Rating', '', '', 'h2'));
+		// const minRating = UItools.getInput(UItools.getLabel('Minimum rating'), 'range', 'rating', 0);
+		// minRating.input.setAttribute('min', 0);
+		// minRating.input.setAttribute('max', 5);
+		// minRating.input.setAttribute('step', 1);
+		// content.push(minRating);
+		// const maxRating = UItools.getInput(UItools.getLabel('Maximum rating'), 'range', 'rating', 5);
+		// maxRating.input.setAttribute('min', 0);
+		// maxRating.input.setAttribute('max', 5);
+		// maxRating.input.setAttribute('step', 1);
+		// content.push(maxRating);
 
 		// Buttons
 		content.push(UItools.wrap(

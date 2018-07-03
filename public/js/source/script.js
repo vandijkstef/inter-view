@@ -21,14 +21,16 @@ import Controls from './Controls.js';
 	window.addEventListener('beforeunload', function (e) {
 		e.returnValue = 'false';
 	});
-
+	// window.offline = true;
 	// Decide on online status, Decide on login status
-	if (!navigator.onLine) {
+	if (!navigator.onLine || window.offline) {
+		window.offline = true;
 		// TODO: Offline functionality
 		// This can only be reached if the page is loaded. It won't reach here if we disconnect after loading, we can be pretty sure the page got served by a serviceworker
 		// TODO: Can we 'assume' login? -> Kinda, at least flag the data
 		// TODO: Do we have cached scripts? And like, all of them?
 		// Note to self: Online mode can only be enabled by reloading the page
+		UI.Notify('Offline mode');
 		UI.RenderHome();
 	} else {
 		// Decide on login status

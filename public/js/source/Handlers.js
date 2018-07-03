@@ -258,13 +258,13 @@ export default class {
 			if (i < rating) {
 				try {
 					stars[i].querySelector('.icon').classList.add('selected');
-				} catch {
+				} catch (err) {
 					stars[i].classList.add('selected');
 				}
 			} else {
 				try {
 					stars[i].querySelector('.icon').classList.remove('selected');
-				} catch {
+				} catch (err) {
 					stars[i].classList.remove('selected');
 				}
 			}
