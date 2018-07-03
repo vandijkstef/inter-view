@@ -251,6 +251,9 @@ export default class {
 		if (stars === undefined) {
 			stars = this.parentElement.querySelectorAll('.icon.star');
 		}
+		if (stars === null) {
+			stars = document.querySelectorAll('.icon.star');
+		}
 		if (rating === undefined) {
 			rating = this.dataset.value;
 		}
