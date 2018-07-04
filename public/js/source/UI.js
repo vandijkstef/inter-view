@@ -104,7 +104,16 @@ export default class {
 						// UItools.getText(response.question_id),
 						UItools.getText(response.question, 'key'),
 						UItools.getInput(UItools.getLabel(response.audio), 'checkbox', 'selected', true, response.audio),
-						this.elements.GetRating(response.question_id, response.rating, true)
+						this.elements.GetRating(response.question_id, response.rating, true),
+						UItools.addHandler(
+							UItools.addHandler(
+								UItools.getAudio(response.audio, true),
+								this.handlers.AudioPlaying,
+								'playing'
+							), 
+							this.handlers.AudioPaused,
+							'pause'
+						)
 					]
 				),
 				entry.responses
@@ -182,7 +191,7 @@ export default class {
 									),
 									UItools.wrap(
 										[
-											UItools.getText('Select script', '', '', 'h2'), // TODO: Update to script title
+											UItools.getText('Selected script', '', '', 'h2'), // TODO: Update to script title
 											this.ScriptPreview,
 											UItools.wrap(
 												[

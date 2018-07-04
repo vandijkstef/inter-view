@@ -251,6 +251,9 @@ export default class {
 		if (stars === undefined) {
 			stars = this.parentElement.querySelectorAll('.icon.star');
 		}
+		if (stars === null) {
+			stars = document.querySelectorAll('.icon.star');
+		}
 		if (rating === undefined) {
 			rating = this.dataset.value;
 		}
@@ -326,4 +329,11 @@ export default class {
 		closeBtn.click();
 	}
 
+	AudioPlaying() {
+		this.parentElement.classList.add('playing');
+	}
+
+	AudioPaused() {
+		this.parentElement.classList.remove('playing');
+	}
 }

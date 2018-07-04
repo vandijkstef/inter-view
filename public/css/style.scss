@@ -35,6 +35,11 @@ img {
 	outline-color: $lblue;
 }
 
+h2 {
+	font-size: 1.2em;
+}
+
+
 .dev {
 	position: fixed;
     bottom: 0;
@@ -142,7 +147,7 @@ header {
 		max-width: 12em;
 	}
 	h1 {
-		font-size: 1.2em;
+		font-size: 1.4em;
 		flex-grow: 2;
 		&::before {
 			content: "|";
@@ -246,7 +251,7 @@ label {
 		}
 	}
 	&.row-TWB {
-		grid-template-rows: 4em 1fr;
+		grid-template-rows: 3.3em 1fr;
 	}
 	&.row-BB {
 		grid-template-rows: 1fr;
@@ -457,9 +462,16 @@ form[name=interview] {
 		& > * {
 			padding: 1rem;
 			margin: 0;
+			transition: $trans;
+			&.playing {
+				background-color: rgba($grey, .05);
+			}
 		}
 		& > div:nth-of-type(2n - 1) {
 			background-color: rgba($main, .1);
+			&.playing {
+				background-color: rgba($main, .2);
+			}
 		}
 		p {
 			margin: 0;
