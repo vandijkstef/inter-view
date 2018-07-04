@@ -329,4 +329,11 @@ export default class {
 		closeBtn.click();
 	}
 
+	AudioPlaying() {
+		this.parentElement.classList.add('playing');
+	}
+
+	AudioPaused() {
+		this.parentElement.classList.remove('playing');
+	}
 }

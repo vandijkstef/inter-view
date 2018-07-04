@@ -462,9 +462,16 @@ form[name=interview] {
 		& > * {
 			padding: 1rem;
 			margin: 0;
+			transition: $trans;
+			&.playing {
+				background-color: rgba($grey, .05);
+			}
 		}
 		& > div:nth-of-type(2n - 1) {
 			background-color: rgba($main, .1);
+			&.playing {
+				background-color: rgba($main, .2);
+			}
 		}
 		p {
 			margin: 0;
