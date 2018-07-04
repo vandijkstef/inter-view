@@ -1,6 +1,6 @@
 export default class {
 	Keyboard(e) {
-		console.log(e.key);
+		// console.log(e.key);
 		// Determine app state
 		const interview = document.querySelector('form[name=interview]');
 		if (interview) {
