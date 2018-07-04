@@ -107,6 +107,22 @@ export default class {
 
 	StartScript(e) {
 		e.preventDefault();
+		if (this.classList.contains('warning')) {
+			console.warn('No mic set-up');
+			window.UI.Notify('No mic set-up', 'warning');
+			window.UI.micWrap.audio.InitAudio(() => {
+				window.UI.handlers.DoStartScript();
+			}, (err) => {
+				console.log(err);
+				return;
+			});
+			return;
+		} else {
+			window.UI.handlers.DoStartScript();
+		}		
+	}
+
+	DoStartScript() {
 		let selection = document.querySelectorAll('input[name=script]');
 		selection.forEach((input) => {
 			if (input.checked) {
