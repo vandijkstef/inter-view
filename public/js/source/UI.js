@@ -869,11 +869,10 @@ export default class {
 		}
 		UItools.render(
 			[
-				UItools.addHandler(UItools.getInput(false, 'radio', 'script', `script_${script.id}`, '', 'hide'), this.handlers.RadioDiv, 'change'),
 				UItools.addHandler(
 					UItools.wrap(
 						[
-							
+							UItools.addHandler(UItools.getInput(false, 'radio', 'script', `script_${script.id}`, '', 'hide'), this.handlers.RadioDiv, 'change'),
 							UItools.wrap(
 								[
 									UItools.getText(script.title),
@@ -885,7 +884,7 @@ export default class {
 								'controls'
 							)
 						],
-						[script.cached ? 'cached' : null],
+						[script.cached ? 'cached' : 'fresh', 'animated', 'fadeInLeft'],
 						`script_${script.id}`
 					), 
 					this.handlers.DivRadio
