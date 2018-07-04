@@ -3,6 +3,7 @@ const router = express.Router();
 const path = require('path');
 const DB = require('../scripts/DB.js');
 const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 
 const multer = require('multer');
 const storage = multer.diskStorage({
@@ -20,6 +21,37 @@ function AuthError(data, res) {
 	res.json(data);
 }
 
+function SendMail(to, subject, html) {
+	let transporter = nodemailer.createTransport({
+		host: process.env.MAIL_HOST,
+		port: process.env.MAIL_PORT,
+		secure: false,
+		auth: {
+			user: process.env.MAIL_FROM,
+			pass: process.env.MAIL_PASS
+		},
+		tls: {
+			rejectUnauthorized: false
+		}
+	});
+
+	let mailOptions = {
+		from: '"Fred Foo 👻" <iview@vandijkstef.nl>',
+		to: to,
+		subject: subject,
+		text: html, // TODO: strip html
+		html: html
+	};
+
+	transporter.sendMail(mailOptions, (error, info) => {
+		if (error) {
+			return console.log(error);
+		}
+		console.log('Message sent: %s', info.messageId);
+	});
+	console.log(process.env.MAIL_FROM, process.env.MAIL_PASS);
+}
+
 router.get('/', function(req, res) {
 	res.sendFile(path.join(__dirname + '/public/index.html'));
 });
@@ -33,6 +65,12 @@ router.get('/audio/:file', function(req, res) {
 		// res.send('Sorry, thats not allowed');
 		res.redirect('/');
 	}
+});
+
+router.get('/testmail', function(req, res) {
+
+	SendMail('vandijkstef@gmail.com', 'testing', 'with some content');
+	res.json('send');
 });
 
 router.post('/api', function(req, res) {
