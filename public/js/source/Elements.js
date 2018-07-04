@@ -69,8 +69,16 @@ export default class {
 	}
 
 	GetTime(timer) {
-		// TODO: Improve time display
-		return Math.floor((performance.now() - timer) / 1000);
+		const time = Math.floor((performance.now() - timer) / 1000);
+
+		const hours = Math.floor(time / 3600);
+		const minutes = Math.floor((time - (hours * 3600)) / 60);
+		let seconds = time - (hours * 3600) - (minutes * 60);
+		seconds = Math.round(seconds * 100) / 100;
+
+		let result = (minutes < 10 ? '0' + minutes : minutes) + ':' + (seconds  < 10 ? '0' + seconds : seconds);
+
+		return result;
 	}
 
 	TimerUpdater(element, timer) {
