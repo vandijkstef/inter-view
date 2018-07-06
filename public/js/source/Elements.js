@@ -123,7 +123,12 @@ export default class {
 	}
 
 	GetMic(enabled, configurable = true) {
-		const mic = this.GetIconSVG('021-microphone', 'mic');
+		let mic;
+		if (configurable) {
+			mic = this.GetIconSVG('040-settings-1', 'mic');
+		} else {
+			mic = this.GetIconSVG('021-microphone', 'mic');
+		}
 		window.UI.micWrap = UItools.addHandler(UItools.wrap(mic, ['small', 'transparent'], '', 'button'), window.UI.AddAudioModal);
 		window.UI.micWrap.mic = mic;
 		window.UI.micWrap.audio = new Audio();

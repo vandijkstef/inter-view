@@ -941,7 +941,7 @@ export default class {
 
 		// Enable/Disable questions
 		if (window.questions) {
-			content.push(UItools.getText('Filter questions', '', '', 'h2'));
+			content.push(UItools.getText('Questions', '', '', 'h2'));
 			for (const id in window.questions) {
 				content.push(UItools.getInput(UItools.getLabel(window.questions[id].question), 'checkbox', 'filter_' + id, true));
 			}
