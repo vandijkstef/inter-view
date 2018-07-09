@@ -300,7 +300,8 @@ router.post('/api', function(req, res) {
 							question_id: response.question_id,
 							audio: response.audiofile,
 							question: response.question,
-							rating: response.rating
+							rating: response.rating,
+							notes: response.notes
 						};
 					}
 				});
@@ -309,7 +310,7 @@ router.post('/api', function(req, res) {
 			}, {
 				JOIN: 'LEFT JOIN response ON respondent.`id` = response.`respondent_id` LEFT JOIN respondent_meta ON respondent.`id` = respondent_meta.`respondent_id` LEFT JOIN scripts_meta ON scripts_meta.`id` = respondent_meta.`meta_id` LEFT JOIN questions ON questions.`id` = response.`question_id`',
 				ORDER: 'respondent.`id`',
-				SELECT: '`respondent`.*, `response`.`question_id`, `response`.`interviewer_id`, `response`.`audiofile`, `response`.`rating`, `respondent_meta`.`meta_id`, `respondent_meta`.`value`, `scripts_meta`.`key`, `questions`.`question`'
+				SELECT: '`respondent`.*, `response`.`question_id`, `response`.`interviewer_id`, `response`.`audiofile`, `response`.`rating`, `response`.`notes`, `respondent_meta`.`meta_id`, `respondent_meta`.`value`, `scripts_meta`.`key`, `questions`.`question`'
 			});
 		} else {
 			data.err = 'Cannot get respondents: Not authenticated';
