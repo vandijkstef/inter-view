@@ -64,9 +64,7 @@ export default class {
 		if (response.meta_id && response.value) {
 			if (!entry.metas) {
 				entry.metas = UItools.wrap(
-					[
-						UItools.getText('Meta Data', '', '', 'h3')
-					],
+					[],
 					'metas'
 				);
 				UItools.render(
@@ -86,10 +84,11 @@ export default class {
 		}
 
 		if (response.question_id) {
+			console.log(response);
 			if (!entry.responses) {
 				entry.responses = UItools.wrap(
 					[
-						UItools.getText('Answers', '', '', 'h3')
+						UItools.getText('Responses', '', '', 'h3')
 					],
 					'responses'
 				);
@@ -98,24 +97,28 @@ export default class {
 					entry
 				);
 			}
-			UItools.render(
-				UItools.wrap(
-					[
-						// UItools.getText(response.question_id),
-						UItools.getText(response.question, 'key'),
-						UItools.getInput(UItools.getLabel(response.audio), 'checkbox', 'selected', true, response.audio),
-						this.elements.GetRating(response.question_id, response.rating, true),
+			const content = [];
+			content.push(UItools.getText(response.question, 'key'));
+			content.push(UItools.wrap(
+				[
+					UItools.getInput(UItools.addHandler(
 						UItools.addHandler(
-							UItools.addHandler(
-								UItools.getAudio(response.audio, true),
-								this.handlers.AudioPlaying,
-								'playing'
-							), 
-							this.handlers.AudioPaused,
-							'pause'
-						)
-					]
-				),
+							UItools.getAudio(response.audio, true),
+							this.handlers.AudioPlaying,
+							'playing'
+						), 
+						this.handlers.AudioPaused,
+						'pause'
+					), 'checkbox', 'selected', true, response.audio),
+					this.elements.GetRating(response.question_id, response.rating, true)
+				],
+				['flex']
+			));
+			if (response.notes) {
+				content.push(UItools.getText(`Notes: ${response.notes}`));
+			}
+			UItools.render(
+				UItools.wrap(content),
 				entry.responses
 			);
 		}
@@ -251,7 +254,7 @@ export default class {
 		const scriptSelection = UItools.getSelect('script', []);
 		UItools.addHandler(scriptSelection, this.handlers.ResultsChangeScript, 'change');
 		const filter = UItools.addHandler(UItools.getButton('Filter', ['small', 'inactive'], 'filterBtn'), this.AddFilterModal);
-		const download = UItools.addHandler(UItools.getButton('Download selected', ['small', 'secondary']), this.handlers.DownloadSelected);
+		const download = UItools.addHandler(UItools.getButton('Export', ['small', 'secondary']), this.AddExportModal);
 		UItools.render(
 			[
 				this.elements.GetHeader('Results', 'Home'),
@@ -357,20 +360,23 @@ export default class {
 		this.FetchScript(selected, (script) => {
 			this.Clear(this.ScriptPreview);
 			const entries = [];
+			if (!script.metas.length && !script.questions.length) {
+				entries.push(UItools.getText('No questions set', ['animated', 'fadeIn']));
+			}
 			script.metas.forEach((meta) => {
 				if (!meta.post) {
-					entries.push(UItools.getText(`Meta: ${meta.key}`));
+					entries.push(UItools.getText(`Meta: ${meta.key}`, ['animated', 'fadeIn']));
 				}
 			});
 			script.questions.sort((a, b) => {
 				return a.order - b.order;
 			});
 			script.questions.forEach((question) => {
-				entries.push(UItools.getText(question.question));
+				entries.push(UItools.getText(question.question, ['animated', 'fadeIn']));
 			});
 			script.metas.forEach((meta) => {
 				if (meta.post) {
-					entries.push(UItools.getText(`Meta: ${meta.key}`));
+					entries.push(UItools.getText(`Meta: ${meta.key}`, ['animated', 'fadeIn']));
 				}
 			});
 			UItools.render(
@@ -378,7 +384,6 @@ export default class {
 				this.ScriptPreview
 			);
 			if (script.questions.length > 0) {
-				// this.StartScriptButton.disabled = false;
 				this.ScriptButtonState(true);
 			}
 		});
@@ -413,6 +418,7 @@ export default class {
 	RenderPreMeta() {
 		if (!this.script || this.script.scriptStarted) {
 			console.warn('Flow isn\'t accepting your jokes bruh');
+			this.Notify('Something went wrong, please reload the page', 'warning');
 			return;
 		}
 		this.script.scriptStarted = true;
@@ -912,7 +918,7 @@ export default class {
 						'content'
 					)
 				],
-				'modal',
+				['modal', 'animated', 'fadeIn'],
 				'',
 				'section'
 			),
@@ -965,6 +971,20 @@ export default class {
 			[
 				UItools.getButton('Reset', 'warning', '', window.UI.handlers.ResetFilter),
 				UItools.getButton('Apply', '', '', window.UI.handlers.ApplyFilter)
+			],
+			'buttonRow'
+		));
+		window.UI.AddModal(UItools.getText('Filter', '', '', 'h1'), content);
+	}
+
+	AddExportModal() {
+		const content = [];
+
+		// Buttons
+		content.push(UItools.wrap(
+			[
+				// UItools.getButton('Reset', 'warning', '', window.UI.handlers.ResetFilter),
+				UItools.getButton('Apply', '', '', window.UI.handlers.DownloadSelected)
 			],
 			'buttonRow'
 		));

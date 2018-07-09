@@ -346,10 +346,10 @@ export default class {
 	}
 
 	AudioPlaying() {
-		this.parentElement.classList.add('playing');
+		this.parentElement.parentElement.parentElement.classList.add('playing');
 	}
 
 	AudioPaused() {
-		this.parentElement.classList.remove('playing');
+		this.parentElement.parentElement.parentElement.classList.remove('playing');
 	}
 }

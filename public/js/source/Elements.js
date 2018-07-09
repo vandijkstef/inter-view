@@ -98,6 +98,7 @@ export default class {
 			let starIcon = UItools.getInput(UItools.wrap(this.GetIconSVG('071-star'), '', '', 'label'), 'radio', 'rating_' + questionID, i, '', 'hide');
 			if (nonInteractable) {
 				starIcon.querySelector('input').disabled = true;
+				starIcon.classList.add('disabled');
 			} else {
 				starIcon = UItools.addHandler(
 					starIcon,
@@ -158,7 +159,7 @@ export default class {
 			[
 				this.GetResultEntry(respondent)
 			],
-			'entry'
+			['entry', 'animated', 'fadeIn']
 		);
 	}
 
