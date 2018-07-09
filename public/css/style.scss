@@ -204,6 +204,9 @@ input, textarea {
 
 select {
 	font-size: 1.2em;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	padding: 0 .6rem;
 }
 
 label {
@@ -289,7 +292,7 @@ label {
 	background-color: $green;
 	color: $white;
 	font-size: 1.2em;
-	padding: .8rem;
+	padding: .4rem;
 	transition: background-color $trans;
 	border: none;
 	border-radius: $radius;
@@ -369,7 +372,7 @@ label {
 		margin: 0 auto;
 	}
 	&.mic {
-		width: 2.6em;
+		width: 2.2em;
 		&.recording {
 			fill: $green;
 		}
@@ -460,55 +463,102 @@ form[name=interview] {
 }
 
 .entry {
-	> div {
-		margin-bottom: 1rem;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	h2 {
+		font-size: 2em;
+		margin: .5rem 0;
 	}
-	.responses, .metas {
-		border: 2px solid rgba($main, .2);
+	h3 {
+		font-size: 1.4em;
+	}
+	.metas {
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-end;
+		padding-top: 3rem;
+		p {
+			display: inline;
+			&:first-of-type {
+				&::after {
+					content: ':';
+					margin-right: .4em;
+				}
+			}
+		}
+	}
+	.responses {
+		// border: 2px solid rgba($main, .2);
+		width: 100%;
+		// max-width: 30em;
 		border-radius: $radius;
-		& > * {
-			padding: 1rem;
-			margin: 0;
-			transition: $trans;
-			&.playing {
-				background-color: rgba($grey, .05);
-			}
+		.playing {
+			// TODO: Smth with playing state
 		}
-		& > div:nth-of-type(2n - 1) {
-			background-color: rgba($main, .1);
-			&.playing {
-				background-color: rgba($main, .2);
-			}
-		}
+
+		// & > * {
+		// 	padding: 1rem;
+		// 	margin: 0;
+		// 	transition: $trans;
+		// }
+		// & > div:nth-of-type(2n - 1) {
+		// 	background-color: rgba($main, .1);
+		// 	&.playing {
+		// 		background-color: rgba($main, .2);
+		// 	}
+		// }
 		p {
 			margin: 0;
+			&:nth-of-type(2) {
+				font-style: italic;
+			}
+			// font-weight: 600;
 		}
 		.rating {
 			max-width: 20em;
 		}
+		.flex {
+			justify-content: space-between;
+			margin: .6rem 0;
+			max-width: 35em;
+		}
+		& > div {
+			margin-bottom: 2rem;
+		}
 	}
 	.key {
 		font-weight: bold;
+	}
+	.inputwrapper.checkbox {
+		align-items: center;
 	}
 }
 
 .rating {
 	display: flex;
 	justify-content: space-around;
-	&:focus-within {
-		.icon {
-			fill: rgba($orange, .2);
-		}
-	}
 	.icon {
+		width: 1em;
 		fill: rgba($orange, 0);
-		&:hover {
-			fill: rgba($orange, .5);
-		}
 		&.selected {
 			fill: rgba($orange, 1);
+		}
+	}
+	& > *:not(.disabled) {
+		&:focus-within {
+			.icon {
+				fill: rgba($orange, .2);
+			}
+		}
+		.icon {
 			&:hover {
-				fill: rgba($orange, .8);
+				fill: rgba($orange, .5);
+			}
+			&.selected {
+				&:hover {
+					fill: rgba($orange, .8);
+				}
 			}
 		}
 	}
@@ -570,10 +620,9 @@ form[name=interview] {
 // Based of Animate.css https://github.com/daneden/animate.css/blob/master/animate.css
 .animated {
 	animation-duration: 1s;
-	@for $i from 1 through 4 {
-		&:nth-of-type(#{$i}) {
-			animation-duration: #{$i * 0.2}s;
-		}
+	&.fadeIn {
+		animation: fadeIn;
+		animation-duration: $trans;
 	}
 	&.fadeInUp {
 		animation-name: fadeInUp;
@@ -586,7 +635,22 @@ form[name=interview] {
 		animation-name: fadeInRight;
 	}
 	&.fadeInLeft {
+		@for $i from 1 through 4 {
+			&:nth-of-type(#{$i}) {
+				animation-duration: #{$i * 0.2}s;
+			}
+		}
 		animation-name: fadeInLeft;
+	}
+}
+
+@keyframes fadeIn {
+	from {
+	  opacity: 0;
+	}
+  
+	to {
+	  opacity: 1;
 	}
 }
 
