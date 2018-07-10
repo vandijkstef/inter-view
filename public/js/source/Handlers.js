@@ -221,6 +221,11 @@ export default class {
 
 	DivRadio() {
 		document.querySelector(`input[value=${this.id}]`).checked = true;
+		const boxes = document.querySelectorAll('#scripts > div');
+		boxes.forEach((box) => {
+			box.classList.remove('selected');
+		});
+		this.classList.add('selected');
 		window.UI.ScriptSelection();
 	}
 
@@ -292,6 +297,7 @@ export default class {
 
 	GetRatingValue(rating) {
 		const values = rating.querySelectorAll('input[type=radio]');
+		console.log(values);
 		if (values) {
 			let val = false;
 			values.forEach((value) => {

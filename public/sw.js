@@ -25,10 +25,10 @@ self.addEventListener('fetch', (e) => {
 		caches.match(e.request)
 			.then((response) => {
 				if (response) {
-					console.log('Got response: ' + e.request.url);
+					// console.log('Got response: ' + e.request.url);
 					return response;
 				}
-				console.log('From server: ' + e.request.url);
+				// console.log('From server: ' + e.request.url);
 				return fetch(e.request);
 			})
 	);

@@ -84,7 +84,6 @@ export default class {
 		}
 
 		if (response.question_id) {
-			console.log(response);
 			if (!entry.responses) {
 				entry.responses = UItools.wrap(
 					[
@@ -429,6 +428,10 @@ export default class {
 				preMetas.push(UItools.getInput(meta.key, meta.type, `meta_${meta.id}`));
 			}
 		});
+		if (!preMetas.length) {
+			this.handlers.GoQuestions();
+			return;
+		}
 		this.Clear(this.main);
 		UItools.render(
 			[
@@ -465,6 +468,7 @@ export default class {
 			],
 			this.main
 		);
+		preMetas[0].querySelector('input').focus();
 	}
 
 	RenderQuestions(insertID) {
@@ -563,6 +567,10 @@ export default class {
 				postMetas.push(UItools.getInput(meta.key, meta.type, `meta_${meta.id}`));
 			}
 		});
+		if (!postMetas.length) {
+			window.UI.RenderPostInterview();
+			return;
+		}
 		const endButton = UItools.addHandler(UItools.getButton('End Interview', '', ''), (e) => {
 			e.preventDefault();
 			const inputData = document.querySelectorAll('input');
@@ -625,6 +633,7 @@ export default class {
 			],
 			this.main
 		);
+		postMetas[0].querySelector('input').focus();
 	}
 
 	RenderPostInterview() {
@@ -638,6 +647,7 @@ export default class {
 			answers.push(this.elements.GetPostInterviewAnswer(answer, i));
 		});
 		answers.push(this.elements.GetSummary());
+		answers.push(UItools.getButton('Save Interview', '', '', this.handlers.StoreInterview));
 		UItools.render(
 			[
 				this.elements.GetHeader('Interview Review'),
@@ -648,19 +658,19 @@ export default class {
 								this.elements.GetScrollWindow(
 									answers	
 								),
-								UItools.wrap(
-									[
-										UItools.wrap(
-											[
-												UItools.getText(this.script.title, '', '', 'h2')
-											]
-										),
-										UItools.getButton('Save Interview', '', '', this.handlers.StoreInterview)
-									],
-									['grid', 'row-BB']
-								)
+								// UItools.wrap(
+								// 	[
+								// 		UItools.wrap(
+								// 			[
+								// 				UItools.getText(this.script.title, '', '', 'h2')
+								// 			]
+								// 		),
+								// 		
+								// 	],
+								// 	['grid', 'row-BB']
+								// )
 							],
-							['grid', 'col-21']
+							['grid']
 						)
 					],
 					'/',
@@ -733,7 +743,7 @@ export default class {
 
 		UItools.render(
 			[
-				this.elements.GetHeader(title),
+				this.elements.GetHeader(title, null, false, 'disabled'),
 				UItools.getForm('name',
 					[
 						UItools.wrap(
@@ -928,7 +938,7 @@ export default class {
 	}
 
 	AddAudioModal() {
-		window.UI.AddModal(UItools.getText('Audio Settings', '', '', 'h1'), UItools.getText('test'));
+		window.UI.AddModal(UItools.getText('Audio Settings', '', '', 'h1'), UItools.getText('This modal box will contain audio and app settings'));
 		if (!this.audio.permission) {
 			this.audio.InitAudio((stream) => {
 				this.audio.GotStream(stream);

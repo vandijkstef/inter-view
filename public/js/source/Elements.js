@@ -29,7 +29,9 @@ export default class {
 		if (nav && !window.offline) {
 			content.push(this.GetNav(nav));
 		}
-		content.push(this.GetMic(micEnabled, micConfigurable));
+		if (micConfigurable !== 'disabled') {
+			content.push(this.GetMic(micEnabled, micConfigurable));
+		}
 		return UItools.wrap(
 			content,
 			'', '', 'header' 
