@@ -46,7 +46,7 @@ export default class {
 		window.UI.AddToScript(this);
 	}
 
-	RemoveQuestion(e) {
+	RemoveQuestion() {
 		const questionID = this.parentElement.querySelector('input[name=questionID]').value;
 		if (questionID !== 'new') {
 			const api = new API();
@@ -343,7 +343,7 @@ export default class {
 		}
 	}
 
-	ApplyFilter(e) {
+	ApplyFilter() {
 		const filterBtn = document.querySelector('#filterBtn');
 		const closeBtn = document.querySelector('.modal .cancel');
 		const questionsFilter = document.querySelectorAll('input[name^=filter]');
@@ -372,7 +372,7 @@ export default class {
 		closeBtn.click();
 	}
 
-	ResetFilter(e) {
+	ResetFilter() {
 		const filterBtn = document.querySelector('#filterBtn');
 		filterBtn.classList.add('inactive');
 		const closeBtn = document.querySelector('.modal .cancel');
@@ -389,6 +389,7 @@ export default class {
 			window.UI.ContentEditable(true);
 			window.UI.StartScriptButton.innerText = 'Save Script';
 			window.UI.StartScriptButton.classList.add('secondary');
+			window.changedFields = [];
 			this.classList.add('active');
 		} else {
 			window.UI.LockSelection(false);
@@ -410,7 +411,46 @@ export default class {
 	}
 
 	StoreInline() {
-		console.log('storing..');
+		console.log('storing..', window.changedFields);
+
+		const questions = [];
+		const metas = [];
+		window.changedFields.forEach((field) => {
+			if (field.classList.contains('question')) {
+				questions.push({
+					id: field.dataset.id,
+					value: field.innerText
+				});
+			} else if (field.classList.contains('meta')) {
+				metas.push({
+					id: field.dataset.id,
+					value: field.innerText,
+					post: field.classList.contains('post')
+				});
+			} else {
+				console.warn('Unspecified field', field);
+			}
+		});
+		console.log(window.previewedScript, questions, metas);
+		if (questions.length > 0 || metas.length > 0) {
+			const api = new API();
+			api.call({
+				action: 'update_inline',
+				script_id: window.previewedScript,
+				questions: questions,
+				metas: metas 
+			}, (data) => {
+				console.log(data);
+				if (data.status) {
+					window.UI.Notify('Script successfully saved');
+					window.UI.editIcon.click();
+				} else {
+					console.log(data);
+				}
+			});
+		} else {
+			window.UI.editIcon.click();
+		}
 	}
 
 

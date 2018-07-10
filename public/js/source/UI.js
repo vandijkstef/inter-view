@@ -368,6 +368,7 @@ export default class {
 			this.editIcon.classList.remove('hidden');
 			this.Clear(this.ScriptPreview);
 			const entries = [];
+			window.previewedScript = script.id;
 			if (!script.metas.length && !script.questions.length) {
 				entries.push(UItools.getText('No questions set', ['animated', 'fadeIn', 'noQuestions']));
 			}
@@ -375,11 +376,17 @@ export default class {
 				if (!meta.post) {
 					const entry = UItools.getText(`${meta.key}`, ['animated', 'fadeIn', 'meta', 'pre']);
 					entry.dataset.id = meta.id;
+					entry.dataset.order = meta.order;
 					entries.push(
-						UItools.addHandler(
-							entry,
-							this.handlers.FieldWatcher,
-							'input'
+						UItools.wrap(
+							[
+								this.elements.EntryControls(),
+								UItools.addHandler(
+									entry,
+									this.handlers.FieldWatcher,
+									'input'
+								)
+							]
 						)
 					);
 				}
@@ -394,7 +401,21 @@ export default class {
 				return a.order - b.order;
 			});
 			script.questions.forEach((question) => {
-				entries.push(UItools.getText(question.question, ['animated', 'fadeIn', 'question']));
+				const entry = UItools.getText(question.question, ['animated', 'fadeIn', 'question']);
+				entry.dataset.id = question.id;
+				entry.dataset.order = question.order;
+				entries.push(
+					UItools.wrap(
+						[
+							this.elements.EntryControls(),
+							UItools.addHandler(
+								entry,
+								this.handlers.FieldWatcher,
+								'input'
+							)
+						]
+					)
+				);
 			});
 			entries.push(
 				UItools.addHandler(
@@ -404,7 +425,22 @@ export default class {
 			);
 			script.metas.forEach((meta) => {
 				if (meta.post) {
-					entries.push(UItools.getText(`Meta: ${meta.key}`, ['animated', 'fadeIn', 'meta', 'post']));
+					const entry = UItools.getText(`Meta: ${meta.key}`, ['animated', 'fadeIn', 'meta', 'post']);
+					entry.dataset.id = meta.id;
+					entry.dataset.order = meta.order;
+					entry.dataset.metapost = true;
+					entries.push(
+						UItools.wrap(
+							[
+								this.elements.EntryControls(),
+								UItools.addHandler(
+									entry,
+									this.handlers.FieldWatcher,
+									'input'
+								)
+							]
+						)
+					);
 				}
 			});
 			entries.push(
@@ -1067,14 +1103,20 @@ export default class {
 	LockSelection(locking) {
 		const scripts = document.querySelector('#scripts');
 		const scriptsRadios = scripts.querySelectorAll('input[type=radio]');
-		scripts.disabled = locking;
+		if (locking) {
+			scripts.classList.add('locked');
+			scripts.parentElement.classList.add('smaller');
+		} else {
+			scripts.classList.remove('locked');
+			scripts.parentElement.classList.remove('smaller');
+		}
 		scriptsRadios.forEach((radio) => {
 			radio.disabled = locking;
 		});
 	}
 
 	ContentEditable(editable) {
-		const fields = document.querySelectorAll('#preview > *');
+		const fields = document.querySelectorAll('#preview p');
 		fields.forEach((field) => {
 			if (field.classList.contains('add')) {
 				if (editable) {
@@ -1095,8 +1137,27 @@ export default class {
 			}
 		});
 		fields[0].focus();
+		const controls = document.querySelectorAll('#preview .controls');
+		controls.forEach((control) => {
+			if (editable) {
+				control.classList.remove('hidden');
+			} else {
+				control.classList.add('hidden');
+			}
+		});
 	}
 
+	OrderUp() {
+		console.log('order up');
+	}
+
+	OrderDown() {
+		console.log('Order down');
+	}
+
+	RemoveEntry() {
+		console.log('removing');
+	}
 
 
 }

@@ -199,4 +199,15 @@ export default class {
 			['postentry', 'summary']
 		);
 	}
+
+	EntryControls() {
+		return UItools.wrap(
+			[
+				UItools.getButton(this.GetIconSVG('008-back'), ['small', 'transparent'], '', window.UI.OrderUp),
+				UItools.getButton(this.GetIconSVG('014-next'), ['small', 'transparent'], '', window.UI.OrderDown),
+				UItools.getButton(this.GetIconSVG('045-minus'), ['small', 'transparent'], '', window.UI.RemoveEntry)
+			],
+			['flex', 'controls', 'hidden', 'animated', 'fadeIn']
+		);
+	}
 }

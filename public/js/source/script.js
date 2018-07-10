@@ -5,7 +5,7 @@ import Controls from './Controls.js';
 {
 	// First, clear our base page
 	document.body.innerHTML = '';
-	window.changedFields = [];
+	
 	// App variables
 	const api = new API('api');
 	const UI = new UIm();
