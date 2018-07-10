@@ -40,7 +40,7 @@ h2 {
 }
 
 .hidden {
-	display: none;
+	display: none !important;
 }
 
 .dev {
@@ -244,8 +244,12 @@ label {
 		}
 		&.split {
 			grid-template-columns: 47.5% 5% 47.5%;
+			transition: grid-template-columns 1s;
 			& > * {
 				margin: 0 !important;
+			}
+			&.smaller {
+				grid-template-columns: 27.5% 5% 67.5%;
 			}
 		}
 	}
@@ -410,8 +414,6 @@ label {
 	}
 }
 
-
-
 #scripts {
 	input[type=radio] {
 		&:checked + div {
@@ -438,6 +440,10 @@ label {
 		& > div {
 			border: 2px solid rgba($main, .4);
 		}
+	}
+	&.locked {
+		opacity: .5;
+		cursor: not-allowed;
 	}
 }
 
@@ -607,6 +613,7 @@ form[name=interview] {
 }
 
 .postentry, #preview p, .metaentry, .questionentry, .entry, #notify p {
+	display: block;
 	border: 2px solid rgba($main, .2);
 	background-color: $white;
 	border-radius: $radius;
@@ -627,9 +634,31 @@ form[name=interview] {
 	button{
 		width: 8%;
 	}
+	&.meta {
+		background-color: rgba($white, .7);
+	}
 	&.add {
-		background-color: rgba($white, .3);
+		background-color: rgba($white, .1);
 		cursor: pointer;
+	}
+}
+
+#preview {
+	.controls {
+		justify-content: flex-end;
+		margin-right: -.7rem;
+		margin-bottom: -1rem;
+		margin-top: -.6rem;
+		button {
+			margin-top: 0;
+			padding: .2rem;
+			svg {
+				width: 1em;
+			}
+		}
+		.icon.back, .icon.next {
+			transform: rotate(-90deg);
+		}
 	}
 }
 
