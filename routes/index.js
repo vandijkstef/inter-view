@@ -400,6 +400,64 @@ router.post('/api', function(req, res) {
 			AuthError(data, res);
 		}
 		break;
+	case 'update_inline':
+		if (req.session.user) {
+			// const db = new DB();
+			console.log(req.body);
+			req.body.metas.forEach((meta) => {
+				const db = new DB();
+				if (meta.id === undefined) {
+					db.Insert('scripts_meta', {
+						script_id: req.body.script_id,
+						key: meta.value,
+						// type: meta.type, // TODO:
+						// order: meta.order, // TODO:
+						post: meta.post || false
+					},
+					() => {
+						// Silence is golden..
+					});
+				} else {
+					db.Update('scripts_meta', {
+						id: meta.id,
+						script_id: req.body.script_id,
+						key: meta.value,
+						// type: meta.type,
+						// order: meta.order,
+						post: meta.post || false
+					}, () => {
+						// Silence is golden...
+					});
+				}
+			});
+			req.body.questions.forEach((question) => {
+				const db = new DB();
+				if (question.id === undefined) {
+					db.Insert('questions', {
+						script_id: req.body.script_id,
+						question: question.value,
+						// order: question.order
+					}, () => {
+						// Silence is golden..
+					});
+				} else { 
+					db.Update('questions', {
+						id: question.id,
+						script_id: req.body.script_id,
+						question: question.value,
+						// order: question.order
+					}, () => {
+						// Silence is golden
+					});
+				}
+			});
+			data.status = true;
+			res.json(data);
+		} else {
+			data.err = 'Cannot remove question: Not authenticated';
+			AuthError(data, res);
+		}
+		break;
 	default:
 		data.err = 'Action not available: ' + req.body.action;
 		data.req = req.body;
