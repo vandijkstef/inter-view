@@ -209,6 +209,10 @@ input, textarea {
 	}
 }
 
+textarea {
+	padding-top: 0;
+}
+
 select {
 	font-size: 1.2em;
 	-webkit-appearance: none;
@@ -410,7 +414,7 @@ label {
 			margin-top: 0;
 		}
 		&.selected {
-			border: 2px solid $main;
+			border: 2px solid $main !important;
 		}
 	}
 	&:focus-within {
@@ -591,6 +595,21 @@ form[name=interview] {
 	border-radius: $radius;
 	padding: 1rem 1rem;
 	margin-bottom: 1rem;
+	.number {
+		margin-right: 1rem;
+		font-style: italic;
+		font-size: 2em;
+	}
+	.rating {
+		max-width: 30em;
+	}
+	input {
+		max-width: 90%;
+		margin-right: 2%;
+	}
+	button{
+		width: 8%;
+	}
 }
 
 .inputwrapper {
