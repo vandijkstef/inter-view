@@ -11,6 +11,7 @@ export default class {
 			case '4':
 			case '5':
 				window.UI.handlers.SetRating(null, null, e.key);
+				document.querySelectorAll('input[type=radio]')[e.key - 1].checked = true;
 				break;
 			case 'ArrowRight':
 				interview.querySelector('button').click();
