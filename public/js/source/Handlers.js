@@ -42,6 +42,24 @@ export default class {
 		window.UI.AddQuestion(e.target);
 	}
 
+	RemoveQuestion(e) {
+		const questionID = this.parentElement.querySelector('input[name=questionID]').value;
+		if (questionID !== 'new') {
+			const api = new API();
+			api.call({
+				action: 'remove_question',
+				id: questionID
+			}, (data) => {
+				if (data.status === true) {
+					this.parentElement.parentElement.removeChild(this.parentElement);
+					window.UI.Notify('Question succesfully removed');
+				} else {
+					window.UI.Notify('Could not remove question, since there are answers');
+				}
+			});
+		}
+	}
+
 	CancelEdit(e) {
 		e.preventDefault();
 		window.UI.RenderHome();
@@ -282,6 +300,7 @@ export default class {
 			if (i < rating) {
 				try {
 					stars[i].querySelector('.icon').classList.add('selected');
+					
 				} catch (err) {
 					stars[i].classList.add('selected');
 				}

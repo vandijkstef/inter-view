@@ -850,13 +850,15 @@ export default class {
 			};
 		}
 		const questionText = UItools.getInput(false, 'text', 'questionText', questionData.question, 'Enter question', '', true);
+		const removeQuestion = UItools.getButton('X', ['small', 'transparent'], '', window.UI.handlers.RemoveQuestion);
 		UItools.render(
 			[
 				UItools.wrap(
 					[
 						UItools.getInput(false, 'hidden', 'questionID', questionData.id),
 						UItools.getInput(false, 'hidden', 'questionOrder', questionData.order),
-						questionText
+						questionText,
+						removeQuestion
 					], 'questionentry', '', 'fieldset'
 				)
 			],

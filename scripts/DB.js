@@ -26,24 +26,7 @@ class DB {
 			if (typeof where === 'function') {
 				callback = where;
 			} else {
-				query += ` WHERE `;
-				if (typeof where === 'object') {
-					let string = '';
-					let first = true;
-					for (const col in where) {
-						if (first) {
-							first = false;
-						} else {
-							string += 'AND ';
-						}
-						const key = mysql.escapeId(col);
-						const value = mysql.escape(where[col]);
-						string += `${key}=${value}`;
-						string += ' ';
-					}
-					where = string;
-					query += string;
-				}
+				query += this._Where(where);
 			}
 		}
 		if (options && options.ORDER) {
@@ -112,6 +95,24 @@ class DB {
 		});  
 	}
 
+	Remove(table, where, callback) {
+		let query = `DELETE FROM ??`;
+		query += this._Where(where);
+		query = mysql.format(query, [table]);
+		this.connection.query(query, (error) => {
+			if (error) {
+				if (error.errno === 1451) {
+					callback(false);
+				} else {
+					throw error;
+				}
+			} else {
+				callback(true);
+			}
+			this.connection.end();
+		}); 
+	}
+
 	// TODO: Common query method - use by other methods
 	Query(query, callback) {
 		this.connection.connect();
@@ -120,6 +121,28 @@ class DB {
 			callback(results);
 			this.connection.end();
 		}); 
+	}
+
+	_Where(where) {
+		let query = ` WHERE `;
+		if (typeof where === 'object') {
+			let string = '';
+			let first = true;
+			for (const col in where) {
+				if (first) {
+					first = false;
+				} else {
+					string += 'AND ';
+				}
+				const key = mysql.escapeId(col);
+				const value = mysql.escape(where[col]);
+				string += `${key}=${value}`;
+				string += ' ';
+			}
+			where = string;
+			query += string;
+		}
+		return query;
 	}
 
 }

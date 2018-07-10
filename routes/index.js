@@ -387,6 +387,19 @@ router.post('/api', function(req, res) {
 			AuthError(data, res);
 		}
 		break;
+	case 'remove_question':
+		if (req.session.user) {
+			const db = new DB();
+			db.Remove('questions', {id: req.body.id}, (results) => {
+				console.log(results);
+				data.status = results;
+				res.json(data);
+			});
+		} else {
+			data.err = 'Cannot remove question: Not authenticated';
+			AuthError(data, res);
+		}
+		break;
 	default:
 		data.err = 'Action not available: ' + req.body.action;
 		data.req = req.body;
