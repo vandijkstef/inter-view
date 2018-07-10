@@ -369,11 +369,19 @@ export default class {
 			this.Clear(this.ScriptPreview);
 			const entries = [];
 			if (!script.metas.length && !script.questions.length) {
-				entries.push(UItools.getText('No questions set', ['animated', 'fadeIn']));
+				entries.push(UItools.getText('No questions set', ['animated', 'fadeIn', 'noQuestions']));
 			}
 			script.metas.forEach((meta) => {
 				if (!meta.post) {
-					entries.push(UItools.getText(`Meta: ${meta.key}`, ['animated', 'fadeIn', 'meta', 'pre']));
+					const entry = UItools.getText(`${meta.key}`, ['animated', 'fadeIn', 'meta', 'pre']);
+					entry.dataset.id = meta.id;
+					entries.push(
+						UItools.addHandler(
+							entry,
+							this.handlers.FieldWatcher,
+							'input'
+						)
+					);
 				}
 			});
 			entries.push(
@@ -942,14 +950,17 @@ export default class {
 	AddToScript(creator) {
 		const classes = Object.assign([], creator.classList);
 		classes.splice(classes.indexOf('add'), 1);
+		classes.splice(classes.indexOf('fadeInDown'), 1);
+		classes.push('fadeIn');
 		const newItem = UItools.getText(' ', classes);
 		newItem.contentEditable = true;
 		UItools.render(
-			newItem,
+			UItools.addHandler(newItem, window.UI.handlers.FieldWatcher, 'input'),
 			creator.parentElement,
 			false,
 			creator
 		);
+		newItem.focus();
 	}
 
 	AddModal(title, content) {
@@ -1054,8 +1065,12 @@ export default class {
 	// Inline Edit helpers
 
 	LockSelection(locking) {
-		console.log('Locking', locking);
-		// TODO: Locking
+		const scripts = document.querySelector('#scripts');
+		const scriptsRadios = scripts.querySelectorAll('input[type=radio]');
+		scripts.disabled = locking;
+		scriptsRadios.forEach((radio) => {
+			radio.disabled = locking;
+		});
 	}
 
 	ContentEditable(editable) {
@@ -1068,6 +1083,12 @@ export default class {
 				} else {
 					field.removeAttribute('tabIndex');
 					field.classList.add('hidden');
+				}
+			} else if (field.classList.contains('noQuestions')) {
+				if (editable) {
+					field.classList.add('hidden');
+				} else {
+					field.classList.remove('hidden');
 				}
 			} else {
 				field.contentEditable = editable;

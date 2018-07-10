@@ -17,6 +17,12 @@ export default class {
 				interview.querySelector('button').click();
 				break;
 			}
+		} else {
+			switch (e.key) {
+			case 'Enter':
+				document.activeElement.click();
+				break;
+			}
 		}
 		// Act where applicable
 	}

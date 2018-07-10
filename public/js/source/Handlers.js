@@ -129,7 +129,9 @@ export default class {
 
 	StartScript(e) {
 		e.preventDefault();
-		if (this.classList.contains('warning')) {
+		if (this.classList.contains('secondary')) {
+			window.UI.handlers.StoreInline();
+		} else if (this.classList.contains('warning')) {
 			console.warn('No mic set-up');
 			window.UI.Notify('No mic set-up', 'warning');
 			window.UI.micWrap.audio.InitAudio(() => {
@@ -238,17 +240,24 @@ export default class {
 	}
 
 	RadioDiv() {
-		window.UI.ScriptSelection();
+		if (!this.disabled) {
+			window.UI.ScriptSelection();
+		}
 	}
 
 	DivRadio() {
-		document.querySelector(`input[value=${this.id}]`).checked = true;
-		const boxes = document.querySelectorAll('#scripts > div');
-		boxes.forEach((box) => {
-			box.classList.remove('selected');
-		});
-		this.classList.add('selected');
-		window.UI.ScriptSelection();
+		const radio = document.querySelector(`input[value=${this.id}]`);
+		if (!radio.disabled) {
+			radio.checked = true;
+			const boxes = document.querySelectorAll('#scripts > div');
+			boxes.forEach((box) => {
+				box.classList.remove('selected');
+			});
+			this.classList.add('selected');
+			window.UI.ScriptSelection();
+		} else {
+			window.UI.Notify('Cannot change script, stop editing first');
+		}
 	}
 
 	CloseModal() {
@@ -378,15 +387,31 @@ export default class {
 		if (!this.classList.contains('active')) {
 			window.UI.LockSelection(true);
 			window.UI.ContentEditable(true);
+			window.UI.StartScriptButton.innerText = 'Save Script';
+			window.UI.StartScriptButton.classList.add('secondary');
 			this.classList.add('active');
-			
 		} else {
 			window.UI.LockSelection(false);
 			window.UI.ContentEditable(false);
+			window.UI.StartScriptButton.innerText = 'Start Script';
+			window.UI.StartScriptButton.classList.remove('secondary');
 			this.classList.remove('active');
 		}
 	}
 
+	FieldWatcher() {
+		if (window.changedFields.indexOf(this) === -1) {
+			window.changedFields.push(this);
+		}
+		// if (window.lastField === this) {
+		// 	console.log('got it');
+		// }
+		// window.lastField = this;
+	}
+
+	StoreInline() {
+		console.log('storing..');
+	}
 
 
 	AudioPlaying() {
