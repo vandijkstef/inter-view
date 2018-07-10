@@ -39,6 +39,9 @@ h2 {
 	font-size: 1.2em;
 }
 
+.hidden {
+	display: none;
+}
 
 .dev {
 	position: fixed;
@@ -285,6 +288,9 @@ label {
 	&.center {
 		align-items: center;
 	}
+	&.spread {
+		justify-content: space-between;
+	}
 }
 
 .scrollwindow {
@@ -350,11 +356,11 @@ label {
 	&:disabled {
 		cursor: not-allowed;
 	}
-	&.transparent {
+	&.none, &.transparent {
 		color: $black;
 		background-color: rgba($black, 0);
 		border: 1px solid rgba($main, 0);
-		&:hover, &:focus {
+		&:focus:not(.none), &:hover:not(.none) {
 			background-color: rgba($black, 0.1);
 		}
 		&:focus {
@@ -390,6 +396,17 @@ label {
 	}
 	&.error {
 		fill: $red;
+	}
+	&.pencil {
+		fill: $grey;
+		transform: rotate(90deg);
+		transition: $trans;
+		&:hover, &:focus {
+			fill: $black;
+		}
+		.active & {
+			fill: $green;
+		}
 	}
 }
 
@@ -609,6 +626,10 @@ form[name=interview] {
 	}
 	button{
 		width: 8%;
+	}
+	&.add {
+		background-color: rgba($white, .3);
+		cursor: pointer;
 	}
 }
 

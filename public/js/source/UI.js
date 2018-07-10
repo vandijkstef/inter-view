@@ -168,8 +168,9 @@ export default class {
 		this.StartScriptButton = UItools.getButton('Start Script', '', '', this.handlers.StartScript);
 		this.ScriptButtonState(false);
 		this.ScriptPreview = this.elements.GetScrollWindow(UItools.getText('Select a script on the left side'), 'preview');
+		this.editIcon = UItools.getButton(this.elements.GetIconSVG('047-pencil'), ['none', 'small', 'animated', 'fadeIn'], '', this.handlers.InlineEdit);
 
-		const newScriptButton = UItools.getButton('New Script', ['secondary', 'shadowed'], '', this.handlers.EditScript);
+		const newScriptButton = UItools.getButton('New Script', ['secondary', 'shadowed'], '', this.handlers.EditScript); // TODO: Change new script
 		if (window.offline) {
 			newScriptButton.disabled = true;
 		}
@@ -193,7 +194,13 @@ export default class {
 									),
 									UItools.wrap(
 										[
-											UItools.getText('Selected script', '', '', 'h2'), // TODO: Update to script title
+											UItools.wrap(
+												[
+													UItools.getText('Selected script', '', '', 'h2'), // TODO: Update to script title
+													this.editIcon
+												],
+												['flex', 'spread']
+											),
 											this.ScriptPreview,
 											UItools.wrap(
 												[
@@ -216,6 +223,7 @@ export default class {
 			],
 			this.main
 		);
+		this.editIcon.classList.add('hidden');
 		const cachedScripts = [];
 		for (let i = 0;  i < localStorage.length; i++) {
 			const keySplit = localStorage.key(i).split('_');
@@ -357,6 +365,7 @@ export default class {
 			return;
 		}
 		this.FetchScript(selected, (script) => {
+			this.editIcon.classList.remove('hidden');
 			this.Clear(this.ScriptPreview);
 			const entries = [];
 			if (!script.metas.length && !script.questions.length) {
@@ -364,20 +373,38 @@ export default class {
 			}
 			script.metas.forEach((meta) => {
 				if (!meta.post) {
-					entries.push(UItools.getText(`Meta: ${meta.key}`, ['animated', 'fadeIn']));
+					entries.push(UItools.getText(`Meta: ${meta.key}`, ['animated', 'fadeIn', 'meta', 'pre']));
 				}
 			});
+			entries.push(
+				UItools.addHandler(
+					UItools.getText('Click to add pre-meta', ['add', 'meta', 'pre', 'animated', 'fadeInDown', 'hidden']),
+					this.handlers.AddToScript
+				)
+			);
 			script.questions.sort((a, b) => {
 				return a.order - b.order;
 			});
 			script.questions.forEach((question) => {
-				entries.push(UItools.getText(question.question, ['animated', 'fadeIn']));
+				entries.push(UItools.getText(question.question, ['animated', 'fadeIn', 'question']));
 			});
+			entries.push(
+				UItools.addHandler(
+					UItools.getText('Click to add question', ['add', 'question', 'animated', 'fadeInDown', 'hidden']),
+					this.handlers.AddToScript
+				)
+			);
 			script.metas.forEach((meta) => {
 				if (meta.post) {
-					entries.push(UItools.getText(`Meta: ${meta.key}`, ['animated', 'fadeIn']));
+					entries.push(UItools.getText(`Meta: ${meta.key}`, ['animated', 'fadeIn', 'meta', 'post']));
 				}
 			});
+			entries.push(
+				UItools.addHandler(
+					UItools.getText('Click to add post-meta', ['add', 'meta', 'post', 'animated', 'fadeInDown', 'hidden']),
+					this.handlers.AddToScript
+				)
+			);
 			UItools.render(
 				entries,
 				this.ScriptPreview
@@ -714,11 +741,15 @@ export default class {
 					}
 					return callback(data.script);
 				} else {
-					if (localStorage.getItem(`script_${id}`)) {
-						localStorage.removeItem(`script_${id}`);
-						this.Notify('Script removed from server: Clearing cached script');
+					if (data.autherror) {
+						this.Notify('Session expired, please reload the page', 'warning');
 					} else {
-						this.Notify(data.err);
+						if (localStorage.getItem(`script_${id}`)) {
+							localStorage.removeItem(`script_${id}`);
+							this.Notify('Script removed from server: Clearing cached script');
+						} else {
+							this.Notify(data.err);
+						}
 					}
 				}
 			});
@@ -879,12 +910,6 @@ export default class {
 		const icons = [
 			this.elements.GetIconSVG('035-checked')
 		];
-		if (!window.offline) {
-			const settingsIcon = UItools.getButton(this.elements.GetIconSVG('040-settings-1'), ['transparent', 'small'], '');
-			UItools.addHandler(settingsIcon, this.handlers.EditScript);
-			settingsIcon.dataset.scriptID = script.id;
-			icons.push(settingsIcon);
-		}
 		UItools.render(
 			[
 				UItools.addHandler(
@@ -911,6 +936,19 @@ export default class {
 			targetBefore.parentElement,
 			false,
 			targetBefore
+		);
+	}
+
+	AddToScript(creator) {
+		const classes = Object.assign([], creator.classList);
+		classes.splice(classes.indexOf('add'), 1);
+		const newItem = UItools.getText(' ', classes);
+		newItem.contentEditable = true;
+		UItools.render(
+			newItem,
+			creator.parentElement,
+			false,
+			creator
 		);
 	}
 
@@ -1012,5 +1050,32 @@ export default class {
 			before
 		);
 	}
+
+	// Inline Edit helpers
+
+	LockSelection(locking) {
+		console.log('Locking', locking);
+		// TODO: Locking
+	}
+
+	ContentEditable(editable) {
+		const fields = document.querySelectorAll('#preview > *');
+		fields.forEach((field) => {
+			if (field.classList.contains('add')) {
+				if (editable) {
+					field.tabIndex = 0;
+					field.classList.remove('hidden');
+				} else {
+					field.removeAttribute('tabIndex');
+					field.classList.add('hidden');
+				}
+			} else {
+				field.contentEditable = editable;
+			}
+		});
+		fields[0].focus();
+	}
+
+
 
 }

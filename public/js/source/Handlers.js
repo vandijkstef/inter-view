@@ -42,6 +42,10 @@ export default class {
 		window.UI.AddQuestion(e.target);
 	}
 
+	AddToScript() {
+		window.UI.AddToScript(this);
+	}
+
 	RemoveQuestion(e) {
 		const questionID = this.parentElement.querySelector('input[name=questionID]').value;
 		if (questionID !== 'new') {
@@ -369,6 +373,21 @@ export default class {
 		});
 		closeBtn.click();
 	}
+
+	InlineEdit() {
+		if (!this.classList.contains('active')) {
+			window.UI.LockSelection(true);
+			window.UI.ContentEditable(true);
+			this.classList.add('active');
+			
+		} else {
+			window.UI.LockSelection(false);
+			window.UI.ContentEditable(false);
+			this.classList.remove('active');
+		}
+	}
+
+
 
 	AudioPlaying() {
 		this.parentElement.parentElement.parentElement.classList.add('playing');
