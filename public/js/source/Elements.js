@@ -200,13 +200,37 @@ export default class {
 		);
 	}
 
-	EntryControls() {
-		return UItools.wrap(
-			[
-				UItools.getButton(this.GetIconSVG('008-back'), ['small', 'transparent'], '', window.UI.OrderUp),
-				UItools.getButton(this.GetIconSVG('014-next'), ['small', 'transparent'], '', window.UI.OrderDown),
-				UItools.getButton(this.GetIconSVG('045-minus'), ['small', 'transparent'], '', window.UI.RemoveEntry)
-			],
+	EntryControls(isMeta, meta) {
+		const content = [];
+		if (isMeta) {
+			const select = UItools.getSelect('type', [
+				{
+					value: 'text',
+					label: 'Text'
+				},
+				{
+					value: 'email',
+					label: 'E-mail'
+				},
+				{
+					value: 'phone',
+					label: 'Phone number'
+				},
+				{
+					value: 'checkbox',
+					label: 'Yes/No'
+				}
+			]);
+			select.value = meta.type;
+			select.dataset.id = meta.id;
+			UItools.addHandler(select, window.UI.handlers.MetaTypeUpdate, 'change');
+			content.push(select);
+		}
+		content.push(UItools.getButton(this.GetIconSVG('008-back'), ['small', 'transparent'], '', window.UI.OrderUp));
+		content.push(UItools.getButton(this.GetIconSVG('014-next'), ['small', 'transparent'], '', window.UI.OrderDown));
+		content.push(UItools.getButton(this.GetIconSVG('031-trash'), ['small', 'transparent'], '', window.UI.RemoveEntry));
+		return UItools.wrap( 
+			content,
 			['flex', 'controls', 'hidden', 'animated', 'fadeIn']
 		);
 	}
