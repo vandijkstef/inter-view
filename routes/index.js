@@ -43,7 +43,7 @@ function UpdateMeta(reqbody, callback) {
 				script_id: reqbody.script_id,
 				key: meta.value,
 				type: meta.type,
-				// order: meta.order, // TODO:
+				order: meta.order,
 				post: meta.post || false
 			},
 			() => {
@@ -55,7 +55,7 @@ function UpdateMeta(reqbody, callback) {
 				script_id: reqbody.script_id,
 				key: meta.value,
 				type: meta.type,
-				// order: meta.order,
+				order: meta.order,
 				post: meta.post || false
 			}, () => {
 				callback();
@@ -86,7 +86,7 @@ function UpdateQuestions(reqbody, callback) {
 			db.Insert('questions', {
 				script_id: reqbody.script_id,
 				question: question.value,
-				// order: question.order
+				order: question.order
 			}, () => {
 				callback();
 			});
@@ -95,7 +95,7 @@ function UpdateQuestions(reqbody, callback) {
 				id: question.id,
 				script_id: reqbody.script_id,
 				question: question.value,
-				// order: question.order
+				order: question.order
 			}, () => {
 				callback();
 			});
@@ -497,6 +497,7 @@ router.post('/api', function(req, res) {
 						description: req.body.description
 					}, (insertID) => {
 						req.body.script_id = insertID;
+						data.insertID = insertID;
 						UpdateMeta(req.body, (notRemoved) => {
 							data.notRemovedMeta = notRemoved;
 							UpdateQuestions(req.body, (notRemoved) => {

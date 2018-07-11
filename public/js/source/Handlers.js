@@ -442,7 +442,8 @@ export default class {
 				questions.push({
 					id: field.dataset.id,
 					value: field.innerText,
-					removeMe: field.dataset.removeme || false
+					removeMe: field.dataset.removeme || false,
+					order: field.dataset.order
 				});
 			} else if (field.classList.contains('meta')) {
 				metas.push({
@@ -450,7 +451,8 @@ export default class {
 					value: field.innerText,
 					post: field.classList.contains('post'),
 					removeMe: field.dataset.removeme || false,
-					type: field.dataset.type || 'text'
+					type: field.dataset.type || 'text',
+					order: field.dataset.order
 				});
 			} else {
 				console.warn('Unspecified field', field);
@@ -486,6 +488,14 @@ export default class {
 					if (data.notRemovedMeta.length > 0 || data.notRemovedQuestions.length > 0) {
 						window.UI.Notify('Some items where not removed, since they already contain data');
 					}
+					const currentSelection = document.querySelector('#scripts .selected');
+					if (currentSelection.id === 'script_new') {
+						currentSelection.id = 'script_' + data.insertID;
+					}
+					const title = currentSelection.querySelector('div p:first-of-type');
+					title.innerText = titles[0];
+					const description = currentSelection.querySelector('div p:nth-of-type(2)');
+					description.innerText = descriptions[0];
 					window.UI.editIcon.click();
 				} else {
 					console.log(data);

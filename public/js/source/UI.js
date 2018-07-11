@@ -1030,11 +1030,21 @@ export default class {
 	}
 
 	AddToScript(creator) {
+		console.log(creator.previousSibling);
+		const previous = creator.previousSibling;
+		let orderValue;
+		if (previous.nodeName !== 'DIV') {
+			orderValue = 0;
+		} else {
+			orderValue = parseInt(previous.querySelector('p').dataset.order) + 1;
+		}
+		
 		const classes = Object.assign([], creator.classList);
 		classes.splice(classes.indexOf('add'), 1);
 		classes.splice(classes.indexOf('fadeInDown'), 1);
 		classes.push('fadeIn');
 		const newItem = UItools.getText(' ', classes);
+		newItem.dataset.order = orderValue;
 		let isMeta;
 		if (classes.indexOf('meta') !== -1) {
 			isMeta = true;
@@ -1050,7 +1060,8 @@ export default class {
 						window.UI.handlers.FieldWatcher,
 						'input'
 					)
-				]
+				],
+				'scriptEntry'
 			),
 			creator.parentElement,
 			false,
@@ -1220,6 +1231,12 @@ export default class {
 			previous.parentNode.insertBefore(container_copy, previous);
 			container.parentNode.insertBefore(previous, container);
 			container.parentNode.replaceChild(container, container_copy);
+			if (window.changedFields.indexOf(entry) === -1) {
+				window.changedFields.push(entry);
+			}
+			if (window.changedFields.indexOf(previousEntry) === -1) {
+				window.changedFields.push(previousEntry);
+			}
 		}
 	}
 
@@ -1236,6 +1253,12 @@ export default class {
 			next.parentNode.insertBefore(container_copy, next);
 			container.parentNode.insertBefore(next, container);
 			container.parentNode.replaceChild(container, container_copy);
+			if (window.changedFields.indexOf(entry) === -1) {
+				window.changedFields.push(entry);
+			}
+			if (window.changedFields.indexOf(nextEntry) === -1) {
+				window.changedFields.push(nextEntry);
+			}
 		}
 	}
 
