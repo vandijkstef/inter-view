@@ -436,14 +436,29 @@ export default class {
 			}
 		});
 		console.log(window.previewedScript, questions, metas);
-		if (questions.length > 0 || metas.length > 0) {
+		const data = {
+			action: 'update_inline',
+			script_id: window.previewedScript,
+			questions: questions,
+			metas: metas,
+		};
+		const titles = [
+			document.querySelector('#preview p.title').innerText,
+			document.querySelector('#scripts .selected div > p:first-of-type').innerText
+		];
+		if (titles[0] !== titles[1]) {
+			data.title = titles[0];
+		}
+		const descriptions = [
+			document.querySelector('#preview p.description').innerText,
+			document.querySelector('#scripts .selected div > p:nth-of-type(2)').innerText
+		];
+		if (descriptions[0] !== descriptions[1]) {
+			data.description = descriptions[0];
+		}
+		if (questions.length > 0 || metas.length > 0 || data.title || data.description) {
 			const api = new API();
-			api.call({
-				action: 'update_inline',
-				script_id: window.previewedScript,
-				questions: questions,
-				metas: metas 
-			}, (data) => {
+			api.call(data, (data) => {
 				console.log(data);
 				if (data.status) {
 					window.UI.Notify('Script successfully saved');

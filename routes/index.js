@@ -4,6 +4,7 @@ const path = require('path');
 const DB = require('../scripts/DB.js');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const async = require('async');
 
 const multer = require('multer');
 const storage = multer.diskStorage({
@@ -19,6 +20,83 @@ const upload = multer({ storage: storage });
 function AuthError(data, res) {
 	data.autherror = true;
 	res.json(data);
+}
+
+function UpdateMeta(reqbody, callback) {
+	async.forEach(reqbody.metas, (meta, callback) => {
+		const db = new DB();
+		if (meta.removeMe === 'true') {
+			if (meta.id !== undefined) {
+				db.Remove('scripts_meta', {
+					id: meta.id,
+					script_id: reqbody.script_id
+				}, () => {
+					console.log('removed', meta);
+					callback();
+				});
+			}
+		} else if (meta.id === undefined) {
+			db.Insert('scripts_meta', {
+				script_id: reqbody.script_id,
+				key: meta.value,
+				type: meta.type,
+				// order: meta.order, // TODO:
+				post: meta.post || false
+			},
+			() => {
+				callback();
+			});
+		} else {
+			db.Update('scripts_meta', {
+				id: meta.id,
+				script_id: reqbody.script_id,
+				key: meta.value,
+				type: meta.type,
+				// order: meta.order,
+				post: meta.post || false
+			}, () => {
+				callback();
+			});
+		}
+	}, (err) => {
+		callback();
+	});
+}
+
+function UpdateQuestions(reqbody, callback) {
+	async.forEach(reqbody.questions, (question, callback) => {
+		const db = new DB();
+		if (question.removeMe === 'true') {
+			if (question.id !== undefined) {
+				db.Remove('questions', {
+					id: question.id,
+					script_id: reqbody.script_id
+				}, () => {
+					console.log('removed', question);
+					callback();
+				});
+			}
+		} else if (question.id === undefined) {
+			db.Insert('questions', {
+				script_id: reqbody.script_id,
+				question: question.value,
+				// order: question.order
+			}, () => {
+				callback();
+			});
+		} else { 
+			db.Update('questions', {
+				id: question.id,
+				script_id: reqbody.script_id,
+				question: question.value,
+				// order: question.order
+			}, () => {
+				callback();
+			});
+		}
+	}, (err) => {
+		callback();
+	});
 }
 
 function SendMail(to, subject, html) {
@@ -403,73 +481,52 @@ router.post('/api', function(req, res) {
 	case 'update_inline':
 		if (req.session.user) {
 			console.log(req.body);
-			req.body.metas.forEach((meta) => {
-				const db = new DB();
-				if (meta.removeMe === 'true') {
-					if (meta.id !== undefined) {
-						db.Remove('scripts_meta', {
-							id: meta.id,
-							script_id: req.body.script_id
-						}, () => {
-							console.log('removed', meta);
+
+			// See if we need to touch the scripts table
+			if (req.body.title || req.body.description || req.body.script_id === 'new') {
+				if (req.body.script_id === 'new') {
+					const db = new DB();
+					db.Insert('scripts', {
+						title: req.body.title,
+						description: req.body.description
+					}, (insertID) => {
+						req.body.script_id = insertID;
+						UpdateMeta(req.body, () => {
+							UpdateQuestions(req.body, () => {
+								data.status = true;
+								res.json(data);
+							});
 						});
-					}
-				} else if (meta.id === undefined) {
-					db.Insert('scripts_meta', {
-						script_id: req.body.script_id,
-						key: meta.value,
-						type: meta.type,
-						// order: meta.order, // TODO:
-						post: meta.post || false
-					},
-					() => {
-						// Silence is golden..
 					});
 				} else {
-					db.Update('scripts_meta', {
-						id: meta.id,
-						script_id: req.body.script_id,
-						key: meta.value,
-						type: meta.type,
-						// order: meta.order,
-						post: meta.post || false
-					}, () => {
-						// Silence is golden...
-					});
-				}
-			});
-			req.body.questions.forEach((question) => {
-				const db = new DB();
-				if (question.removeMe === 'true') {
-					if (question.id !== undefined) {
-						db.Remove('questions', {
-							id: question.id,
-							script_id: req.body.script_id
-						}, () => {
-							console.log('removed', question);
-						});
+					// TODO: Update the script data
+					const db = new DB();
+					const data = {
+						id: req.body.script_id
+					};
+					if (req.body.title) {
+						data.title = req.body.title;
 					}
-				} else if (question.id === undefined) {
-					db.Insert('questions', {
-						script_id: req.body.script_id,
-						question: question.value,
-						// order: question.order
-					}, () => {
-						// Silence is golden..
-					});
-				} else { 
-					db.Update('questions', {
-						id: question.id,
-						script_id: req.body.script_id,
-						question: question.value,
-						// order: question.order
-					}, () => {
-						// Silence is golden
+					if (req.body.description) {
+						data.description = req.body.description;
+					}
+					db.Update('scripts', data, () => {
+						UpdateMeta(req.body, () => {
+							UpdateQuestions(req.body, () => {
+								data.status = true;
+								res.json(data);
+							});
+						});
 					});
 				}
-			});
-			data.status = true;
-			res.json(data);
+			} else {
+				UpdateMeta(req.body, () => {
+					UpdateQuestions(req.body, () => {
+						data.status = true;
+						res.json(data);
+					});
+				});
+			}
 		} else {
 			data.err = 'Cannot remove question: Not authenticated';
 			AuthError(data, res);
@@ -483,6 +540,8 @@ router.post('/api', function(req, res) {
 	}
 	
 });
+
+
 
 router.post('/audio', upload.single('audio'), function(req, res) {
 	const data = {};
