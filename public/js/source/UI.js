@@ -718,7 +718,6 @@ export default class {
 			answers.push(this.elements.GetPostInterviewAnswer(answer, i));
 		});
 		answers.push(this.elements.GetSummary());
-		answers.push(UItools.getButton('Save Interview', '', '', this.handlers.StoreInterview));
 		UItools.render(
 			[
 				this.elements.GetHeader('Interview Review'),
@@ -729,19 +728,9 @@ export default class {
 								this.elements.GetScrollWindow(
 									answers	
 								),
-								// UItools.wrap(
-								// 	[
-								// 		UItools.wrap(
-								// 			[
-								// 				UItools.getText(this.script.title, '', '', 'h2')
-								// 			]
-								// 		),
-								// 		
-								// 	],
-								// 	['grid', 'row-BB']
-								// )
+								UItools.getButton('Save Interview', '', '', this.handlers.StoreInterview)
 							],
-							['grid']
+							['grid', 'row-BB']
 						)
 					],
 					'/',
