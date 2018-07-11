@@ -7,14 +7,12 @@ $bred: rgb(137, 6, 86);
 $orange: rgb(239, 166, 29);
 $yellow: rgb(255, 210, 0);
 
-$black: rgb(0, 0, 0);
-$white: rgb(255, 255, 255);
-$grey: rgb(112, 112, 112);
+$black: rgb(70, 70, 70);
+$white: rgb(244, 244, 244);
+$grey: rgb(130, 130, 130);
 
 $trans: .25s;
 $radius: .3rem;
-
-// TODO: Critical CSS Rendering
 
 * {
 	box-sizing: border-box;
@@ -25,6 +23,7 @@ body {
 	background-color: rgba($main, 0.2);
 	margin: 0;
 	font-size: 1.1em;
+	color: $black;
 }
 
 img {
@@ -178,6 +177,11 @@ header {
 					}
 				}
 			}
+		}
+	}
+	.icon.settings {
+		svg {
+			fill: $grey;
 		}
 	}
 }
@@ -398,18 +402,16 @@ label {
 			fill: $green;
 		}
 	}
-	&.error {
+	&.error svg {
 		fill: $red;
 	}
-	&.pencil {
+	&.pencil, &.cancel {
+		padding: .2rem;
 		fill: $grey;
 		transform: rotate(90deg);
 		transition: $trans;
 		&:hover, &:focus {
 			fill: $black;
-		}
-		.active & {
-			fill: $green;
 		}
 	}
 }
@@ -449,7 +451,8 @@ label {
 
 .controls {
 	// width: 1.6em;
-	margin-right: -1rem;
+	margin-right: -.5rem;
+	margin-top: -.3rem;
 	button {
 		margin-top: 1rem;
 	}
@@ -618,6 +621,7 @@ form[name=interview] {
 	background-color: $white;
 	border-radius: $radius;
 	padding: 1rem 1rem;
+	margin-top: 0;
 	margin-bottom: 1rem;
 	.number {
 		margin-right: 1rem;
@@ -638,6 +642,7 @@ form[name=interview] {
 		background-color: rgba($white, .7);
 	}
 	&.add {
+		color: $grey;
 		background-color: rgba($white, .1);
 		cursor: pointer;
 	}
@@ -659,6 +664,37 @@ form[name=interview] {
 		.icon.back, .icon.next {
 			transform: rotate(-90deg);
 		}
+		+ p {
+			margin-top: 1em;
+		}
+	}
+	.removing {
+		cursor: not-allowed;
+		opacity: .5;
+	}
+	select {
+		margin-top: .1rem;
+		font-size: .8em;
+	}
+	h3 {
+		margin-top: 2em;
+		&:first-of-type {
+			margin-top: 0;
+		}
+	}
+}
+
+button.none {
+	.cancel {
+		display: none;
+	}
+}
+button.none.active {
+	.pencil {
+		display: none;
+	}
+	.cancel {
+		display: block;
 	}
 }
 
