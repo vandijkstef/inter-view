@@ -226,8 +226,8 @@ export default class {
 			UItools.addHandler(select, window.UI.handlers.MetaTypeUpdate, 'change');
 			content.push(select);
 		}
-		content.push(UItools.getButton(this.GetIconSVG('008-back'), ['small', 'transparent'], '', window.UI.OrderUp));
-		content.push(UItools.getButton(this.GetIconSVG('014-next'), ['small', 'transparent'], '', window.UI.OrderDown));
+		content.push(UItools.getButton(this.GetIconSVG('008-back'), ['small', 'transparent'], '', window.UI.OrderDown));
+		content.push(UItools.getButton(this.GetIconSVG('014-next'), ['small', 'transparent'], '', window.UI.OrderUp));
 		content.push(UItools.getButton(this.GetIconSVG('031-trash'), ['small', 'transparent'], '', window.UI.RemoveEntry));
 		const classes = ['flex', 'controls', 'animated', 'fadeIn'];
 		if (!dontHide) {

@@ -1208,11 +1208,35 @@ export default class {
 	}
 
 	OrderUp() {
-		console.log('order up', this);
+		const container = this.parentElement.parentElement;
+		const entry = container.querySelector('p');
+		const previous = container.previousSibling;
+		if (previous.nodeName === 'DIV') {
+			const previousEntry = previous.querySelector('p');
+			const newValue = previousEntry.dataset.order;
+			previousEntry.dataset.order = entry.dataset.order;
+			entry.dataset.order = newValue;
+			const container_copy = container.cloneNode(true);
+			previous.parentNode.insertBefore(container_copy, previous);
+			container.parentNode.insertBefore(previous, container);
+			container.parentNode.replaceChild(container, container_copy);
+		}
 	}
 
 	OrderDown() {
-		console.log('Order down', this);
+		const container = this.parentElement.parentElement;
+		const entry = container.querySelector('p');
+		const next = container.nextSibling;
+		if (next.nodeName === 'DIV') {
+			const nextEntry = next.querySelector('p');
+			const newValue = nextEntry.dataset.order;
+			nextEntry.dataset.order = entry.dataset.order;
+			entry.dataset.order = newValue;
+			const container_copy = container.cloneNode(true);
+			next.parentNode.insertBefore(container_copy, next);
+			container.parentNode.insertBefore(next, container);
+			container.parentNode.replaceChild(container, container_copy);
+		}
 	}
 
 	RemoveEntry() {

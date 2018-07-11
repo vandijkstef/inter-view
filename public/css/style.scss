@@ -646,6 +646,9 @@ form[name=interview] {
 		background-color: rgba($white, .1);
 		cursor: pointer;
 	}
+	&.noQuestions {
+		background-color: rgba($white, 0);
+	}
 }
 
 #preview {
@@ -685,6 +688,21 @@ form[name=interview] {
 	h4 {
 		margin-bottom: .4rem;
 	}
+	// Disable the up and down button
+	// No way to remove the last down button however, so disabled for now
+	// > div {
+	// 	.controls button:nth-of-type(2) {
+	// 		display: none;
+	// 	}
+	// 	.controls button:nth-of-type(1) {
+	// 		// display: none;
+	// 	}
+	// 	+ div {
+	// 		.controls button:nth-of-type(2) {
+	// 			display: block;
+	// 		}
+	// 	}
+	// }
 }
 
 button.none {
