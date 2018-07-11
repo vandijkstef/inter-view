@@ -200,7 +200,7 @@ export default class {
 		);
 	}
 
-	EntryControls(isMeta, meta) {
+	EntryControls(isMeta, meta, dontHide) {
 		const content = [];
 		if (isMeta) {
 			const select = UItools.getSelect('type', [
@@ -229,9 +229,13 @@ export default class {
 		content.push(UItools.getButton(this.GetIconSVG('008-back'), ['small', 'transparent'], '', window.UI.OrderUp));
 		content.push(UItools.getButton(this.GetIconSVG('014-next'), ['small', 'transparent'], '', window.UI.OrderDown));
 		content.push(UItools.getButton(this.GetIconSVG('031-trash'), ['small', 'transparent'], '', window.UI.RemoveEntry));
+		const classes = ['flex', 'controls', 'animated', 'fadeIn'];
+		if (!dontHide) {
+			classes.push('hidden')
+		}
 		return UItools.wrap( 
 			content,
-			['flex', 'controls', 'hidden', 'animated', 'fadeIn']
+			classes
 		);
 	}
 }

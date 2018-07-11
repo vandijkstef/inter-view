@@ -23,6 +23,7 @@ function AuthError(data, res) {
 }
 
 function UpdateMeta(reqbody, callback) {
+	const notRemoved = [];
 	async.forEach(reqbody.metas, (meta, callback) => {
 		const db = new DB();
 		if (meta.removeMe === 'true') {
@@ -30,8 +31,10 @@ function UpdateMeta(reqbody, callback) {
 				db.Remove('scripts_meta', {
 					id: meta.id,
 					script_id: reqbody.script_id
-				}, () => {
-					console.log('removed', meta);
+				}, (status) => {
+					if (!status) {
+						notRemoved.push(meta);
+					}
 					callback();
 				});
 			}
@@ -59,11 +62,12 @@ function UpdateMeta(reqbody, callback) {
 			});
 		}
 	}, (err) => {
-		callback();
+		callback(notRemoved);
 	});
 }
 
 function UpdateQuestions(reqbody, callback) {
+	const notRemoved = [];
 	async.forEach(reqbody.questions, (question, callback) => {
 		const db = new DB();
 		if (question.removeMe === 'true') {
@@ -71,8 +75,10 @@ function UpdateQuestions(reqbody, callback) {
 				db.Remove('questions', {
 					id: question.id,
 					script_id: reqbody.script_id
-				}, () => {
-					console.log('removed', question);
+				}, (status) => {
+					if (!status) {
+						notRemoved.push(question);
+					}
 					callback();
 				});
 			}
@@ -95,7 +101,7 @@ function UpdateQuestions(reqbody, callback) {
 			});
 		}
 	}, (err) => {
-		callback();
+		callback(notRemoved);
 	});
 }
 
@@ -491,8 +497,10 @@ router.post('/api', function(req, res) {
 						description: req.body.description
 					}, (insertID) => {
 						req.body.script_id = insertID;
-						UpdateMeta(req.body, () => {
-							UpdateQuestions(req.body, () => {
+						UpdateMeta(req.body, (notRemoved) => {
+							data.notRemovedMeta = notRemoved;
+							UpdateQuestions(req.body, (notRemoved) => {
+								data.notRemovedQuestions = notRemoved;
 								data.status = true;
 								res.json(data);
 							});
@@ -511,8 +519,10 @@ router.post('/api', function(req, res) {
 						data.description = req.body.description;
 					}
 					db.Update('scripts', data, () => {
-						UpdateMeta(req.body, () => {
-							UpdateQuestions(req.body, () => {
+						UpdateMeta(req.body, (notRemoved) => {
+							data.notRemovedMeta = notRemoved;
+							UpdateQuestions(req.body, (notRemoved) => {
+								data.notRemovedQuestions = notRemoved;
 								data.status = true;
 								res.json(data);
 							});
@@ -520,8 +530,10 @@ router.post('/api', function(req, res) {
 					});
 				}
 			} else {
-				UpdateMeta(req.body, () => {
-					UpdateQuestions(req.body, () => {
+				UpdateMeta(req.body, (notRemoved) => {
+					data.notRemovedMeta = notRemoved;
+					UpdateQuestions(req.body, (notRemoved) => {
+						data.notRemovedQuestions = notRemoved;
 						data.status = true;
 						res.json(data);
 					});

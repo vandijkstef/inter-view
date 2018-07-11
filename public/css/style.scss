@@ -638,7 +638,7 @@ form[name=interview] {
 	button{
 		width: 8%;
 	}
-	&.meta {
+	&.meta, &.title, &.description {
 		background-color: rgba($white, .7);
 	}
 	&.add {
@@ -681,6 +681,9 @@ form[name=interview] {
 		&:first-of-type {
 			margin-top: 0;
 		}
+	}
+	h4 {
+		margin-bottom: .4rem;
 	}
 }
 

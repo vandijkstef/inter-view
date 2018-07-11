@@ -46,6 +46,17 @@ export default class {
 		window.UI.AddToScript(this);
 	}
 
+	NewScript() {
+		// Add box in scripts
+		// Select that script and edit it
+		window.UI.AddScript({
+			title: '',
+			description: '',
+			id: 'new'
+		}, this);
+		document.querySelector('#script_new').click();
+	}
+
 	RemoveQuestion() {
 		const questionID = this.parentElement.querySelector('input[name=questionID]').value;
 		if (questionID !== 'new') {
@@ -390,18 +401,28 @@ export default class {
 			window.UI.ContentEditable(true);
 			window.UI.StartScriptButton.innerText = 'Save Script';
 			window.UI.StartScriptButton.classList.add('secondary');
+			window.UI.ScriptButtonState(false);
 			window.changedFields = [];
 			removedItems.forEach((item) => {
 				item.classList.remove('hidden');
 			});
 			this.classList.add('active');
 		} else {
+			const currentSelection = document.querySelector('#scripts .selected');
+			console.log(currentSelection);
 			window.UI.LockSelection(false);
 			window.UI.ContentEditable(false);
 			window.UI.StartScriptButton.innerText = 'Start Script';
 			window.UI.StartScriptButton.classList.remove('secondary');
 			this.classList.remove('active');
-			window.UI.ScriptSelection();
+			if (currentSelection.id === 'script_new') {
+				currentSelection.parentElement.removeChild(currentSelection);
+				// document.querySelector('input[name=script]').click();
+				window.UI.RenderHome();
+			} else {
+				window.UI.ScriptSelection();
+
+			}
 		}
 	}
 
@@ -461,7 +482,10 @@ export default class {
 			api.call(data, (data) => {
 				console.log(data);
 				if (data.status) {
-					window.UI.Notify('Script successfully saved');
+					window.UI.Notify('Script successfully saved', 'success');
+					if (data.notRemovedMeta.length > 0 || data.notRemovedQuestions.length > 0) {
+						window.UI.Notify('Some items where not removed, since they already contain data');
+					}
 					window.UI.editIcon.click();
 				} else {
 					console.log(data);

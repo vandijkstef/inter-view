@@ -178,7 +178,7 @@ export default class {
 			this.handlers.InlineEdit
 		);
 
-		const newScriptButton = UItools.getButton('New Script', ['secondary', 'shadowed'], '', this.handlers.EditScript); // TODO: Change new script
+		const newScriptButton = UItools.getButton('New Script', ['secondary', 'shadowed'], '', this.handlers.NewScript); // TODO: Change new script
 		if (window.offline) {
 			newScriptButton.disabled = true;
 		}
@@ -388,7 +388,9 @@ export default class {
 			const title = UItools.getText(`${script.title}`, ['animated', 'fadeIn', 'title']);
 			const description = UItools.getText(`${script.description}`, ['animated', 'fadeIn', 'description']);
 			entries.push(label);
+			entries.push(UItools.getText('Title', '', '', 'h4'));
 			entries.push(title);
+			entries.push(UItools.getText('Description', '', '', 'h4'));
 			entries.push(description);
 			label = UItools.getText('Meta Pre', '', '', 'h3');
 			entries.push(label);
@@ -496,10 +498,14 @@ export default class {
 			if (script.questions.length > 0) {
 				this.ScriptButtonState(true);
 			}
+			if (script.id === 'new') {
+				this.editIcon.click();
+			}
 		});
 	}
 
 	ScriptButtonState(validScript) {
+		console.log('yolo');
 		if (!this.StartScriptButton) {
 			console.warn('Can\'t change state, no script button set');
 			return;
@@ -514,8 +520,13 @@ export default class {
 					return 'warning';
 				}
 			} else {
-				this.StartScriptButton.disabled = true;
-				return true;	
+				if (this.StartScriptButton.classList.contains('secondary')) {
+					this.StartScriptButton.disabled = false;
+					return false;
+				} else {
+					this.StartScriptButton.disabled = true;
+					return true;
+				}
 			}	
 		}
 	}
@@ -794,9 +805,15 @@ export default class {
 	}
 
 	FetchScript(id, callback) {
-		// TODO: Move this method out of UI
-		// TODO: Test if online, if not, try to retrieve from cache
-		if (window.offline) {
+		if (id === 'new') {
+			return callback({
+				id: 'new',
+				metas: [],
+				questions: [],
+				title: '',
+				description: ''
+			});
+		} else if (window.offline) {
 			if (localStorage.getItem(`script_${id}`)) {
 				return callback(JSON.parse(localStorage.getItem(`script_${id}`)));
 			}
@@ -1018,9 +1035,23 @@ export default class {
 		classes.splice(classes.indexOf('fadeInDown'), 1);
 		classes.push('fadeIn');
 		const newItem = UItools.getText(' ', classes);
+		let isMeta;
+		if (classes.indexOf('meta') !== -1) {
+			isMeta = true;
+		}
 		newItem.contentEditable = true;
+		const controls = window.UI.elements.EntryControls(isMeta, {type: 'text'}, true);
 		UItools.render(
-			UItools.addHandler(newItem, window.UI.handlers.FieldWatcher, 'input'),
+			UItools.wrap(
+				[
+					controls,
+					UItools.addHandler(
+						newItem,
+						window.UI.handlers.FieldWatcher,
+						'input'
+					)
+				]
+			),
 			creator.parentElement,
 			false,
 			creator
