@@ -402,15 +402,23 @@ router.post('/api', function(req, res) {
 		break;
 	case 'update_inline':
 		if (req.session.user) {
-			// const db = new DB();
 			console.log(req.body);
 			req.body.metas.forEach((meta) => {
 				const db = new DB();
-				if (meta.id === undefined) {
+				if (meta.removeMe === 'true') {
+					if (meta.id !== undefined) {
+						db.Remove('scripts_meta', {
+							id: meta.id,
+							script_id: req.body.script_id
+						}, () => {
+							console.log('removed', meta);
+						});
+					}
+				} else if (meta.id === undefined) {
 					db.Insert('scripts_meta', {
 						script_id: req.body.script_id,
 						key: meta.value,
-						// type: meta.type, // TODO:
+						type: meta.type,
 						// order: meta.order, // TODO:
 						post: meta.post || false
 					},
@@ -422,7 +430,7 @@ router.post('/api', function(req, res) {
 						id: meta.id,
 						script_id: req.body.script_id,
 						key: meta.value,
-						// type: meta.type,
+						type: meta.type,
 						// order: meta.order,
 						post: meta.post || false
 					}, () => {
@@ -432,7 +440,16 @@ router.post('/api', function(req, res) {
 			});
 			req.body.questions.forEach((question) => {
 				const db = new DB();
-				if (question.id === undefined) {
+				if (question.removeMe === 'true') {
+					if (question.id !== undefined) {
+						db.Remove('questions', {
+							id: question.id,
+							script_id: req.body.script_id
+						}, () => {
+							console.log('removed', question);
+						});
+					}
+				} else if (question.id === undefined) {
 					db.Insert('questions', {
 						script_id: req.body.script_id,
 						question: question.value,
