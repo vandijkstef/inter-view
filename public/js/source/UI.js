@@ -313,14 +313,15 @@ export default class {
 				action: 'get_respondents',
 				script: scriptID
 			}, (data) => {
+				const resultsWindow = document.querySelector('#results');
 				if (data.resData) {
 					loader.parentElement.removeChild(loader);
-					const resultsWindow = document.querySelector('#results');
 					let resultEntry;
 					window.questions = {};
+					let hasData;
 					for (const respondent_id in data.resData) {
+						hasData = true;
 						const respondent = data.resData[respondent_id];
-						// console.log(respondent);
 						resultEntry = this.elements.GetResult(respondent);
 						UItools.render(
 							resultEntry,
@@ -340,6 +341,12 @@ export default class {
 							const answer = data.resData[respondent_id].answers[question_id];
 							this.AddResultDetail(answer, resultEntry);
 						}
+					}
+					if (!hasData) {
+						UItools.render(
+							UItools.getText('No data found'),
+							resultsWindow
+						);
 					}
 				} else {
 					this.Notify('Invalid data received', 'error');
