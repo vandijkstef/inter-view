@@ -132,11 +132,11 @@ export default class {
 		if (this.classList.contains('secondary')) {
 			window.UI.handlers.StoreInline();
 		} else if (this.classList.contains('warning')) {
-			console.warn('No mic set-up');
-			window.UI.Notify('No mic set-up', 'warning');
+			window.UI.Notify('No mic set-up');
 			window.UI.micWrap.audio.InitAudio(() => {
 				window.UI.handlers.DoStartScript();
 			}, (err) => {
+				window.UI.Notify('Mic not allowed', 'warning');
 				console.log(err);
 				return;
 			});
@@ -384,12 +384,16 @@ export default class {
 	}
 
 	InlineEdit() {
+		const removedItems = document.querySelectorAll('#preview .removing');
 		if (!this.classList.contains('active')) {
 			window.UI.LockSelection(true);
 			window.UI.ContentEditable(true);
 			window.UI.StartScriptButton.innerText = 'Save Script';
 			window.UI.StartScriptButton.classList.add('secondary');
 			window.changedFields = [];
+			removedItems.forEach((item) => {
+				item.classList.remove('hidden');
+			});
 			this.classList.add('active');
 		} else {
 			window.UI.LockSelection(false);
@@ -397,6 +401,7 @@ export default class {
 			window.UI.StartScriptButton.innerText = 'Start Script';
 			window.UI.StartScriptButton.classList.remove('secondary');
 			this.classList.remove('active');
+			window.UI.ScriptSelection();
 		}
 	}
 
@@ -404,10 +409,6 @@ export default class {
 		if (window.changedFields.indexOf(this) === -1) {
 			window.changedFields.push(this);
 		}
-		// if (window.lastField === this) {
-		// 	console.log('got it');
-		// }
-		// window.lastField = this;
 	}
 
 	StoreInline() {
@@ -419,13 +420,16 @@ export default class {
 			if (field.classList.contains('question')) {
 				questions.push({
 					id: field.dataset.id,
-					value: field.innerText
+					value: field.innerText,
+					removeMe: field.dataset.removeme || false
 				});
 			} else if (field.classList.contains('meta')) {
 				metas.push({
 					id: field.dataset.id,
 					value: field.innerText,
-					post: field.classList.contains('post')
+					post: field.classList.contains('post'),
+					removeMe: field.dataset.removeme || false,
+					type: field.dataset.type || 'text'
 				});
 			} else {
 				console.warn('Unspecified field', field);
@@ -460,5 +464,13 @@ export default class {
 
 	AudioPaused() {
 		this.parentElement.parentElement.parentElement.classList.remove('playing');
+	}
+
+	MetaTypeUpdate() {
+		const entry = document.querySelector('#e_' + this.dataset.id);
+		entry.dataset.type = this.value;
+		if (window.changedFields.indexOf(entry) === -1) {
+			window.changedFields.push(entry);
+		}
 	}
 }

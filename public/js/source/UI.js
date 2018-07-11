@@ -168,7 +168,15 @@ export default class {
 		this.StartScriptButton = UItools.getButton('Start Script', '', '', this.handlers.StartScript);
 		this.ScriptButtonState(false);
 		this.ScriptPreview = this.elements.GetScrollWindow(UItools.getText('Select a script on the left side'), 'preview');
-		this.editIcon = UItools.getButton(this.elements.GetIconSVG('047-pencil'), ['none', 'small', 'animated', 'fadeIn'], '', this.handlers.InlineEdit);
+		this.editIcon = UItools.getButton( // TODO: Remove offline
+			UItools.wrap([
+				this.elements.GetIconSVG('047-pencil'),
+				this.elements.GetIconSVG('059-cancel'),
+			]),
+			['none', 'small', 'animated', 'fadeIn'],
+			'',
+			this.handlers.InlineEdit
+		);
 
 		const newScriptButton = UItools.getButton('New Script', ['secondary', 'shadowed'], '', this.handlers.EditScript); // TODO: Change new script
 		if (window.offline) {
@@ -376,18 +384,27 @@ export default class {
 			this.Clear(this.ScriptPreview);
 			const entries = [];
 			window.previewedScript = script.id;
-			if (!script.metas.length && !script.questions.length) {
-				entries.push(UItools.getText('No questions set', ['animated', 'fadeIn', 'noQuestions']));
-			}
+			let label = UItools.getText('Script', '', '', 'h3');
+			const title = UItools.getText(`${script.title}`, ['animated', 'fadeIn', 'title']);
+			const description = UItools.getText(`${script.description}`, ['animated', 'fadeIn', 'description']);
+			entries.push(label);
+			entries.push(title);
+			entries.push(description);
+			label = UItools.getText('Meta Pre', '', '', 'h3');
+			entries.push(label);
+			let hasPre, hasPost;
 			script.metas.forEach((meta) => {
 				if (!meta.post) {
+					hasPre = true;
 					const entry = UItools.getText(`${meta.key}`, ['animated', 'fadeIn', 'meta', 'pre']);
+					entry.id = 'e_' + meta.id;
 					entry.dataset.id = meta.id;
 					entry.dataset.order = meta.order;
+					entry.dataset.type = meta.type;
 					entries.push(
 						UItools.wrap(
 							[
-								this.elements.EntryControls(),
+								this.elements.EntryControls(true, meta),
 								UItools.addHandler(
 									entry,
 									this.handlers.FieldWatcher,
@@ -398,6 +415,9 @@ export default class {
 					);
 				}
 			});
+			if (!hasPre) {
+				entries.push(UItools.getText('No pre-meta set', ['animated', 'fadeIn', 'noQuestions']));
+			}
 			entries.push(
 				UItools.addHandler(
 					UItools.getText('Click to add pre-meta', ['add', 'meta', 'pre', 'animated', 'fadeInDown', 'hidden']),
@@ -407,6 +427,11 @@ export default class {
 			script.questions.sort((a, b) => {
 				return a.order - b.order;
 			});
+			label = UItools.getText('Questions', '', '', 'h3');
+			entries.push(label);
+			if (script.questions.length === 0) {
+				entries.push(UItools.getText('No questions set', ['animated', 'fadeIn', 'noQuestions']));
+			}
 			script.questions.forEach((question) => {
 				const entry = UItools.getText(question.question, ['animated', 'fadeIn', 'question']);
 				entry.dataset.id = question.id;
@@ -430,16 +455,21 @@ export default class {
 					this.handlers.AddToScript
 				)
 			);
+			label = UItools.getText('Meta Post', '', '', 'h3');
+			entries.push(label);
 			script.metas.forEach((meta) => {
 				if (meta.post) {
-					const entry = UItools.getText(`Meta: ${meta.key}`, ['animated', 'fadeIn', 'meta', 'post']);
+					hasPost = true;
+					const entry = UItools.getText(`${meta.key}`, ['animated', 'fadeIn', 'meta', 'post']);
+					entry.id = 'e_' + meta.id;
 					entry.dataset.id = meta.id;
 					entry.dataset.order = meta.order;
 					entry.dataset.metapost = true;
+					entry.dataset.type = meta.type;
 					entries.push(
 						UItools.wrap(
 							[
-								this.elements.EntryControls(),
+								this.elements.EntryControls(true, meta),
 								UItools.addHandler(
 									entry,
 									this.handlers.FieldWatcher,
@@ -450,6 +480,9 @@ export default class {
 					);
 				}
 			});
+			if (!hasPost) {
+				entries.push(UItools.getText('No post meta set', ['animated', 'fadeIn', 'noQuestions']));
+			}
 			entries.push(
 				UItools.addHandler(
 					UItools.getText('Click to add post-meta', ['add', 'meta', 'post', 'animated', 'fadeInDown', 'hidden']),
@@ -1144,15 +1177,29 @@ export default class {
 	}
 
 	OrderUp() {
-		console.log('order up');
+		console.log('order up', this);
 	}
 
 	OrderDown() {
-		console.log('Order down');
+		console.log('Order down', this);
 	}
 
 	RemoveEntry() {
-		console.log('removing');
+		// console.log('removing', this.parentElement.parentElement.querySelector('p'));
+		const entry = this.parentElement.parentElement;
+		const input = entry.querySelector('p');
+		if (entry.classList.contains('removing')) {
+			input.dataset.removeme = false;
+			input.contentEditable = true;
+			entry.classList.remove('removing');
+		} else {
+			input.dataset.removeme = true;
+			input.contentEditable = false;
+			entry.classList.add('removing');
+			if (window.changedFields.indexOf(input) === -1) {
+				window.changedFields.push(input);
+			}
+		}
 	}
 
 
