@@ -10,10 +10,14 @@ import Controls from './Controls.js';
 	const api = new API('api');
 	const UI = new UIm();
 	const controls = new Controls();
-	window.appSettings = {
-		downloadWav: false
-	};
-	localStorage.setItem('settings', JSON.stringify(window.appSettings));
+	if (!localStorage.getItem('settings')) {
+		window.appSettings = {
+			downloadWav: false
+		};
+		localStorage.setItem('settings', JSON.stringify(window.appSettings));
+	} else {
+		window.appSettings = JSON.parse(localStorage.getItem('settings'));
+	}
 	// TODO: Create router, or.. do I need that?
 
 	window.timers = {

@@ -397,22 +397,24 @@ export default class {
 				hasUnchecked = true;
 			}
 		});
-		if (hasUnchecked) {
-			filterBtn.classList.remove('inactive');
-		} else {
-			filterBtn.classList.add('inactive');
-		}
 		questionsResults.forEach((response) => {
 			if (questions.includes(response.dataset.value.split('-')[2])) {
 				if (response.dataset.rating >= minRating.value && response.dataset.rating <= maxRating.value) {
 					response.checked = true;
 				} else {
+					hasUnchecked = true;
 					response.checked = false;
 				}
 			} else {
+				hasUnchecked = true;
 				response.checked = false;
 			}
 		});
+		if (hasUnchecked) {
+			filterBtn.classList.remove('inactive');
+		} else {
+			filterBtn.classList.add('inactive');
+		}
 		closeBtn.click();
 	}
 

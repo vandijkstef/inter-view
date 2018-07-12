@@ -280,7 +280,8 @@ export default class {
 		const scriptSelection = UItools.getSelect('script', []);
 		UItools.addHandler(scriptSelection, this.handlers.ResultsChangeScript, 'change');
 		const filter = UItools.addHandler(UItools.getButton('Filter', ['small', 'inactive'], 'filterBtn'), this.AddFilterModal);
-		const download = UItools.addHandler(UItools.getButton('Export', ['small', 'secondary']), this.AddExportModal);
+		// const download = UItools.addHandler(UItools.getButton('Export', ['small', 'secondary']), this.AddExportModal);
+		const download = UItools.addHandler(UItools.getButton('Download Selected', ['small', 'secondary']), this.handlers.DownloadSelected);
 		UItools.render(
 			[
 				this.elements.GetHeader('Results', 'Home'),
@@ -1101,7 +1102,17 @@ export default class {
 	}
 
 	AddAudioModal() {
-		window.UI.AddModal(UItools.getText('Audio Settings', '', '', 'h1'), UItools.getText('This modal box will contain audio and app settings'));
+		const content = [];
+		content.push(UItools.getText('App', '', '', 'h2'));
+		content.push(UItools.addHandler(UItools.getInput(UItools.getLabel('Local download'), 'checkbox', 'downloadWav', window.appSettings.downloadWav), function () {
+			console.log(this);
+			console.log(this.querySelector('input').checked);
+			window.appSettings.downloadWav = this.querySelector('input').checked ? true : false;
+			localStorage.setItem('settings', JSON.stringify(window.appSettings));
+		}, 'change'));
+		content.push(UItools.getText('Audio', '', '', 'h2'));
+		content.push(UItools.getText('Audio settings are not enabled'));
+		window.UI.AddModal(UItools.getText('Settings', '', '', 'h1'), UItools.wrap(content));
 		if (!this.audio.permission) {
 			this.audio.InitAudio((stream) => {
 				this.audio.GotStream(stream);
