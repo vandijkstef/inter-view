@@ -204,7 +204,7 @@ export default class {
 										[
 											UItools.wrap(
 												[
-													UItools.getText('Selected script', '', '', 'h2'), // TODO: Update to script title
+													UItools.getText('Script details', '', '', 'h2'), // TODO: Update to script title
 													this.editIcon
 												],
 												['flex', 'spread']
@@ -505,7 +505,6 @@ export default class {
 	}
 
 	ScriptButtonState(validScript) {
-		console.log('yolo');
 		if (!this.StartScriptButton) {
 			console.warn('Can\'t change state, no script button set');
 			return;
@@ -1122,17 +1121,33 @@ export default class {
 		}
 
 		// Rating
-		// content.push(UItools.getText('Rating', '', '', 'h2'));
-		// const minRating = UItools.getInput(UItools.getLabel('Minimum rating'), 'range', 'rating', 0);
-		// minRating.input.setAttribute('min', 0);
-		// minRating.input.setAttribute('max', 5);
-		// minRating.input.setAttribute('step', 1);
-		// content.push(minRating);
-		// const maxRating = UItools.getInput(UItools.getLabel('Maximum rating'), 'range', 'rating', 5);
-		// maxRating.input.setAttribute('min', 0);
-		// maxRating.input.setAttribute('max', 5);
-		// maxRating.input.setAttribute('step', 1);
-		// content.push(maxRating);
+		content.push(UItools.getText('Rating', '', '', 'h2'));
+		const minRating = UItools.getInput(UItools.getLabel('Minimum rating'), 'range', 'minRating', 0);
+		minRating.input.setAttribute('min', 0);
+		minRating.input.setAttribute('max', 5);
+		minRating.input.setAttribute('step', 1);
+		content.push(minRating);
+		content.push(UItools.wrap([
+			UItools.getText(0),
+			UItools.getText(1),
+			UItools.getText(2),
+			UItools.getText(3),
+			UItools.getText(4),
+			UItools.getText(5)
+		], ['values', 'flex', 'spread']));
+		const maxRating = UItools.getInput(UItools.getLabel('Maximum rating'), 'range', 'maxRating', 5);
+		maxRating.input.setAttribute('min', 0);
+		maxRating.input.setAttribute('max', 5);
+		maxRating.input.setAttribute('step', 1);
+		content.push(maxRating);
+		content.push(UItools.wrap([
+			UItools.getText(0),
+			UItools.getText(1),
+			UItools.getText(2),
+			UItools.getText(3),
+			UItools.getText(4),
+			UItools.getText(5)
+		], ['values', 'flex', 'spread']));
 
 		// Buttons
 		content.push(UItools.wrap(

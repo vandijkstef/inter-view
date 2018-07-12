@@ -139,6 +139,7 @@ main {
 		top: 50%;
 		transform: translate(-50%, -50%);
 		padding-left: 3rem;
+		overflow-y: scroll;
 	}
 }
 
@@ -728,6 +729,10 @@ button.none.active {
 			width: auto;
 			margin-bottom: 0;
 		}
+	}
+	&.range + .values {
+		margin: -2rem 1rem 0;
+		color: rgba($main, .4);
 	}
 }
 
