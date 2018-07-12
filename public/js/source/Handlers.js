@@ -340,7 +340,6 @@ export default class {
 
 	GetRatingValue(rating) {
 		const values = rating.querySelectorAll('input[type=radio]');
-		console.log(values);
 		if (values) {
 			let val = false;
 			values.forEach((value) => {
@@ -377,7 +376,6 @@ export default class {
 		}
 		questionsResults.forEach((response) => {
 			if (questions.includes(response.dataset.value.split('-')[2])) {
-				console.log(response.dataset.rating, minRating.value, maxRating.value);
 				if (response.dataset.rating >= minRating.value && response.dataset.rating <= maxRating.value) {
 					response.checked = true;
 				} else {
@@ -416,7 +414,6 @@ export default class {
 			this.classList.add('active');
 		} else {
 			const currentSelection = document.querySelector('#scripts .selected');
-			console.log(currentSelection);
 			window.UI.LockSelection(false);
 			window.UI.ContentEditable(false);
 			window.UI.StartScriptButton.innerText = 'Start Script';
@@ -440,8 +437,6 @@ export default class {
 	}
 
 	StoreInline() {
-		console.log('storing..', window.changedFields);
-
 		const questions = [];
 		const metas = [];
 		window.changedFields.forEach((field) => {
@@ -465,7 +460,6 @@ export default class {
 				console.warn('Unspecified field', field);
 			}
 		});
-		console.log(window.previewedScript, questions, metas);
 		const data = {
 			action: 'update_inline',
 			script_id: window.previewedScript,
@@ -489,7 +483,6 @@ export default class {
 		if (questions.length > 0 || metas.length > 0 || data.title || data.description) {
 			const api = new API();
 			api.call(data, (data) => {
-				console.log(data);
 				if (data.status) {
 					window.UI.Notify('Script successfully saved', 'success');
 					if (data.notRemovedMeta.length > 0 || data.notRemovedQuestions.length > 0) {

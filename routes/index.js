@@ -133,7 +133,6 @@ function SendMail(to, subject, html) {
 		}
 		console.log('Message sent: %s', info.messageId);
 	});
-	console.log(process.env.MAIL_FROM, process.env.MAIL_PASS);
 }
 
 router.get('/', function(req, res) {
@@ -401,25 +400,25 @@ router.post('/api', function(req, res) {
 			AuthError(data, res);
 		}
 		break;
-	case 'get_responses': // TODO: Currently unused?
-		console.log('I have the idea I aint using this..');
-		if (req.session.user) {
-			const db = new DB();
-			if (req.body.respondent) { // Return data on single respondent
-				db.Select('response', {respondent_id: req.body.respondent}, (responses) => {
-					data.status = true;
-					data.responses = responses;
-					res.json(data);
-				});
-			} else {
-				data.err = 'Cannot get responses: No respondent set';
-				res.json(data);
-			}
-		} else {
-			data.err = 'Cannot get responses: Not authenticated';
-			AuthError(data, res);
-		}
-		break;
+	// case 'get_responses': // TODO: Currently unused?
+	// 	console.log('I have the idea I aint using this..');
+	// 	if (req.session.user) {
+	// 		const db = new DB();
+	// 		if (req.body.respondent) { // Return data on single respondent
+	// 			db.Select('response', {respondent_id: req.body.respondent}, (responses) => {
+	// 				data.status = true;
+	// 				data.responses = responses;
+	// 				res.json(data);
+	// 			});
+	// 		} else {
+	// 			data.err = 'Cannot get responses: No respondent set';
+	// 			res.json(data);
+	// 		}
+	// 	} else {
+	// 		data.err = 'Cannot get responses: Not authenticated';
+	// 		AuthError(data, res);
+	// 	}
+	// 	break;
 	case 'post_meta':
 		if (req.session.user) {
 			req.body.meta.forEach((meta) => {
@@ -441,7 +440,6 @@ router.post('/api', function(req, res) {
 		break;
 	case 'update_responses':
 		if (req.session.user) {
-			console.log(req.body);
 			const db = new DB();
 			db.Update('respondent', {
 				id: req.body.respondent,
@@ -475,7 +473,6 @@ router.post('/api', function(req, res) {
 		if (req.session.user) {
 			const db = new DB();
 			db.Remove('questions', {id: req.body.id}, (results) => {
-				console.log(results);
 				data.status = results;
 				res.json(data);
 			});
@@ -486,7 +483,6 @@ router.post('/api', function(req, res) {
 		break;
 	case 'update_inline':
 		if (req.session.user) {
-			console.log(req.body);
 
 			// See if we need to touch the scripts table
 			if (req.body.title || req.body.description || req.body.script_id === 'new') {
