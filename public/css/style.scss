@@ -14,6 +14,8 @@ $grey: rgb(130, 130, 130);
 $trans: .25s;
 $radius: .3rem;
 
+$breakpoint: 50em;
+
 * {
 	box-sizing: border-box;
 	font-family: Open Sans, Helvetica, Arial, sans-serif;
@@ -97,11 +99,13 @@ h2 {
 	display: grid;
     grid-template-rows: 4em 1fr;
 	width: auto;
-	height: 96.5vh;
 	padding: 1rem;
 	border-radius: $radius;
 	margin: 1rem;
 	box-shadow: 0 3px 6px rgba($main, .2);
+	@media (min-width: $breakpoint) {
+		height: 96.5vh;
+	}
 	&.login, &.small {
 		position: unset;
 		display: block;
@@ -265,24 +269,41 @@ label {
 
 .grid {
 	display: grid;
-	max-height: 85vh; // This would be content area - header
-	&.col-50 {
-		grid-template-columns: 50% 1fr;
-		& > * {
-			margin-right: .8rem;
-			+ * {
-				margin-left: .8rem;
-				margin-right: 0;
-			}
+	@media (max-width: $breakpoint) {
+		display: flex;
+		&.col-50 {
+			flex-direction: column-reverse;
 		}
-		&.split {
-			grid-template-columns: 47.5% 5% 47.5%;
-			transition: grid-template-columns 1s;
+		&.row-TWB {
+			flex-direction: column;
+			margin-bottom: 2em;
+		}
+		#scripts + .flex {
+			display: none;
+		}
+	}
+	@media (min-width: $breakpoint) {
+		max-height: 85vh; // This would be content area - header
+	}
+	@media (min-width: $breakpoint) {
+		&.col-50 {
+			grid-template-columns: 50% 1fr;
 			& > * {
-				margin: 0 !important;
+				margin-right: .8rem;
+				+ * {
+					margin-left: .8rem;
+					margin-right: 0;
+				}
 			}
-			&.smaller {
-				grid-template-columns: 27.5% 5% 67.5%;
+			&.split {
+				grid-template-columns: 47.5% 5% 47.5%;
+				transition: grid-template-columns 1s;
+				& > * {
+					margin: 0 !important;
+				}
+				&.smaller {
+					grid-template-columns: 27.5% 5% 67.5%;
+				}
 			}
 		}
 	}
@@ -296,7 +317,9 @@ label {
 		grid-template-rows: 50% 50%;
 		.grid {
 			&.row-TWB {
-				max-height: 42.5vh;
+				@media (min-width: $breakpoint) {
+					max-height: 42.5vh;
+				}
 			}
 		}
 	}
@@ -304,14 +327,18 @@ label {
 		grid-template-rows: 40% 60%;
 		.grid {
 			&.row-TWB {
-				max-height: 59.5vh;
+				@media (min-width: $breakpoint) {
+					max-height: 59.5vh;
+				}
 			}
 		}
 	}
-	&.row-TWB {
-		grid-template-rows: 3.3em 1fr;
-		header + & {
-			grid-template-rows: 4em 1fr;
+	@media (min-width: $breakpoint) {
+		&.row-TWB {
+			grid-template-rows: 3.3em 1fr;
+			header + & {
+				grid-template-rows: 4em 1fr;
+			}
 		}
 	}
 	&.row-BB {
@@ -585,13 +612,17 @@ form[name=interview] {
 			}
 			// font-weight: 600;
 		}
-		.rating {
-			max-width: 20em;
+		.rating svg {
+			width: 1.4em;
+			@media (min-width: $breakpoint) {
+				width: 2em;
+			}
 		}
 		.flex {
 			justify-content: space-between;
 			margin: .6rem 0;
 			max-width: 35em;
+			flex-wrap: wrap;
 		}
 		& > div {
 			margin-bottom: 2rem;
