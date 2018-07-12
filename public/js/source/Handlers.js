@@ -359,6 +359,8 @@ export default class {
 		const closeBtn = document.querySelector('.modal .cancel');
 		const questionsFilter = document.querySelectorAll('input[name^=filter]');
 		const questionsResults = document.querySelectorAll('.responses .inputwrapper.checkbox input');
+		const minRating = document.querySelector('input[name=minRating]');
+		const maxRating = document.querySelector('input[name=maxRating]');
 		const questions = [];
 		let hasUnchecked = false;
 		questionsFilter.forEach((input) => {
@@ -375,7 +377,12 @@ export default class {
 		}
 		questionsResults.forEach((response) => {
 			if (questions.includes(response.dataset.value.split('-')[2])) {
-				response.checked = true;
+				console.log(response.dataset.rating, minRating.value, maxRating.value);
+				if (response.dataset.rating >= minRating.value && response.dataset.rating <= maxRating.value) {
+					response.checked = true;
+				} else {
+					response.checked = false;
+				}
 			} else {
 				response.checked = false;
 			}

@@ -98,17 +98,25 @@ export default class {
 			}
 			const content = [];
 			content.push(UItools.getText(response.question, 'key'));
+			const checkbox = UItools.getInput(
+				UItools.addHandler(
+					UItools.addHandler(
+						UItools.getAudio(response.audio, true),
+						this.handlers.AudioPlaying,
+						'playing'
+					), 
+					this.handlers.AudioPaused,
+					'pause'
+				), 
+				'checkbox', 
+				'selected', 
+				true, 
+				response.audio
+			);
+			checkbox.querySelector('input').dataset.rating = response.rating;
 			content.push(UItools.wrap(
 				[
-					UItools.getInput(UItools.addHandler(
-						UItools.addHandler(
-							UItools.getAudio(response.audio, true),
-							this.handlers.AudioPlaying,
-							'playing'
-						), 
-						this.handlers.AudioPaused,
-						'pause'
-					), 'checkbox', 'selected', true, response.audio),
+					checkbox,
 					this.elements.GetRating(response.question_id, response.rating, true)
 				],
 				['flex']
