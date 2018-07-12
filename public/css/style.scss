@@ -649,9 +649,17 @@ form[name=interview] {
 				width: 1.2em;
 			}
 		}
+		.rotate {
+			display: none;
+		}
 		@media (max-width: $breakpoint/1.5) {
 			audio {
 				display: none;
+			}
+			.rotate {
+				display: block;
+				color: $grey;
+				padding-left: 1rem;
 			}
 		}
 		.flex {

@@ -99,15 +99,18 @@ export default class {
 			const content = [];
 			content.push(UItools.getText(response.question, 'key'));
 			const checkbox = UItools.getInput(
-				UItools.addHandler(
+				UItools.wrap([
 					UItools.addHandler(
-						UItools.getAudio(response.audio, true),
-						this.handlers.AudioPlaying,
-						'playing'
-					), 
-					this.handlers.AudioPaused,
-					'pause'
-				), 
+						UItools.addHandler(
+							UItools.getAudio(response.audio, true),
+							this.handlers.AudioPlaying,
+							'playing'
+						), 
+						this.handlers.AudioPaused,
+						'pause'
+					),
+					UItools.getText('Rotate for audio', 'rotate')
+				]),
 				'checkbox', 
 				'selected', 
 				true, 
