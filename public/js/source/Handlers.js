@@ -183,27 +183,59 @@ export default class {
 		}
 	}
 
-	GoQuestions(e) {
-		e.preventDefault();
-		const inputData = document.querySelectorAll('input');
-		const data = [];
-		inputData.forEach((input) => {
-			data.push({
-				key: input.name,
-				value: input.value,
-				type: input.type
-			});
-		});
-		const api = new API();
-		api.call({
-			action: 'new_respondent',
-			meta: data,
-			script: window.UI.script.id
-		}, (data) => {
-			if (data.status && data.insertID) {
-				window.UI.RenderQuestions(data.insertID);
+	GoQuestions(e, button) {
+		if (e) {
+			e.preventDefault();
+		}
+		if (this.classList && this.classList.contains('starting')) {
+			this.classList.remove('starting');
+			this.innerHTML = 'Start Interview';
+			clearTimeout(window.curTimeOut);
+			return;
+		} else {
+			if (!button) {
+				button = this;
 			}
-		});
+			if (button.classList.contains('starting')) {
+				const value = button.querySelector('span');
+				value.innerText = parseInt(value.innerText) - 1;
+				if (value.innerText !== '0') {
+					window.curTimeOut = setTimeout(() => {
+						window.UI.handlers.GoQuestions(null, button);
+					}, 1000);
+				} else {
+					const inputData = document.querySelectorAll('input');
+					const data = [];
+					inputData.forEach((input) => {
+						data.push({
+							key: input.name,
+							value: input.value,
+							type: input.type
+						});
+					});
+					if (!window.offline) {
+						const api = new API();
+						api.call({
+							action: 'new_respondent',
+							meta: data,
+							script: window.UI.script.id
+						}, (data) => {
+							if (data.status && data.insertID) {
+								window.UI.RenderQuestions(data.insertID);
+							}
+						});
+					} else {
+						window.UI.RenderQuestions('new');
+					}
+				}
+			} else {
+				button.classList.add('starting');
+				button.innerHTML = 'Starting in <span>3</span>';
+				window.curTimeOut = setTimeout(() => {
+					window.UI.handlers.GoQuestions(null, this);
+				}, 1000);
+			}
+		}
 	}
 
 	GoNextQuestion(e) {

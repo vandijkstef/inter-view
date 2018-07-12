@@ -62,10 +62,10 @@ h2 {
 
 #notify.container {
 	display: flex;
-	flex-direction: column-reverse;
-    position: absolute;
+	flex-direction: column;
+    position: fixed;
     right: 0;
-	bottom: 0;
+	top: 0;
 	width: 20em;
 	p {
 		margin: 0;
@@ -185,8 +185,10 @@ header {
 		}
 	}
 	&.interview {
-		flex-direction: column;
 		margin: -1rem -1rem 0;
+		@media (max-width: $breakpoint) {
+			flex-direction: column;
+		}
 		& > div {
 			width: 100%;
 			display: flex;
@@ -453,7 +455,9 @@ label {
 			border: 1px solid $main;
 		}
 	}
-
+	&.starting {
+		background-color: $red;
+	}
 }
 
 .buttonRow {
@@ -477,7 +481,8 @@ label {
 	&.mic {
 		width: 2.2em;
 		&.recording {
-			fill: $green;
+			fill: $red;
+			animation: fadeRed 2s infinite ease-out;
 		}
 	}
 	&.error svg {
@@ -949,7 +954,7 @@ button.none.active {
 	}
 }
 
-  @keyframes fadeInLeft {
+@keyframes fadeInLeft {
 	from {
 	  opacity: 0;
 	  transform: translate3d(-100%, 0, 0);
@@ -958,5 +963,17 @@ button.none.active {
 	to {
 	  opacity: 1;
 	  transform: translate3d(0, 0, 0);
+	}
+}
+
+@keyframes fadeRed {
+	0% {
+		fill: $grey;
+	}
+	50% {
+		fill: $red;
+	}
+	100% {
+		fill: $grey;
 	}
 }
