@@ -514,9 +514,10 @@ export default class {
 			const api = new API();
 			api.call(data, (data) => {
 				if (data.status) {
-					window.UI.Notify('Script successfully saved', 'success');
 					if (data.notRemovedMeta.length > 0 || data.notRemovedQuestions.length > 0) {
-						window.UI.Notify('Some items where not removed, since they already contain data');
+						window.UI.Notify('Some items where not removed, since they already contain data', 'warning');
+					} else {
+						window.UI.Notify('Script successfully saved', 'success');
 					}
 					const currentSelection = document.querySelector('#scripts .selected');
 					if (currentSelection.id === 'script_new') {
