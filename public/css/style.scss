@@ -99,6 +99,7 @@ h2 {
 	display: grid;
 	width: auto;
 	padding: 1rem;
+	margin: 0;
 	border-radius: $radius;
 	box-shadow: 0 3px 6px rgba($main, .2);
 	@media (min-width: $breakpoint) {
@@ -291,6 +292,7 @@ label {
 	display: grid;
 	@media (max-width: $breakpoint) {
 		display: flex;
+		flex-wrap: wrap;
 		&.col-50 {
 			flex-direction: column-reverse;
 		}
@@ -565,13 +567,19 @@ label {
 
 form[name=interview] {
 	margin: 0 -1rem -1rem -1rem;
-	grid-template-columns: 1fr 3.5em;
+	grid-template-columns: 1fr;
+	@media (min-width: $breakpoint) {
+		grid-template-columns: 1fr 3.5em;
+	}
 	& > div {
 		text-align: center;
 		margin: 0 auto;
 		p:first-of-type {
 			background-color: rgba($main, 0.1);
-			font-size: 2.4em;
+			font-size: 1.8em;
+			@media (min-width: $breakpoint) {
+				font-size: 2.4em;
+			}
 			padding: 1em;
 			margin-top: 2em;
 			display: inline-block;
