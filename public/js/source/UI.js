@@ -563,7 +563,7 @@ export default class {
 		this.Clear(this.main);
 		UItools.render(
 			[
-				this.elements.GetHeader('Interviewee Pre Meta'),
+				this.elements.GetHeader('Interviewee Pre Meta', null, false, 'disabled'),
 				UItools.getForm(
 					'preMeta',
 					[
@@ -729,7 +729,7 @@ export default class {
 		this.Clear(this.main);
 		UItools.render(
 			[
-				this.elements.GetHeader('Interviewee Post Meta'),
+				this.elements.GetHeader('Interviewee Post Meta', null, false, 'disabled'),
 				UItools.getForm('postMeta',
 					[
 						UItools.wrap(
@@ -777,7 +777,7 @@ export default class {
 		answers.push(this.elements.GetSummary());
 		UItools.render(
 			[
-				this.elements.GetHeader('Interview Review'),
+				this.elements.GetHeader('Interview Review', null, false, 'disabled'),
 				UItools.getForm('review',
 					[
 						UItools.wrap(

@@ -141,6 +141,7 @@ export default class {
 				mic.classList.add('error');
 			}
 			if (!configurable) {
+				window.UI.micWrap.disabled = true;
 				mic.classList.add('disabled');
 			}
 		});
