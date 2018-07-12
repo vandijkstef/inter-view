@@ -97,13 +97,13 @@ h2 {
 	position: relative;
 	background-color: $white;
 	display: grid;
-    grid-template-rows: 4em 1fr;
 	width: auto;
 	padding: 1rem;
 	border-radius: $radius;
 	margin: 1rem;
 	box-shadow: 0 3px 6px rgba($main, .2);
 	@media (min-width: $breakpoint) {
+		grid-template-rows: 4em 1fr;
 		height: 96.5vh;
 	}
 	&.login, &.small {
@@ -150,17 +150,30 @@ main {
 header {
 	display: flex;
 	align-items: center;
+	flex-wrap: wrap;
+	@media (min-width: $breakpoint) {
+		grid-template-rows: 4em 1fr;
+		height: 96.5vh;	
+	}
+	@media (max-width: $breakpoint) {
+		justify-content: space-between;
+		h1 {
+			text-align: center;
+		}
+	}
 	img {
 		max-width: 12em;
 	}
 	h1 {
 		font-size: 1.4em;
 		flex-grow: 2;
-		&::before {
-			content: "|";
-			color: $grey;
-			opacity: .5;
-			margin-right: .8rem;
+		@media (min-width: $breakpoint) {
+			&::before {
+				content: "|";
+				color: $grey;
+				opacity: .5;
+				margin-right: .8rem;
+			}
 		}
 	}
 	&.interview {

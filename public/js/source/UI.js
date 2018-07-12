@@ -24,7 +24,7 @@ export default class {
 		this.SetTitle('test a title');
 
 		// TODO: Remove post-dev, maybe hookup to smth server-ish? Or add actual live host to this? (Warning, subdomain hosting!)
-		if (window.location.hostname !== 'localhost') {
+		if (window.location.hostname !== 'localhost' && window.location.hostname !== 'www.inter-view.app') {
 			UItools.render(
 				[
 					UItools.wrap(
@@ -1037,7 +1037,6 @@ export default class {
 	}
 
 	AddToScript(creator) {
-		console.log(creator.previousSibling);
 		const previous = creator.previousSibling;
 		let orderValue;
 		if (previous.nodeName !== 'DIV') {
@@ -1286,7 +1285,6 @@ export default class {
 	}
 
 	RemoveEntry() {
-		// console.log('removing', this.parentElement.parentElement.querySelector('p'));
 		const entry = this.parentElement.parentElement;
 		const input = entry.querySelector('p');
 		if (entry.classList.contains('removing')) {
