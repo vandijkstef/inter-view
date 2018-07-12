@@ -54,11 +54,13 @@ export default class {
 			// TODO: Push the audio into PouchDB
 
 			// Download the wav on users device
-			window.Recorder.Download(blob, filename, (status) => {
-				if (status) {
-					// The worker should have killed itself
-				}
-			});
+			if (window.appSettings.downloadWav) {
+				window.Recorder.Download(blob, filename, (status) => {
+					if (status) {
+						// The worker should have killed itself
+					}
+				});
+			}
 
 			// Upload the audio
 			const formData = new FormData();

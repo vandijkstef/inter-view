@@ -5,11 +5,15 @@ import Controls from './Controls.js';
 {
 	// First, clear our base page
 	document.body.innerHTML = '';
-	
+
 	// App variables
 	const api = new API('api');
 	const UI = new UIm();
 	const controls = new Controls();
+	window.appSettings = {
+		downloadWav: false
+	};
+	localStorage.setItem('settings', JSON.stringify(window.appSettings));
 	// TODO: Create router, or.. do I need that?
 
 	window.timers = {
