@@ -143,7 +143,6 @@ export default class {
 		if (this.classList.contains('secondary')) {
 			window.UI.handlers.StoreInline();
 		} else if (this.classList.contains('warning')) {
-			window.UI.Notify('No mic set-up');
 			window.UI.micWrap.audio.InitAudio(() => {
 				window.UI.handlers.DoStartScript();
 			}, (err) => {
@@ -212,9 +211,6 @@ export default class {
 		window.UI.script.currentQuestion++;
 		if (window.UI.script.currentQuestion < window.UI.script.questions.length) {
 			window.UI.RenderQuestions();
-		} else {
-			console.warn('is this being executed once?'); // TODO: I think I have this duplicated...
-			window.UI.handlers.GoPostMeta(e);
 		}
 	}
 

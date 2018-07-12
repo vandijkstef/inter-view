@@ -560,10 +560,6 @@ export default class {
 				preMetas.push(UItools.getInput(meta.key, meta.type, `meta_${meta.id}`));
 			}
 		});
-		if (!preMetas.length) {
-			this.handlers.GoQuestions();
-			return;
-		}
 		this.Clear(this.main);
 		UItools.render(
 			[
