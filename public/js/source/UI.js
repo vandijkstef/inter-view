@@ -261,12 +261,17 @@ export default class {
 			api.call({
 				action: 'scripts_fetch'
 			}, (data) => {
-				data.scripts.forEach((script) => {
-					if (!cachedScripts.includes(script.id)) { // TODO: Improve, test lastSaved value
-						this.AddScript(script, newScriptButton);
-					}
-				});
-				loader.parentElement.removeChild(loader);
+				if (data) {	
+					data.scripts.forEach((script) => {
+						if (!cachedScripts.includes(script.id)) { // TODO: Improve, test lastSaved value
+							this.AddScript(script, newScriptButton);
+						}
+					});
+					loader.parentElement.removeChild(loader);
+				} else {
+					this.Notify('Could not reach server, please reload the page', 'error');
+					loader.parentElement.removeChild(loader);
+				}
 			});
 		}
 	}
