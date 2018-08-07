@@ -161,6 +161,10 @@ router.post('/api', function(req, res) {
 		status: false
 	};
 	switch (req.body.action) {
+	case 'ping':
+		data.status = true;
+		res.json(data);
+		break;
 	case 'auth':
 		if (req.session.user) {
 			data.err = 'User already logged in';
