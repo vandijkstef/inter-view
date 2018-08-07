@@ -18,7 +18,11 @@ export default class {
 				return callback(json);
 			} else {
 				console.warn('API error: ' + API.status);
+				callback(false);
 			}
+		};
+		API.onerror = function() {
+			callback(false);
 		};
 		API.send(JSON.stringify(data));
 	}
