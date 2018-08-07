@@ -18,12 +18,14 @@ import Controls from './Controls.js';
 	} else {
 		window.appSettings = JSON.parse(localStorage.getItem('settings'));
 	}
+	
 	// TODO: Create router, or.. do I need that?
 
 	window.timers = {
 		script: performance.now(),
 		question: performance.now()
 	};
+
 	// Prevent navigation
 	// Apparently, client needs to have seen at least one form/input for this to get enabled
 	window.addEventListener('beforeunload', function (e) {
